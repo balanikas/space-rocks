@@ -5,7 +5,7 @@ from pygame import Color
 import random
 
 def load_sprite(name, with_alpha=True):
-    path = f"../assets/sprites/{name}.png"
+    path = f"assets/sprites/{name}.png"
     loaded_sprite = load(path)
 
     if with_alpha:
@@ -30,7 +30,7 @@ def get_random_velocity(min_speed, max_speed):
     return Vector2(speed, 0).rotate(angle)
 
 def load_sound(name):
-    path = f"../assets/sounds/{name}.wav"
+    path = f"assets/sounds/{name}.wav"
     return Sound(path)
 
 def print_text(surface, text, font, color=Color("tomato")):
