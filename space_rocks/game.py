@@ -1,10 +1,13 @@
 import time
+from typing import List
 
 import pygame
-import random
-from utils import load_sprite, get_random_position, print_text
-from models import Spaceship, Asteroid
-from pygame.transform import rotozoom
+
+from pygame import Vector2, surface
+
+
+from models import Asteroid, GameObject, Spaceship, Bullet
+from utils import get_random_position, load_sprite, print_text
 
 
 class SpaceRocks:
@@ -12,29 +15,25 @@ class SpaceRocks:
 
     def __init__(self):
         self._init_pygame()
-        self.screen = pygame.display.set_mode((1000, 800))
-        self.default_fill = (0, 0, 255)
+        self.screen:surface.Surface = pygame.display.set_mode((1000, 800))
         self.clock = pygame.time.Clock()
         self.background = load_sprite("space", False)
         self.font = pygame.font.Font(None, 64)
         self.message = ""
         pygame.font.init()
-        self.stats = pygame.font.SysFont('Comic Sans MS', 20)
+        self.stats = pygame.font.SysFont(None, 20)
         self._initialize()
 
-
     def _initialize(self):
-        self.bullets = []
-        self.spaceship = Spaceship((500, 400), self.bullets.append)
+        
+        self.bullets:List[Bullet] = []
+        self.spaceship = Spaceship(Vector2(500, 400), self.bullets.append)
 
-        self.asteroids = []
+        self.asteroids:List[Asteroid] = []
         for _ in range(6):
             while True:
                 position = get_random_position(self.screen)
-                if (
-                        position.distance_to(self.spaceship.position)
-                        > self.MIN_ASTEROID_DISTANCE
-                ):
+                if (position.distance_to(self.spaceship.position) > self.MIN_ASTEROID_DISTANCE):
                     break
 
             self.asteroids.append(Asteroid(position, self.asteroids.append))
@@ -52,11 +51,14 @@ class SpaceRocks:
 
     def _handle_input(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            if event.type == pygame.QUIT or (
+                event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
+            ):
                 quit()
-            elif (self.spaceship
-                    and event.type == pygame.KEYDOWN
-                    and event.key == pygame.K_SPACE
+            elif (
+                self.spaceship
+                and event.type == pygame.KEYDOWN
+                and event.key == pygame.K_SPACE
             ):
                 self.spaceship.shoot()
 
@@ -78,9 +80,6 @@ class SpaceRocks:
 
     def _process_game_logic(self):
 
-        for _ in range(150000):
-            pass
-
         for game_object in self._get_game_objects():
             game_object.move(self.screen)
 
@@ -90,7 +89,7 @@ class SpaceRocks:
                     self.spaceship = None
                     self.message = "You lost!"
                     break
-
+                    
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
                 if asteroid.collides_with(bullet):
@@ -126,11 +125,13 @@ class SpaceRocks:
         ms_since_start = (end_time - self.start_time) * 1000
         ms_wait_time_percent = (ms_since_start / ms_per_frame) * 100
 
-        text_surface = self.stats.render(str(round(ms_wait_time_percent, 0)) + "%", False, (255, 255, 0))
+        text_surface = self.stats.render(
+            str(round(ms_wait_time_percent, 0)) + "%", False, (255, 255, 0)
+        )
         self.screen.blit(text_surface, (0, 0))
 
-    def _get_game_objects(self):
-        game_objects = [*self.asteroids, *self.bullets]
+    def _get_game_objects(self) -> List[GameObject]:
+        game_objects:List[GameObject] = [*self.asteroids, *self.bullets]
 
         if self.spaceship:
             game_objects.append(self.spaceship)
