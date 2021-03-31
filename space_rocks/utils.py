@@ -1,4 +1,3 @@
-from typing import Any
 from pygame.font import Font
 from pygame.image import load
 from pygame.math import Vector2

@@ -4,10 +4,10 @@ from typing import List
 import pygame
 
 from pygame import Vector2, surface
-
+from audio import SoundLibrary, init_sounds
 
 from models import Asteroid, GameObject, Spaceship, Bullet
-from utils import collides_with, get_random_position, load_sprite, print_text, load_sound
+from utils import collides_with, get_random_position, load_sprite, print_text
 
 
 class SpaceRocks:
@@ -24,13 +24,11 @@ class SpaceRocks:
         pygame.font.init()
         self.stats = pygame.font.SysFont(None, 20)
 
-        self.background_sound = load_sound("background")
-
         self._initialize()
 
     def _initialize(self):
 
-        self.background_sound.play(1000)
+        SoundLibrary.play("background")
         self.bullets: List[Bullet] = []
         self.spaceship = Spaceship(Vector2(500, 400), self.bullets.append)
 
@@ -53,6 +51,7 @@ class SpaceRocks:
     def _init_pygame(self):
         pygame.init()
         pygame.display.set_caption("Space Rocks")
+        init_sounds()
 
     def _handle_input(self):
         for event in pygame.event.get():
@@ -76,7 +75,7 @@ class SpaceRocks:
         self.ellapsed_frames += 1   
 
         if is_key_pressed[pygame.K_RETURN]:
-            self.background_sound.stop()
+            SoundLibrary.stop("background")
             self.message = ""
             self._initialize()
 

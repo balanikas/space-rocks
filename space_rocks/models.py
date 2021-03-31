@@ -1,8 +1,9 @@
 from typing import Any, Callable
 from pygame.surface import Surface
 from pygame.math import Vector2
+from audio import SoundLibrary
 from geometry import Geometry
-from utils import load_sprite, wrap_position, get_random_velocity, load_sound
+from utils import load_sprite, wrap_position, get_random_velocity
 from pygame.transform import rotozoom
 
 
@@ -33,7 +34,6 @@ class Spaceship(GameObject):
     def __init__(self, position: Vector2, create_bullet_callback: Callable[[Any], None]):
         self.create_bullet_callback = create_bullet_callback
         self.direction = Vector2(self.UP)
-        self.laser_sound = load_sound("laser")
         super().__init__(position, load_sprite("spaceship"), Vector2(0))
 
     def rotate(self, clockwise: bool = True):
@@ -55,8 +55,7 @@ class Spaceship(GameObject):
         bullet_velocity = self.direction * self.BULLET_SPEED + self.geometry.velocity
         bullet = Bullet(self.geometry.position, bullet_velocity)
         self.create_bullet_callback(bullet)
-        self.laser_sound.play()
-
+        SoundLibrary.play("laser")
 
 class Asteroid(GameObject):
     def __init__(
@@ -67,9 +66,6 @@ class Asteroid(GameObject):
     ):
         self.create_asteroid_callback = create_asteroid_callback
         self.size: int = size
-        self.hit_big_sound = load_sound("hit_big")
-        self.hit_sound = load_sound("hit")
-
         size_to_scale = {
             3: 1,
             2: 0.5,
@@ -81,7 +77,7 @@ class Asteroid(GameObject):
         super().__init__(position, sprite, get_random_velocity(1, 2))
 
     def split(self):
-        self.hit_big_sound.play()
+        SoundLibrary.play("hit_big")
         if self.size > 1:
             for _ in range(2):
                 asteroid = Asteroid(self.geometry.position, self.create_asteroid_callback, self.size - 1)
