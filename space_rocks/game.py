@@ -7,7 +7,7 @@ from pygame import Vector2, surface
 
 
 from models import Asteroid, GameObject, Spaceship, Bullet
-from utils import get_random_position, load_sprite, print_text, load_sound
+from utils import collides_with, get_random_position, load_sprite, print_text, load_sound
 
 
 class SpaceRocks:
@@ -38,7 +38,7 @@ class SpaceRocks:
         for _ in range(6):
             while True:
                 position = get_random_position(self.screen)
-                if (position.distance_to(self.spaceship.position) > self.MIN_ASTEROID_DISTANCE):
+                if (position.distance_to(self.spaceship.geometry.position) > self.MIN_ASTEROID_DISTANCE):
                     break
 
             self.asteroids.append(Asteroid(position, self.asteroids.append))
@@ -87,21 +87,21 @@ class SpaceRocks:
 
         if self.spaceship:
             for asteroid in self.asteroids:
-                if asteroid.collides_with(self.spaceship):
+                if collides_with(asteroid.geometry, self.spaceship.geometry):
                     self.spaceship = None
                     self.message = "You lost! Press RETURN to replay"
                     break
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
-                if asteroid.collides_with(bullet):
+                if  collides_with(asteroid.geometry,bullet.geometry):
                     self.asteroids.remove(asteroid)
                     self.bullets.remove(bullet)
                     asteroid.split()
                     break
 
         for bullet in self.bullets[:]:
-            if not self.screen.get_rect().collidepoint(bullet.position):
+            if not self.screen.get_rect().collidepoint(bullet.geometry.position):
                 self.bullets.remove(bullet)
 
         if not self.asteroids and self.spaceship:

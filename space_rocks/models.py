@@ -1,39 +1,38 @@
 from typing import Any, Callable
 from pygame.surface import Surface
 from pygame.math import Vector2
+from geometry import Geometry
 from utils import load_sprite, wrap_position, get_random_velocity, load_sound
 from pygame.transform import rotozoom
 
-UP = Vector2(0, -1)
+
+
 
 
 class GameObject:
     def __init__(self, position: Vector2, sprite: Surface, velocity: Vector2):
-        self.position: Vector2 = Vector2(position)
         self.sprite: Surface = sprite
-        self.radius: float = sprite.get_width() / 2
-        self.velocity: Vector2 = Vector2(velocity)
+        self.geometry:Geometry = Geometry(position, sprite.get_width() / 2, velocity)
 
     def draw(self, surface: Surface):
-        blit_position = self.position - Vector2(self.radius)
+        blit_position = self.geometry.position - Vector2(self.geometry.radius)
         surface.blit(self.sprite, blit_position)
 
     def move(self, surface: Surface):
-        self.position = wrap_position(self.position + self.velocity, surface)
+        self.geometry = self.geometry.update_pos(wrap_position(self.geometry.position + self.geometry.velocity, surface))
 
-    def collides_with(self, other_obj: Any) -> bool:
-        distance = self.position.distance_to(other_obj.position)
-        return distance < self.radius + other_obj.radius
+
 
 
 class Spaceship(GameObject):
     MANEUVERABILITY = 3
     ACCELERATION = 0.05
     BULLET_SPEED = 3
+    UP = Vector2(0, -1)
 
     def __init__(self, position: Vector2, create_bullet_callback: Callable[[Any], None]):
         self.create_bullet_callback = create_bullet_callback
-        self.direction = Vector2(UP)
+        self.direction = Vector2(self.UP)
         self.laser_sound = load_sound("laser")
         super().__init__(position, load_sprite("spaceship"), Vector2(0))
 
@@ -43,18 +42,18 @@ class Spaceship(GameObject):
         self.direction.rotate_ip(angle)
 
     def draw(self, surface: Surface):
-        angle = self.direction.angle_to(UP)
+        angle = self.direction.angle_to(self.UP)
         rotated_surface = rotozoom(self.sprite, angle, 1.0)
         rotated_surface_size = Vector2(rotated_surface.get_size())
-        blit_position: Vector2 = self.position - rotated_surface_size * 0.5
+        blit_position: Vector2 = self.geometry.position - rotated_surface_size * 0.5
         surface.blit(rotated_surface, blit_position)
 
     def accelerate(self):
-        self.velocity += self.direction * self.ACCELERATION
+        self.geometry = self.geometry.update_vel( self.geometry.velocity + (self.direction * self.ACCELERATION))
 
     def shoot(self):
-        bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
-        bullet = Bullet(self.position, bullet_velocity)
+        bullet_velocity = self.direction * self.BULLET_SPEED + self.geometry.velocity
+        bullet = Bullet(self.geometry.position, bullet_velocity)
         self.create_bullet_callback(bullet)
         self.laser_sound.play()
 
@@ -85,7 +84,7 @@ class Asteroid(GameObject):
         self.hit_big_sound.play()
         if self.size > 1:
             for _ in range(2):
-                asteroid = Asteroid(self.position, self.create_asteroid_callback, self.size - 1)
+                asteroid = Asteroid(self.geometry.position, self.create_asteroid_callback, self.size - 1)
                 self.create_asteroid_callback(asteroid)
 
 
@@ -94,4 +93,4 @@ class Bullet(GameObject):
         super().__init__(position, load_sprite("bullet"), velocity)
 
     def move(self, surface: Surface):
-        self.position = self.position + self.velocity
+           self.geometry = self.geometry.update_pos(self.geometry.position + self.geometry.velocity)
