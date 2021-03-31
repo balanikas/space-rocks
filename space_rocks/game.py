@@ -6,7 +6,7 @@ import pygame
 from pygame import Vector2, surface
 from audio import SoundLibrary, init_sounds
 
-from models import Asteroid, GameObject, Spaceship, Bullet
+from models import Asteroid, GameObject, Spaceship, Bullet, Stats
 from utils import collides_with, get_random_position, load_sprite, print_text
 
 
@@ -21,8 +21,6 @@ class SpaceRocks:
         self.font = pygame.font.Font(None, 64)
         self.message = ""
         self.ellapsed_frames = 0
-        pygame.font.init()
-        self.stats = pygame.font.SysFont(None, 20)
 
         self._initialize()
 
@@ -31,7 +29,7 @@ class SpaceRocks:
         SoundLibrary.play("background")
         self.bullets: List[Bullet] = []
         self.spaceship = Spaceship(Vector2(500, 400), self.bullets.append)
-
+        self.stats = Stats()
         self.asteroids: List[Asteroid] = []
         for _ in range(6):
             while True:
@@ -51,6 +49,8 @@ class SpaceRocks:
     def _init_pygame(self):
         pygame.init()
         pygame.display.set_caption("Space Rocks")
+        pygame.font.init()
+
         init_sounds()
 
     def _handle_input(self):
@@ -112,27 +112,14 @@ class SpaceRocks:
         for game_object in self._get_game_objects():
             game_object.draw(self.screen)
 
-        self._draw_stats()
-
         if self.message:
             print_text(self.screen, self.message, self.font)
 
         pygame.display.flip()
         self.clock.tick(60)
 
-    def _draw_stats(self):
-        end_time = time.perf_counter()
-        ms_per_frame = 1000 / 60
-        ms_since_start = (end_time - self.start_time) * 1000
-        ms_wait_time_percent = (ms_since_start / ms_per_frame) * 100
-
-        text_surface = self.stats.render(
-            str(round(ms_wait_time_percent, 0)) + "%", False, (255, 255, 0)
-        )
-        self.screen.blit(text_surface, (0, 0))
-
     def _get_game_objects(self) -> List[GameObject]:
-        game_objects: List[GameObject] = [*self.asteroids, *self.bullets]
+        game_objects: List[GameObject] = [*self.asteroids, *self.bullets, self.stats]
 
         if self.spaceship:
             game_objects.append(self.spaceship)

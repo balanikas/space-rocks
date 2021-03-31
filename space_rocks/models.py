@@ -1,4 +1,6 @@
+import time
 from typing import Any, Callable
+import pygame
 from pygame.surface import Surface
 from pygame.math import Vector2
 from audio import SoundLibrary
@@ -12,8 +14,9 @@ from pygame.transform import rotozoom
 
 class GameObject:
     def __init__(self, position: Vector2, sprite: Surface, velocity: Vector2):
-        self.sprite: Surface = sprite
-        self.geometry:Geometry = Geometry(position, sprite.get_width() / 2, velocity)
+        if sprite:
+            self.sprite: Surface = sprite
+            self.geometry:Geometry = Geometry(position, sprite.get_width() / 2, velocity)
 
     def draw(self, surface: Surface):
         blit_position = self.geometry.position - Vector2(self.geometry.radius)
@@ -90,3 +93,27 @@ class Bullet(GameObject):
 
     def move(self, surface: Surface):
            self.geometry = self.geometry.update_pos(self.geometry.position + self.geometry.velocity)
+
+class Stats(GameObject):
+    def __init__(self):
+        self.start_time = time.perf_counter()
+        self.font = pygame.font.SysFont(None, 20)
+        super().__init__(Vector2(0,0), None, Vector2(0,0))
+
+    def draw(self, surface: Surface):
+        end_time = time.perf_counter()
+        ms_per_frame = 1000 / 60
+        ms_since_start = (end_time - self.start_time) * 1000
+        ms_wait_time_percent = (ms_since_start / ms_per_frame) * 100
+
+        text_surface = self.font.render(
+            str(round(ms_wait_time_percent, 0)) + "%", False, (255, 255, 0)
+        )
+        surface.blit(text_surface, (0, 0))
+        self.start_time = time.perf_counter()
+
+    
+    def move(self, surface: Surface):
+        pass
+
+
