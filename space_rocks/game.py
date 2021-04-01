@@ -2,12 +2,12 @@ import time
 from typing import List
 
 import pygame
-
 from pygame import Vector2, surface
-from audio import SoundLibrary, init_sounds
 
+from audio import SoundLibrary, init_sounds
+from graphics import SpriteLibrary, init_sprites
 from models import Asteroid, GameObject, Spaceship, Bullet, Stats
-from utils import collides_with, get_random_position, load_sprite, print_text
+from utils import collides_with, get_random_position, print_text
 
 
 class SpaceRocks:
@@ -17,7 +17,7 @@ class SpaceRocks:
         self._init_pygame()
         self.screen: surface.Surface = pygame.display.set_mode((1000, 800))
         self.clock = pygame.time.Clock()
-        self.background = load_sprite("space", False)
+        self.background = SpriteLibrary.load("space", False)
         self.font = pygame.font.Font(None, 64)
         self.message = ""
         self.ellapsed_frames = 0
@@ -34,7 +34,10 @@ class SpaceRocks:
         for _ in range(6):
             while True:
                 position = get_random_position(self.screen)
-                if (position.distance_to(self.spaceship.geometry.position) > self.MIN_ASTEROID_DISTANCE):
+                if (
+                        position.distance_to(self.spaceship.geometry.position)
+                        > self.MIN_ASTEROID_DISTANCE
+                ):
                     break
 
             self.asteroids.append(Asteroid(position, self.asteroids.append))
@@ -52,10 +55,13 @@ class SpaceRocks:
         pygame.font.init()
 
         init_sounds()
+        init_sprites()
 
     def _handle_input(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            if event.type == pygame.QUIT or (
+                    event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
+            ):
                 quit()
 
         is_key_pressed = pygame.key.get_pressed()
@@ -68,11 +74,11 @@ class SpaceRocks:
             if is_key_pressed[pygame.K_UP]:
                 self.spaceship.accelerate()
             if is_key_pressed[pygame.K_SPACE]:
-                if(self.ellapsed_frames > 20):
+                if self.ellapsed_frames > 20:
                     self.spaceship.shoot()
                     self.ellapsed_frames = 0
 
-        self.ellapsed_frames += 1   
+        self.ellapsed_frames += 1
 
         if is_key_pressed[pygame.K_RETURN]:
             SoundLibrary.stop("background")
@@ -93,7 +99,7 @@ class SpaceRocks:
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
-                if  collides_with(asteroid.geometry,bullet.geometry):
+                if collides_with(asteroid.geometry, bullet.geometry):
                     self.asteroids.remove(asteroid)
                     self.bullets.remove(bullet)
                     asteroid.split()
