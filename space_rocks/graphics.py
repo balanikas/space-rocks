@@ -23,3 +23,4 @@ class SpriteLibrary:
 
 def init_sprites():
     SpriteLibrary()
+    print("sprites loaded")

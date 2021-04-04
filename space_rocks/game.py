@@ -1,13 +1,12 @@
-import time
 from typing import List
 
 import pygame
 from pygame import Vector2, surface
 
 from audio import SoundLibrary, init_sounds
-from graphics import SpriteLibrary, init_sprites
-from models import Asteroid, GameObject, Spaceship, Bullet, Stats
-from utils import collides_with, get_random_position, print_text
+from graphics import init_sprites
+from models import Asteroid, GameObject, Spaceship, Bullet, Stats, UI, GameState, Background
+from utils import collides_with, get_random_position
 
 
 class SpaceRocks:
@@ -15,21 +14,23 @@ class SpaceRocks:
 
     def __init__(self):
         self._init_pygame()
-        self.screen: surface.Surface = pygame.display.set_mode((1000, 800))
+        self.screen: surface.Surface = pygame.display.set_mode((1200, 1000),
+                                                               pygame.HWSURFACE)
         self.clock = pygame.time.Clock()
-        self.background = SpriteLibrary.load("space", False)
-        self.font = pygame.font.Font(None, 64)
-        self.message = ""
         self.ellapsed_frames = 0
+        self.state = GameState.NOT_RUNNING
 
         self._initialize()
 
     def _initialize(self):
 
-        SoundLibrary.play("background")
+        self.state = GameState.RUNNING
+        self.stats = Stats(self.clock)
+        self.ui = UI()
+
+        self.background = Background()
         self.bullets: List[Bullet] = []
         self.spaceship = Spaceship(Vector2(500, 400), self.bullets.append)
-        self.stats = Stats()
         self.asteroids: List[Asteroid] = []
         for _ in range(6):
             while True:
@@ -42,16 +43,17 @@ class SpaceRocks:
 
             self.asteroids.append(Asteroid(position, self.asteroids.append))
 
+        print("initialized")
+
     def main_loop(self):
         while True:
-            self.start_time = time.perf_counter()
             self._handle_input()
             self._process_game_logic()
             self._draw()
 
     def _init_pygame(self):
         pygame.init()
-        pygame.display.set_caption("Space Rocks")
+        pygame.display.set_caption("Softwaroids")
         pygame.font.init()
 
         init_sounds()
@@ -82,7 +84,6 @@ class SpaceRocks:
 
         if is_key_pressed[pygame.K_RETURN]:
             SoundLibrary.stop("background")
-            self.message = ""
             self._initialize()
 
     def _process_game_logic(self):
@@ -94,7 +95,7 @@ class SpaceRocks:
             for asteroid in self.asteroids:
                 if collides_with(asteroid.geometry, self.spaceship.geometry):
                     self.spaceship = None
-                    self.message = "You lost! Press RETURN to replay"
+                    self.state = GameState.LOST
                     break
 
         for bullet in self.bullets[:]:
@@ -110,22 +111,20 @@ class SpaceRocks:
                 self.bullets.remove(bullet)
 
         if not self.asteroids and self.spaceship:
-            self.message = "You won! Press RETURN to replay"
+            self.state = GameState.WON
 
     def _draw(self):
-        self.screen.blit(self.background, (0, 0))
 
         for game_object in self._get_game_objects():
             game_object.draw(self.screen)
 
-        if self.message:
-            print_text(self.screen, self.message, self.font)
+        self.ui.draw(self.screen, self.state)
 
         pygame.display.flip()
         self.clock.tick(60)
 
     def _get_game_objects(self) -> List[GameObject]:
-        game_objects: List[GameObject] = [*self.asteroids, *self.bullets, self.stats]
+        game_objects: List[GameObject] = [self.background, *self.asteroids, *self.bullets, self.stats]
 
         if self.spaceship:
             game_objects.append(self.spaceship)

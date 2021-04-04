@@ -1,7 +1,9 @@
-import time
+from enum import Enum
 from typing import Any, Callable
 
 import pygame
+from pygame import Color
+from pygame.font import Font
 from pygame.math import Vector2
 from pygame.surface import Surface
 from pygame.transform import rotozoom
@@ -10,6 +12,13 @@ from audio import SoundLibrary
 from geometry import Geometry
 from graphics import SpriteLibrary
 from utils import wrap_position, get_random_velocity
+
+
+class GameState(Enum):
+    RUNNING = 1
+    NOT_RUNNING = 2
+    LOST = 3
+    WON = 4
 
 
 class GameObject:
@@ -107,22 +116,56 @@ class Bullet(GameObject):
 
 
 class Stats(GameObject):
-    def __init__(self):
-        self.start_time = time.perf_counter()
-        self.font = pygame.font.SysFont(None, 20)
+    def __init__(self, clock: pygame.time.Clock):
+        self.clock = clock
+        self.font = pygame.font.Font(None, 30)
         super().__init__(Vector2(0, 0), None, Vector2(0, 0))
 
     def draw(self, surface: Surface):
-        end_time = time.perf_counter()
-        ms_per_frame = 1000 / 60
-        ms_since_start = (end_time - self.start_time) * 1000
-        ms_wait_time_percent = (ms_since_start / ms_per_frame) * 100
+        fps = self.clock.get_fps()
 
         text_surface = self.font.render(
-            str(round(ms_wait_time_percent, 0)) + "%", False, (255, 255, 0)
+            str(round(fps, 0)) + "%", False, (255, 255, 0)
         )
         surface.blit(text_surface, (0, 0))
-        self.start_time = time.perf_counter()
+
+    def move(self, surface: Surface):
+        pass
+
+
+class UI():
+    def __init__(self):
+        self.font = pygame.font.Font(None, 64)
+        self.message = ""
+
+    def _print_text(self, surface: Surface, text: str, font: Font, color: Color = Color("tomato")):
+        text_surface: Surface = font.render(text, True, color)
+        text_surface.set_colorkey((0, 100, 100))
+
+        rect = text_surface.get_rect()
+        rect.center = Vector2(surface.get_size()) / 2
+        surface.blit(text_surface, rect)
+
+    def draw(self, surface: Surface, state: GameState):
+        if state == GameState.WON:
+            self.message = "You won! Press RETURN to replay"
+        if state == GameState.LOST:
+            self.message = "You lost! Press RETURN to replay"
+        if state == GameState.RUNNING:
+            self.message = ""
+        if state == GameState.NOT_RUNNING:
+            self.message = "Press RETURN to start"
+
+        self._print_text(surface, self.message, self.font)
+
+
+class Background():
+    def __init__(self):
+        self.background = SpriteLibrary.load("space", False)
+        SoundLibrary.play("background")
+
+    def draw(self, surface: Surface):
+        surface.blit(self.background, (0, 0))
 
     def move(self, surface: Surface):
         pass
