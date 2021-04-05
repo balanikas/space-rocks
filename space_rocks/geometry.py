@@ -19,25 +19,8 @@ class Geometry:
     def radius(self):
         return self._radius
 
-        # @property
-
-    # def direction(self):
-    #     return self._direction
-
-    # def accelerate(self, direction: Vector2, acceleration: float):
-    #     return Geometry(self._position, self.radius, self.velocity + (direction * acceleration), self.direction)
-
-    # def move(self):
-    #     return Geometry(self.position + self.velocity, self.radius, self.velocity, self.direction)
-
     def update_pos(self, position: Vector2):
         return Geometry(position, self.radius, self.velocity)
 
     def update_vel(self, velocity: Vector2):
         return Geometry(self.position, self.radius, velocity)
-
-    # def rotate(self, angle: float):
-    #     self._direction.rotate_ip(angle)
-
-    # def angle_to(self, other: Vector2):
-    #     return self._direction.angle_to(other)

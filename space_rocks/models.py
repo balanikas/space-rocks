@@ -46,11 +46,14 @@ class Spaceship(GameObject):
     UP = Vector2(0, -1)
 
     def __init__(
-            self, position: Vector2, create_bullet_callback: Callable[[Any], None]
+            self,
+            sprite_name: str,
+            position: Vector2,
+            create_bullet_callback: Callable[[Any], None]
     ):
         self.create_bullet_callback = create_bullet_callback
         self.direction = Vector2(self.UP)
-        super().__init__(position, SpriteLibrary.load("spaceship"), Vector2(0))
+        super().__init__(position, SpriteLibrary.load(sprite_name), Vector2(0))
 
     def rotate(self, clockwise: bool = True):
         sign = 1 if clockwise else -1
@@ -71,7 +74,7 @@ class Spaceship(GameObject):
 
     def shoot(self):
         bullet_velocity = self.direction * self.BULLET_SPEED + self.geometry.velocity
-        bullet = Bullet(self.geometry.position, bullet_velocity)
+        bullet = Bullet("bullet", self.geometry.position, bullet_velocity)
         self.create_bullet_callback(bullet)
         SoundLibrary.play("laser")
 
@@ -79,6 +82,7 @@ class Spaceship(GameObject):
 class Asteroid(GameObject):
     def __init__(
             self,
+            sprite_name: str,
             position: Vector2,
             create_asteroid_callback: Callable[[Any], None],
             size: int = 3,
@@ -91,7 +95,7 @@ class Asteroid(GameObject):
             1: 0.25,
         }
         scale = size_to_scale[size]
-        sprite = rotozoom(SpriteLibrary.load("asteroid"), 0, scale)
+        sprite = rotozoom(SpriteLibrary.load(sprite_name), 0, scale)
 
         super().__init__(position, sprite, get_random_velocity(1, 2))
 
@@ -99,15 +103,15 @@ class Asteroid(GameObject):
         SoundLibrary.play("hit_big")
         if self.size > 1:
             for _ in range(2):
-                asteroid = Asteroid(
+                asteroid = Asteroid("asteroid",
                     self.geometry.position, self.create_asteroid_callback, self.size - 1
                 )
                 self.create_asteroid_callback(asteroid)
 
 
 class Bullet(GameObject):
-    def __init__(self, position: Vector2, velocity: Vector2):
-        super().__init__(position, SpriteLibrary.load("bullet"), velocity)
+    def __init__(self, sprite_name: str, position: Vector2, velocity: Vector2):
+        super().__init__(position, SpriteLibrary.load(sprite_name), velocity)
 
     def move(self, surface: Surface):
         self.geometry = self.geometry.update_pos(
@@ -160,8 +164,8 @@ class UI():
 
 
 class Background():
-    def __init__(self):
-        self.background = SpriteLibrary.load("space", False)
+    def __init__(self, sprite_name: str):
+        self.background = SpriteLibrary.load(sprite_name, False)
         SoundLibrary.play("background")
 
     def draw(self, surface: Surface):
