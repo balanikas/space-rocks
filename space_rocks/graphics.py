@@ -6,11 +6,11 @@ from pygame.surface import Surface
 
 
 class SpriteLibrary:
+    _bank: Dict[str, Surface] = {}
 
     @classmethod
     def __init__(cls) -> None:
 
-        cls._bank: Dict[str, Surface] = {}
         for f in os.listdir(f"../assets/sprites/"):
             if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
                 cls._bank[f.split(".")[0]] = load(f"../assets/sprites/{f}")

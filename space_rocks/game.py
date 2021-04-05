@@ -27,7 +27,7 @@ from utils import collides_with
 class SpaceRocks:
 
     def set_level(self, value, level):
-        self.level = self.world.get_level(level)
+        self._level = self._world.get_level(level)
 
     def start_the_game(self):
         self._initialize()
@@ -35,29 +35,29 @@ class SpaceRocks:
     def __init__(self):
         self._init_pygame()
 
-        self.clock = pygame.time.Clock()
-        self.ellapsed_frames = 0
-        self.state = GameState.NOT_RUNNING
-        self.stats = Stats(self.clock)
-        self.ui = UI()
+        self._clock = pygame.time.Clock()
+        self._ellapsed_frames = 0
+        self._state = GameState.NOT_RUNNING
+        self._stats = Stats(self._clock)
+        self._ui = UI()
         screen_size = (constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
-        self.screen: surface.Surface = pygame.display.set_mode(screen_size,
-                                                               pygame.HWSURFACE)
-        self.screen.fill((0, 0, 0))
+        self._screen: surface.Surface = pygame.display.set_mode(screen_size,
+                                                                pygame.HWSURFACE)
+        self._screen.fill((0, 0, 0))
 
-        self.world = World(self.screen)
-        self.level = self.world.get_current_level()
+        self._world = World(self._screen)
+        self._level = self._world.get_current_level()
 
         self._menu = Menu(
             constants.SCREEN_WIDTH,
             constants.SCREEN_HEIGHT,
             self.set_level,
             self.start_the_game,
-            self.screen)
+            self._screen)
 
     def _initialize(self):
         SoundLibrary.stop_all()
-        self.state = GameState.RUNNING
+        self._state = GameState.RUNNING
 
     def main_loop(self):
         while True:
@@ -78,87 +78,87 @@ class SpaceRocks:
                 quit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self._menu.menu.enable()
-                self._menu.menu.mainloop(self.screen)
+                self._menu.menu.mainloop(self._screen)
 
         is_key_pressed = pygame.key.get_pressed()
 
-        if self.level.spaceship and self.state is GameState.RUNNING:
+        if self._level.spaceship and self._state is GameState.RUNNING:
             if is_key_pressed[pygame.K_RIGHT]:
-                self.level.spaceship.rotate(clockwise=True)
+                self._level.spaceship.rotate(clockwise=True)
             elif is_key_pressed[pygame.K_LEFT]:
-                self.level.spaceship.rotate(clockwise=False)
+                self._level.spaceship.rotate(clockwise=False)
             if is_key_pressed[pygame.K_UP]:
-                self.level.spaceship.accelerate()
+                self._level.spaceship.accelerate()
             if is_key_pressed[pygame.K_SPACE]:
-                if self.ellapsed_frames > 10:
-                    self.level.spaceship.shoot()
-                    self.ellapsed_frames = 0
+                if self._ellapsed_frames > 10:
+                    self._level.spaceship.shoot()
+                    self._ellapsed_frames = 0
 
-        self.ellapsed_frames += 1
+        self._ellapsed_frames += 1
 
-        if is_key_pressed[pygame.K_RETURN] and self.state is not GameState.RUNNING:
-            if self.state == GameState.WON:
-                self.level = self.world.get_next_level()
-            if self.state == GameState.LOST:
-                self.level = self.world.get_level(0)
+        if is_key_pressed[pygame.K_RETURN] and self._state is not GameState.RUNNING:
+            if self._state == GameState.WON:
+                self._level = self._world.get_next_level()
+            if self._state == GameState.LOST:
+                self._level = self._world.get_level(0)
             self._initialize()
 
         if is_key_pressed[pygame.K_1]:
-            self.state = GameState.RUNNING
-            self.level = self.world.get_level(0)
+            self._state = GameState.RUNNING
+            self._level = self._world.get_level(0)
             self._initialize()
 
         if is_key_pressed[pygame.K_2]:
-            self.state = GameState.RUNNING
-            self.level = self.world.get_level(1)
+            self._state = GameState.RUNNING
+            self._level = self._world.get_level(1)
             self._initialize()
 
         # quick switch level
         if is_key_pressed[pygame.K_z]:
-            self.state = GameState.WON
+            self._state = GameState.WON
 
     def _process_game_logic(self):
 
-        if self.state is not GameState.RUNNING:
+        if self._state is not GameState.RUNNING:
             return
 
         for game_object in self._get_game_objects():
-            game_object.move(self.screen)
+            game_object.move(self._screen)
 
-        if self.level.spaceship:
-            for asteroid in self.level.asteroids:
-                if collides_with(asteroid.geometry, self.level.spaceship.geometry):
-                    self.level.remove_spaceship()
-                    self.state = GameState.LOST
+        if self._level.spaceship:
+            for asteroid in self._level.asteroids:
+                if collides_with(asteroid.geometry, self._level.spaceship.geometry):
+                    self._level.remove_spaceship()
+                    self._state = GameState.LOST
                     break
 
-        for bullet in self.level.bullets[:]:
-            for asteroid in self.level.asteroids[:]:
+        for bullet in self._level.bullets[:]:
+            for asteroid in self._level.asteroids[:]:
                 if collides_with(asteroid.geometry, bullet.geometry):
-                    self.level.remove_asteroid(asteroid)
-                    self.level.remove_bullet(bullet)
+                    self._level.remove_asteroid(asteroid)
+                    self._level.remove_bullet(bullet)
                     asteroid.split()
                     break
 
-        for bullet in self.level.bullets[:]:
-            if not self.screen.get_rect().collidepoint(bullet.geometry.position):
-                self.level.remove_bullet(bullet)
+        for bullet in self._level.bullets[:]:
+            if not self._screen.get_rect().collidepoint(bullet.geometry.position):
+                self._level.remove_bullet(bullet)
 
-        if not self.level.asteroids and self.level.spaceship:
-            self.state = GameState.WON
+        if not self._level.asteroids and self._level.spaceship:
+            self._state = GameState.WON
 
     def _draw(self):
 
         for game_object in self._get_game_objects():
-            game_object.draw(self.screen)
+            game_object.draw(self._screen)
 
-        self.ui.draw(self.screen, self.state)
+        self._ui.draw(self._screen, self._state)
 
         pygame.display.flip()
-        self.clock.tick(60)
+        self._clock.tick(60)
 
     def _get_game_objects(self) -> List[GameObject]:
-        game_objects: List[GameObject] = self.level.get_game_objects()
-        game_objects.append(self.stats)
+        game_objects: List[GameObject] = self._level.get_game_objects()
+        game_objects.append(self._stats)
 
         return game_objects

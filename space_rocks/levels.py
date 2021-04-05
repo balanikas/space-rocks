@@ -8,13 +8,13 @@ from space_rocks.models import Background, Asteroid, Spaceship, Bullet, Asteroid
 from space_rocks.utils import get_random_position
 
 
-class Level():
+class Level:
     MIN_ASTEROID_DISTANCE = 250
 
     def __init__(self):
-        self._background = Background("level0")
+        self._background: Background = Background("level0")
         self._bullets: List[Bullet] = []
-        self._spaceship = Spaceship("spaceship", Vector2(500, 400), self._bullets.append)
+        self._spaceship: Spaceship
         self._asteroids: List[Asteroid] = []
 
     @property
@@ -114,7 +114,7 @@ class Level3(Level):
             self._asteroids.append(Asteroid(properties, "asteroid", position, self._asteroids.append, 2))
 
 
-class World():
+class World:
     def __init__(self, screen: Surface):
 
         self._levels = {

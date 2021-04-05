@@ -3,12 +3,13 @@ from typing import Dict
 
 
 class SoundLibrary:
+    from pygame.mixer import Sound
+    _bank: Dict[str, Sound] = {}
 
     @classmethod
     def __init__(cls) -> None:
-        from pygame.mixer import Sound
 
-        cls._bank: Dict[str, Sound] = {}
+        from pygame.mixer import Sound
         for f in os.listdir(f"../assets/sounds/"):
             if f.endswith(".wav"):
                 cls._bank[f.split(".")[0]] = Sound(f"../assets/sounds/{f}")

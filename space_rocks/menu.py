@@ -5,7 +5,7 @@ from pygame.surface import Surface
 from pygame_menu import sound
 
 
-class Menu():
+class Menu:
     def __init__(
             self,
             width: int,

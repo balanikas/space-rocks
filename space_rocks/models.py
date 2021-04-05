@@ -60,18 +60,18 @@ class Spaceship(GameObject):
             position: Vector2,
             create_bullet_callback: Callable[[Any], None]
     ):
-        self.properties = properties
-        self.create_bullet_callback = create_bullet_callback
-        self.direction = Vector2(self.UP)
+        self._properties = properties
+        self._create_bullet_callback = create_bullet_callback
+        self._direction = Vector2(self.UP)
         super().__init__(position, SpriteLibrary.load(sprite_name), Vector2(0))
 
     def rotate(self, clockwise: bool = True):
         sign = 1 if clockwise else -1
-        angle = self.properties.maneuverability * sign
-        self.direction.rotate_ip(angle)
+        angle = self._properties.maneuverability * sign
+        self._direction.rotate_ip(angle)
 
     def draw(self, surface: Surface):
-        angle = self.direction.angle_to(self.UP)
+        angle = self._direction.angle_to(self.UP)
         rotated_surface = rotozoom(self.sprite, angle, 1.0)
         rotated_surface_size = Vector2(rotated_surface.get_size())
         blit_position: Vector2 = self.geometry.position - rotated_surface_size * 0.5
@@ -79,13 +79,13 @@ class Spaceship(GameObject):
 
     def accelerate(self):
         self.geometry = self.geometry.update_vel(
-            self.geometry.velocity + (self.direction * self.properties.acceleration)
+            self.geometry.velocity + (self._direction * self._properties.acceleration)
         )
 
     def shoot(self):
-        bullet_velocity = self.direction * self.properties.bullet_speed + self.geometry.velocity
+        bullet_velocity = self._direction * self._properties.bullet_speed + self.geometry.velocity
         bullet = Bullet("bullet", self.geometry.position, bullet_velocity)
-        self.create_bullet_callback(bullet)
+        self._create_bullet_callback(bullet)
         SoundLibrary.play("laser")
 
 
@@ -104,10 +104,10 @@ class Asteroid(GameObject):
             create_asteroid_callback: Callable[[Any], None],
             size: int,
     ):
-        self.properties = properties
-        self.sprite_name = sprite_name
-        self.create_asteroid_callback = create_asteroid_callback
-        self.size: int = size
+        self._properties = properties
+        self._sprite_name = sprite_name
+        self._create_asteroid_callback = create_asteroid_callback
+        self._size: int = size
         size_to_scale = {
             4: 2,
             3: 1,
@@ -115,22 +115,22 @@ class Asteroid(GameObject):
             1: 0.25,
         }
         scale = size_to_scale[size]
-        sprite = rotozoom(SpriteLibrary.load(self.sprite_name), 0, scale)
+        sprite = rotozoom(SpriteLibrary.load(self._sprite_name), 0, scale)
 
         super().__init__(position, sprite,
-                         get_random_velocity(self.properties.min_velocity, self.properties.max_velocity))
+                         get_random_velocity(self._properties.min_velocity, self._properties.max_velocity))
 
     def split(self):
         SoundLibrary.play("hit_big")
-        if self.size > 1:
+        if self._size > 1:
             for _ in range(2):
                 asteroid = Asteroid(
-                    self.properties,
-                    self.sprite_name,
+                    self._properties,
+                    self._sprite_name,
                     self.geometry.position,
-                    self.create_asteroid_callback,
-                    self.size - 1)
-                self.create_asteroid_callback(asteroid)
+                    self._create_asteroid_callback,
+                    self._size - 1)
+                self._create_asteroid_callback(asteroid)
 
 
 class Bullet(GameObject):
@@ -151,14 +151,14 @@ class Stats(GameObject):
     def __init__(
             self,
             clock: pygame.time.Clock):
-        self.clock = clock
-        self.font = pygame.font.Font(None, 30)
+        self._clock = clock
+        self._font = pygame.font.Font(None, 30)
         super().__init__(Vector2(0, 0), None, Vector2(0, 0))
 
     def draw(self, surface: Surface):
-        fps = self.clock.get_fps()
+        fps = self._clock.get_fps()
 
-        text_surface = self.font.render(
+        text_surface = self._font.render(
             str(round(fps, 0)) + " fps", False, (255, 255, 0)
         )
         surface.blit(text_surface, (0, 0))
@@ -167,10 +167,10 @@ class Stats(GameObject):
         pass
 
 
-class UI():
+class UI:
     def __init__(self):
-        self.font = pygame.font.Font(None, 64)
-        self.message = ""
+        self._font = pygame.font.Font(None, 64)
+        self._message = ""
 
     def _print_text(self, surface: Surface, text: str, font: Font, color: Color = Color("white")):
         text_surface: Surface = font.render(text, True, color)
@@ -181,24 +181,23 @@ class UI():
 
     def draw(self, surface: Surface, state: GameState):
         if state == GameState.WON:
-            self.message = "You won! Press RETURN to replay"
+            self._message = "You won! Press RETURN to replay"
         if state == GameState.LOST:
-            self.message = "You lost! Press RETURN to replay"
+            self._message = "You lost! Press RETURN to replay"
         if state == GameState.RUNNING:
-            self.message = ""
+            self._message = ""
         if state == GameState.NOT_RUNNING:
-            self.message = "Press RETURN to start"
+            self._message = "Press RETURN to start"
 
-        self._print_text(surface, self.message, self.font)
+        self._print_text(surface, self._message, self._font)
 
 
-class Background():
+class Background:
     def __init__(self, sprite_name: str):
-        self.background = SpriteLibrary.load(sprite_name, False)
-        # SoundLibrary.play("background")
+        self._background = SpriteLibrary.load(sprite_name, False)
 
     def draw(self, surface: Surface):
-        surface.blit(self.background, (0, 0))
+        surface.blit(self._background, (0, 0))
 
     def move(self, surface: Surface):
         pass
