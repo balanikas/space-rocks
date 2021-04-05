@@ -13,9 +13,6 @@ class SoundLibrary:
             if f.endswith(".wav"):
                 cls._bank[f.split(".")[0]] = Sound(f"../assets/sounds/{f}")
 
-        # import pygame
-        # pygame.mixer.pause()
-
     @classmethod
     def play(cls, name: str):
         cls._bank[name].play()
@@ -23,6 +20,11 @@ class SoundLibrary:
     @classmethod
     def stop(cls, name: str):
         cls._bank[name].stop()
+
+    @classmethod
+    def stop_all(cls):
+        for k, v in cls._bank.items():
+            v.stop()
 
 
 def init_sounds():

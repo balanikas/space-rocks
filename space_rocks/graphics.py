@@ -12,7 +12,7 @@ class SpriteLibrary:
 
         cls._bank: Dict[str, Surface] = {}
         for f in os.listdir(f"../assets/sprites/"):
-            if f.endswith(".png"):
+            if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
                 cls._bank[f.split(".")[0]] = load(f"../assets/sprites/{f}")
 
     @classmethod
