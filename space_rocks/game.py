@@ -149,8 +149,17 @@ class SpaceRocks:
 
     def _draw(self):
 
-        for game_object in self._get_game_objects():
-            game_object.draw(self._screen)
+        for o in self._get_game_objects():
+            o.draw(self._screen)
+
+        for o in self._get_game_objects():
+            if hasattr(o, "sprite"):
+                rect = o.sprite.get_rect()
+                pygame.draw.rect(
+                    self._screen,
+                    (0,255,0),
+                     (o.geometry.position.x - (rect.width / 2), o.geometry.position.y - (rect.height /2), rect.width, rect.height),
+                    width = 1)
 
         self._ui.draw(self._screen, self._state)
 

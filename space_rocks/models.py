@@ -44,10 +44,11 @@ class GameObject:
 
 
 class SpaceshipProperties:
-    def __init__(self, maneuverability: float, acceleration: float, bullet_speed: float):
+    def __init__(self, maneuverability: float, acceleration: float, bullet_speed: float, sound_shoot: str):
         self.maneuverability = maneuverability
         self.acceleration = acceleration
         self.bullet_speed = bullet_speed
+        self.sound_shoot = sound_shoot
 
 
 class Spaceship(GameObject):
@@ -72,7 +73,7 @@ class Spaceship(GameObject):
 
     def draw(self, surface: Surface):
         angle = self._direction.angle_to(self.UP)
-        rotated_surface = rotozoom(self.sprite, angle, 1.0)
+        rotated_surface = rotozoom(self.sprite, angle, 0.5)
         rotated_surface_size = Vector2(rotated_surface.get_size())
         blit_position: Vector2 = self.geometry.position - rotated_surface_size * 0.5
         surface.blit(rotated_surface, blit_position)
@@ -86,13 +87,14 @@ class Spaceship(GameObject):
         bullet_velocity = self._direction * self._properties.bullet_speed + self.geometry.velocity
         bullet = Bullet("bullet", self.geometry.position, bullet_velocity)
         self._create_bullet_callback(bullet)
-        SoundLibrary.play("laser")
+        SoundLibrary.play(self._properties.sound_shoot)
 
 
 class AsteroidProperties:
-    def __init__(self, min_velocity: int, max_velocity: int):
+    def __init__(self, min_velocity: int, max_velocity: int, sound_hit: str):
         self.min_velocity = min_velocity
         self.max_velocity = max_velocity
+        self.sound_hit = sound_hit
 
 
 class Asteroid(GameObject):
@@ -109,10 +111,10 @@ class Asteroid(GameObject):
         self._create_asteroid_callback = create_asteroid_callback
         self._size: int = size
         size_to_scale = {
-            4: 2,
-            3: 1,
-            2: 0.5,
-            1: 0.25,
+            4: 0.5,
+            3: 0.3,
+            2: 0.2,
+            1: 0.05,
         }
         scale = size_to_scale[size]
         sprite = rotozoom(SpriteLibrary.load(self._sprite_name), 0, scale)
@@ -121,7 +123,7 @@ class Asteroid(GameObject):
                          get_random_velocity(self._properties.min_velocity, self._properties.max_velocity))
 
     def split(self):
-        SoundLibrary.play("hit_big")
+        SoundLibrary.play(self._properties.sound_hit)
         if self._size > 1:
             for _ in range(2):
                 asteroid = Asteroid(

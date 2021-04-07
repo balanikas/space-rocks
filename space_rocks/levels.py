@@ -68,7 +68,7 @@ class Level1(Level):
                         > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
-            properties = AsteroidProperties(1, 2)
+            properties = AsteroidProperties(1, 2, "hit_big")
             self._asteroids.append(Asteroid(properties, "asteroid", position, self._asteroids.append, 3))
 
 
@@ -76,7 +76,7 @@ class Level2(Level):
     def __init__(self, screen: Surface):
         self._background = Background("level2")
         self._bullets: List[Bullet] = []
-        props = SpaceshipProperties(3, 0.05, 3)
+        props = SpaceshipProperties(3, 0.05, 3, "laser")
         self._spaceship = Spaceship(props, "spaceship",
                                     Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2),
                                     self._bullets.append)
@@ -89,7 +89,7 @@ class Level2(Level):
                         > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
-            properties = AsteroidProperties(1, 3)
+            properties = AsteroidProperties(1, 3, "hit_big")
             self._asteroids.append(Asteroid(properties, "asteroid", position, self._asteroids.append, 4))
 
 
@@ -97,7 +97,7 @@ class Level3(Level):
     def __init__(self, screen: Surface):
         self._background = Background("level3")
         self._bullets: List[Bullet] = []
-        props = SpaceshipProperties(3, 0.05, 3)
+        props = SpaceshipProperties(3, 0.05, 3, "laser")
         self._spaceship = Spaceship(props, "spaceship",
                                     Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2),
                                     self._bullets.append)
@@ -110,7 +110,7 @@ class Level3(Level):
                         > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
-            properties = AsteroidProperties(2, 4)
+            properties = AsteroidProperties(2, 4, "hit_big")
             self._asteroids.append(Asteroid(properties, "asteroid", position, self._asteroids.append, 2))
 
 

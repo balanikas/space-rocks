@@ -13,10 +13,17 @@ class SpriteLibrary:
 
         for f in os.listdir(f"../assets/sprites/"):
             if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
-                cls._bank[f.split(".")[0]] = load(f"../assets/sprites/{f}")
+                try:
+                    g = load(f"../assets/sprites/{f}")
+                except:
+                    g = load(f"../assets/sprites/not_found.png")
+                cls._bank[f.split(".")[0]] = g
 
     @classmethod
     def load(cls, name: str, with_alpha: bool = True):
+        if name not in cls._bank:
+            name = "not_found"
+
         loaded_sprite = cls._bank[name]
         return loaded_sprite.convert_alpha() if with_alpha else loaded_sprite.convert()
 

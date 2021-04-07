@@ -12,14 +12,25 @@ class SoundLibrary:
         from pygame.mixer import Sound
         for f in os.listdir(f"../assets/sounds/"):
             if f.endswith(".wav"):
-                cls._bank[f.split(".")[0]] = Sound(f"../assets/sounds/{f}")
+                try:
+                    s = Sound(f"../assets/sounds/{f}")
+                except:
+                    s = Sound(f"../assets/sounds/not_found.wav")
+
+                cls._bank[f.split(".")[0]] = s
 
     @classmethod
     def play(cls, name: str):
+        if name not in cls._bank:
+            name = "not_found"
+
         cls._bank[name].play()
 
     @classmethod
     def stop(cls, name: str):
+        if name not in cls._bank:
+            name = "not_found"
+
         cls._bank[name].stop()
 
     @classmethod
