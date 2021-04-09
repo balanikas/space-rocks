@@ -55,7 +55,7 @@ class Level1(Level):
     def __init__(self, screen: Surface):
         self._background = Background("level1")
         self._bullets: List[Bullet] = []
-        props = SpaceshipProperties(5, 0.15, 5)
+        props = SpaceshipProperties(5, 0.15, 5, "laser")
         self._spaceship = Spaceship(props, "spaceship",
                                     Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2),
                                     self._bullets.append)
@@ -68,7 +68,12 @@ class Level1(Level):
                         > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
-            properties = AsteroidProperties(1, 2, "hit_big")
+            properties = AsteroidProperties(1, 2, "hit_big", {
+                4: 2,
+                3: 1,
+                2: 0.5,
+                1: 0.25,
+            })
             self._asteroids.append(Asteroid(properties, "asteroid", position, self._asteroids.append, 3))
 
 
@@ -89,7 +94,13 @@ class Level2(Level):
                         > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
-            properties = AsteroidProperties(1, 3, "hit_big")
+            properties = AsteroidProperties(1, 3, "hit_big",
+                                            {
+                                                4: 2,
+                                                3: 1,
+                                                2: 0.5,
+                                                1: 0.25,
+                                            })
             self._asteroids.append(Asteroid(properties, "asteroid", position, self._asteroids.append, 4))
 
 
@@ -110,7 +121,12 @@ class Level3(Level):
                         > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
-            properties = AsteroidProperties(2, 4, "hit_big")
+            properties = AsteroidProperties(2, 4, "hit_big", {
+                4: 2,
+                3: 1,
+                2: 0.5,
+                1: 0.25,
+            })
             self._asteroids.append(Asteroid(properties, "asteroid", position, self._asteroids.append, 2))
 
 

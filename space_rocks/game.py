@@ -19,11 +19,16 @@ from utils import collides_with
 # todo: more asteroid sprites
 # todo soundtrack
 # todo profiling
-# todo better bullet sprite
 # todo move game logic to per-level?
 # todo: find subclasses of Level and autocreate _levels
 #  todo same badass sound for every menu change
-
+# rotate bullets correctly
+# todo extract asteroid split into props
+# todo paralax effect on background
+# todo make internet fetched level
+# enable debug mode (show coll/det rects etc) with shortcut
+# rotate asteroids randomly, as props
+#  todo in middle of refactor coldet using sprites. outline shows in debug, but not 100% accurate. maybe spaceship rotation messes up
 class SpaceRocks:
 
     def set_level(self, value, level):
@@ -35,6 +40,7 @@ class SpaceRocks:
     def __init__(self):
         self._init_pygame()
 
+        self._debug = False
         self._clock = pygame.time.Clock()
         self._ellapsed_frames = 0
         self._state = GameState.NOT_RUNNING
@@ -76,9 +82,30 @@ class SpaceRocks:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                self._menu.menu.enable()
-                self._menu.menu.mainloop(self._screen)
+
+            if event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_ESCAPE:
+                    self._menu.menu.enable()
+                    self._menu.menu.mainloop(self._screen)
+                if event.key == pygame.K_d:
+                    self._debug = not self._debug
+                if event.key == pygame.K_z:
+                    self._state = GameState.WON
+                if event.key == pygame.K_1:
+                    self._state = GameState.RUNNING
+                    self._level = self._world.get_level(0)
+                    self._initialize()
+                if event.key == pygame.K_2:
+                    self._state = GameState.RUNNING
+                    self._level = self._world.get_level(1)
+                    self._initialize()
+                if event.key == pygame.K_RETURN and self._state is not GameState.RUNNING:
+                    if self._state == GameState.WON:
+                        self._level = self._world.get_next_level()
+                    if self._state == GameState.LOST:
+                        self._level = self._world.get_level(0)
+                    self._initialize()
 
         is_key_pressed = pygame.key.get_pressed()
 
@@ -96,27 +123,6 @@ class SpaceRocks:
 
         self._ellapsed_frames += 1
 
-        if is_key_pressed[pygame.K_RETURN] and self._state is not GameState.RUNNING:
-            if self._state == GameState.WON:
-                self._level = self._world.get_next_level()
-            if self._state == GameState.LOST:
-                self._level = self._world.get_level(0)
-            self._initialize()
-
-        if is_key_pressed[pygame.K_1]:
-            self._state = GameState.RUNNING
-            self._level = self._world.get_level(0)
-            self._initialize()
-
-        if is_key_pressed[pygame.K_2]:
-            self._state = GameState.RUNNING
-            self._level = self._world.get_level(1)
-            self._initialize()
-
-        # quick switch level
-        if is_key_pressed[pygame.K_z]:
-            self._state = GameState.WON
-
     def _process_game_logic(self):
 
         if self._state is not GameState.RUNNING:
@@ -126,9 +132,14 @@ class SpaceRocks:
             game_object.move(self._screen)
 
         if self._level.spaceship:
+
+            self._level.spaceship.rect.center = self._level.spaceship.geometry.position
             for asteroid in self._level.asteroids:
-                if collides_with(asteroid.geometry, self._level.spaceship.geometry):
-                    self._level.remove_spaceship()
+                asteroid.rect.center = asteroid.geometry.position
+
+                if pygame.sprite.spritecollide(self._level.spaceship, pygame.sprite.Group(asteroid), False,
+                                               pygame.sprite.collide_mask):
+                    # self._level.remove_spaceship()
                     self._state = GameState.LOST
                     break
 
@@ -152,14 +163,21 @@ class SpaceRocks:
         for o in self._get_game_objects():
             o.draw(self._screen)
 
-        for o in self._get_game_objects():
-            if hasattr(o, "sprite"):
-                rect = o.sprite.get_rect()
-                pygame.draw.rect(
-                    self._screen,
-                    (0,255,0),
-                     (o.geometry.position.x - (rect.width / 2), o.geometry.position.y - (rect.height /2), rect.width, rect.height),
-                    width = 1)
+        if self._debug:
+            for o in self._get_game_objects():
+                if hasattr(o, "image"):
+                    pygame.draw.polygon(o.image, (0, 255, 0), pygame.mask.from_surface(o.image).outline(), 1)
+                    rect = o.rect
+                    pygame.draw.rect(
+                        self._screen,
+                        (0, 0, 255),
+                        (
+                        o.geometry.position.x - (rect.width / 2), o.geometry.position.y - (rect.height / 2), rect.width,
+                        rect.height),
+                        1
+                    )
+
+            self._stats.draw(self._screen)
 
         self._ui.draw(self._screen, self._state)
 
@@ -168,6 +186,5 @@ class SpaceRocks:
 
     def _get_game_objects(self) -> List[GameObject]:
         game_objects: List[GameObject] = self._level.get_game_objects()
-        game_objects.append(self._stats)
 
         return game_objects

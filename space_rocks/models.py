@@ -11,7 +11,7 @@ from pygame.transform import rotozoom
 from audio import SoundLibrary
 from geometry import Geometry
 from graphics import SpriteLibrary
-from utils import wrap_position, get_random_velocity
+from utils import wrap_position, get_random_velocity, get_random_rotation
 
 
 class GameState(Enum):
@@ -21,21 +21,26 @@ class GameState(Enum):
     WON = 4
 
 
-class GameObject:
+class GameObject(pygame.sprite.Sprite):
     def __init__(
             self,
             position: Vector2,
-            sprite: Surface,
+            image: Surface,
             velocity: Vector2):
-        if sprite:
-            self.sprite: Surface = sprite
+
+        super(GameObject, self).__init__()
+        if image:
+            self.image: Surface = image
             self.geometry: Geometry = Geometry(
-                position, sprite.get_width() / 2, velocity
+                position, image.get_width() / 2, velocity
             )
+
+        if hasattr(self, "image"):
+            self.rect: pygame.rect.Rect = self.image.get_rect(center=position)
 
     def draw(self, surface: Surface):
         blit_position = self.geometry.position - Vector2(self.geometry.radius)
-        surface.blit(self.sprite, blit_position)
+        surface.blit(self.image, blit_position)
 
     def move(self, surface: Surface):
         self.geometry = self.geometry.update_pos(
@@ -64,7 +69,7 @@ class Spaceship(GameObject):
         self._properties = properties
         self._create_bullet_callback = create_bullet_callback
         self._direction = Vector2(self.UP)
-        super().__init__(position, SpriteLibrary.load(sprite_name), Vector2(0))
+        super().__init__(position, SpriteLibrary.load(sprite_name, resize=(100, 100)), Vector2(0))
 
     def rotate(self, clockwise: bool = True):
         sign = 1 if clockwise else -1
@@ -73,7 +78,8 @@ class Spaceship(GameObject):
 
     def draw(self, surface: Surface):
         angle = self._direction.angle_to(self.UP)
-        rotated_surface = rotozoom(self.sprite, angle, 0.5)
+
+        rotated_surface = rotozoom(self.image, angle, 1)
         rotated_surface_size = Vector2(rotated_surface.get_size())
         blit_position: Vector2 = self.geometry.position - rotated_surface_size * 0.5
         surface.blit(rotated_surface, blit_position)
@@ -91,10 +97,11 @@ class Spaceship(GameObject):
 
 
 class AsteroidProperties:
-    def __init__(self, min_velocity: int, max_velocity: int, sound_hit: str):
+    def __init__(self, min_velocity: int, max_velocity: int, sound_hit: str, size_to_scale: dict):
         self.min_velocity = min_velocity
         self.max_velocity = max_velocity
         self.sound_hit = sound_hit
+        self.size_to_scale = size_to_scale
 
 
 class Asteroid(GameObject):
@@ -110,22 +117,30 @@ class Asteroid(GameObject):
         self._sprite_name = sprite_name
         self._create_asteroid_callback = create_asteroid_callback
         self._size: int = size
-        size_to_scale = {
-            4: 0.5,
-            3: 0.3,
-            2: 0.2,
-            1: 0.05,
-        }
-        scale = size_to_scale[size]
-        sprite = rotozoom(SpriteLibrary.load(self._sprite_name), 0, scale)
+        self._direction = Vector2(0, -1)
+        self._angle = 0
+        self._rotation = get_random_rotation(0, 3)
+
+        scale = self._properties.size_to_scale[size]
+        sprite = rotozoom(SpriteLibrary.load(self._sprite_name, resize=(200, 200)), 0, scale)
 
         super().__init__(position, sprite,
                          get_random_velocity(self._properties.min_velocity, self._properties.max_velocity))
 
+    def draw(self, surface: Surface):
+        self._angle += self._rotation
+        self._direction.rotate_ip(self._angle)
+
+        rotated_surface = rotozoom(self.image, self._angle, 1)
+        rotated_surface_size = Vector2(rotated_surface.get_size())
+
+        blit_position: Vector2 = self.geometry.position - rotated_surface_size * 0.5
+        surface.blit(rotated_surface, blit_position)
+
     def split(self):
         SoundLibrary.play(self._properties.sound_hit)
         if self._size > 1:
-            for _ in range(2):
+            for _ in range(4):
                 asteroid = Asteroid(
                     self._properties,
                     self._sprite_name,
