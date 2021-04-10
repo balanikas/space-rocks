@@ -1,4 +1,4 @@
-from typing import List, Sequence
+from typing import List, Sequence, Tuple, Optional
 
 from pygame import Vector2
 from pygame.surface import Surface
@@ -11,11 +11,12 @@ from space_rocks.utils import get_random_position
 class Level:
     MIN_ASTEROID_DISTANCE = 250
 
-    def __init__(self):
-        self._background: Background = Background("level0")
+    def __init__(self, name: str):
+        self._background: Background = Background("background")
         self._bullets: List[Bullet] = []
-        self._spaceship: Spaceship
+        self._spaceship: Optional[Spaceship] = None
         self._asteroids: List[Asteroid] = []
+        self._name = name
 
     @property
     def background(self):
@@ -32,6 +33,10 @@ class Level:
     @property
     def asteroids(self) -> Sequence[Asteroid]:
         return self._asteroids
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     def remove_spaceship(self):
         self._spaceship = None
@@ -52,8 +57,8 @@ class Level:
 
 
 class Level1(Level):
-    def __init__(self, screen: Surface):
-        self._background = Background("level1")
+    def __init__(self, screen: Surface, name: str):
+        super().__init__(name)
         self._bullets: List[Bullet] = []
         props = SpaceshipProperties(5, 0.15, 5, "laser")
         self._spaceship = Spaceship(props, "spaceship",
@@ -78,8 +83,8 @@ class Level1(Level):
 
 
 class Level2(Level):
-    def __init__(self, screen: Surface):
-        self._background = Background("level2")
+    def __init__(self, screen: Surface, name: str):
+        super().__init__(name)
         self._bullets: List[Bullet] = []
         props = SpaceshipProperties(3, 0.05, 3, "laser")
         self._spaceship = Spaceship(props, "spaceship",
@@ -105,8 +110,8 @@ class Level2(Level):
 
 
 class Level3(Level):
-    def __init__(self, screen: Surface):
-        self._background = Background("level3")
+    def __init__(self, screen: Surface, name: str):
+        super().__init__(name)
         self._bullets: List[Bullet] = []
         props = SpaceshipProperties(3, 0.05, 3, "laser")
         self._spaceship = Spaceship(props, "spaceship",
@@ -134,18 +139,33 @@ class World:
     def __init__(self, screen: Surface):
 
         self._levels = {
-            0: lambda: Level1(screen),
-            1: lambda: Level2(screen),
-            2: lambda: Level3(screen),
+            0: ("level1", lambda: Level1(screen, "level1")),
+            1: ("level2", lambda: Level2(screen, "level2")),
+            2: ("level3", lambda: Level3(screen, "level3")),
         }
         self._current_level_id = -1
 
-    def get_current_level(self):
+    def start_current_level(self):
         if self._current_level_id == -1:
             self._current_level_id = 0
-        return self._levels[self._current_level_id]()
+        return self._levels[self._current_level_id][1]()
 
-    def get_next_level(self):
+    def start_next_level(self):
+        self.advance_level()
+        return self._levels[self._current_level_id][1]()
+
+    def start_level(self, level_id: int):
+        return self._levels[level_id][1]()
+
+    def get_current_level(self) -> Tuple[int, str]:
+        if self._current_level_id == -1:
+            self._current_level_id = 0
+        return self._current_level_id, self._levels[self._current_level_id][0]
+
+    def set_current_level(self, level_id: int):
+        self._current_level_id = level_id
+
+    def advance_level(self):
         if self._current_level_id >= len(self._levels) - 1:
             self._current_level_id = 0
         elif self._current_level_id == -1:
@@ -153,7 +173,10 @@ class World:
         else:
             self._current_level_id += 1
 
-        return self._levels[self._current_level_id]()
 
-    def get_level(self, level_id: int):
-        return self._levels[level_id]()
+    def get_all_levels(self) -> List[Tuple[str, int]]:
+        levels = []
+        for k, v in self._levels.items():
+            levels.append((v[0], k))
+
+        return levels

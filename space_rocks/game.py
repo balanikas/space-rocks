@@ -12,7 +12,6 @@ from space_rocks.levels import World
 from utils import collides_with
 
 
-# todo
 # todo more accurate coll detection
 # todo more sound effects
 # todo more ..stuff: lifes, bonus, weapon types, etc
@@ -22,17 +21,14 @@ from utils import collides_with
 # todo move game logic to per-level?
 # todo: find subclasses of Level and autocreate _levels
 #  todo same badass sound for every menu change
-# rotate bullets correctly
 # todo extract asteroid split into props
 # todo paralax effect on background
 # todo make internet fetched level
-# enable debug mode (show coll/det rects etc) with shortcut
-# rotate asteroids randomly, as props
-#  todo in middle of refactor coldet using sprites. outline shows in debug, but not 100% accurate. maybe spaceship rotation messes up
+
 class SpaceRocks:
 
     def set_level(self, value, level):
-        self._level = self._world.get_level(level)
+        self._world.set_current_level(level)
 
     def start_the_game(self):
         self._initialize()
@@ -52,17 +48,22 @@ class SpaceRocks:
         self._screen.fill((0, 0, 0))
 
         self._world = World(self._screen)
-        self._level = self._world.get_current_level()
 
         self._menu = Menu(
             constants.SCREEN_WIDTH,
             constants.SCREEN_HEIGHT,
             self.set_level,
             self.start_the_game,
-            self._screen)
+            self._screen,
+            self._world.get_all_levels())
 
     def _initialize(self):
         SoundLibrary.stop_all()
+
+        current_level = self._world.get_current_level()
+        init_sounds(current_level[1])
+        init_sprites(current_level[1])
+        self._level = self._world.start_level(current_level[0])
         self._state = GameState.RUNNING
 
     def main_loop(self):
@@ -75,8 +76,6 @@ class SpaceRocks:
         pygame.init()
         pygame.display.set_caption("Softwaroids")
         pygame.font.init()
-        init_sounds()
-        init_sprites()
 
     def _handle_input(self):
         for event in pygame.event.get():
@@ -94,22 +93,27 @@ class SpaceRocks:
                     self._state = GameState.WON
                 if event.key == pygame.K_1:
                     self._state = GameState.RUNNING
-                    self._level = self._world.get_level(0)
+                    self._level = self._world.set_current_level(0)
                     self._initialize()
                 if event.key == pygame.K_2:
                     self._state = GameState.RUNNING
-                    self._level = self._world.get_level(1)
+                    self._level = self._world.set_current_level(1)
                     self._initialize()
+                if event.key == pygame.K_3:
+                    self._state = GameState.RUNNING
+                    self._level = self._world.set_current_level(2)
+                    self._initialize()
+
                 if event.key == pygame.K_RETURN and self._state is not GameState.RUNNING:
                     if self._state == GameState.WON:
-                        self._level = self._world.get_next_level()
+                        self._level = self._world.advance_level()
                     if self._state == GameState.LOST:
-                        self._level = self._world.get_level(0)
+                        self._level = self._world.set_current_level(0)
                     self._initialize()
 
         is_key_pressed = pygame.key.get_pressed()
 
-        if self._level.spaceship and self._state is GameState.RUNNING:
+        if self._state is GameState.RUNNING and self._level.spaceship:
             if is_key_pressed[pygame.K_RIGHT]:
                 self._level.spaceship.rotate(clockwise=True)
             elif is_key_pressed[pygame.K_LEFT]:
@@ -160,6 +164,9 @@ class SpaceRocks:
 
     def _draw(self):
 
+        if self._state is GameState.NOT_RUNNING:
+            return
+
         for o in self._get_game_objects():
             o.draw(self._screen)
 
@@ -172,8 +179,9 @@ class SpaceRocks:
                         self._screen,
                         (0, 0, 255),
                         (
-                        o.geometry.position.x - (rect.width / 2), o.geometry.position.y - (rect.height / 2), rect.width,
-                        rect.height),
+                            o.geometry.position.x - (rect.width / 2), o.geometry.position.y - (rect.height / 2),
+                            rect.width,
+                            rect.height),
                         1
                     )
 

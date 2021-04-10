@@ -10,12 +10,15 @@ class SpriteLibrary:
     _bank: Dict[str, Surface] = {}
 
     @classmethod
-    def __init__(cls) -> None:
+    def __init__(cls, level_name: str) -> None:
 
-        for f in os.listdir(f"../assets/sprites/"):
+        cls._bank = {}
+        level_name = level_name.lower()
+        for f in os.listdir(f"../{level_name}/sprites/"):
+            f = f.lower()
             if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
                 try:
-                    g = load(f"../assets/sprites/{f}")
+                    g = load(f"../{level_name}/sprites/{f}")
                 except:
                     g = load(f"../assets/sprites/not_found.png")
                 cls._bank[f.split(".")[0]] = g
@@ -31,6 +34,6 @@ class SpriteLibrary:
         return loaded_sprite.convert_alpha() if with_alpha else loaded_sprite.convert()
 
 
-def init_sprites():
-    SpriteLibrary()
-    print("sprites loaded")
+def init_sprites(level_name: str):
+    SpriteLibrary(level_name)
+    print(f"sprites loaded for level {level_name}")

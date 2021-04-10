@@ -7,13 +7,16 @@ class SoundLibrary:
     _bank: Dict[str, Sound] = {}
 
     @classmethod
-    def __init__(cls) -> None:
+    def __init__(cls, level_name: str) -> None:
 
         from pygame.mixer import Sound
-        for f in os.listdir(f"../assets/sounds/"):
+        cls._bank = {}
+        level_name = level_name.lower()
+        for f in os.listdir(f"../{level_name}/sounds/"):
+            f = f.lower()
             if f.endswith(".wav"):
                 try:
-                    s = Sound(f"../assets/sounds/{f}")
+                    s = Sound(f"../{level_name}/sounds/{f}")
                 except:
                     s = Sound(f"../assets/sounds/not_found.wav")
 
@@ -39,6 +42,6 @@ class SoundLibrary:
             v.stop()
 
 
-def init_sounds():
-    SoundLibrary()
-    print("sounds loaded")
+def init_sounds(level_name: str):
+    SoundLibrary(level_name)
+    print(f"sounds loaded for level {level_name}")

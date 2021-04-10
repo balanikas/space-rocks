@@ -212,9 +212,26 @@ class UI:
 class Background:
     def __init__(self, sprite_name: str):
         self._background = SpriteLibrary.load(sprite_name, False)
+        # self._y = -500
+        # self._x = -500
+        # self._scale = 1
+        # self._angle = 0
+        # self._is_zooming = True
 
     def draw(self, surface: Surface):
+        # rotated_surface = rotozoom(self._background, self._angle, self._scale)
+        # surface.blit(rotated_surface, (self._x, self._y))
         surface.blit(self._background, (0, 0))
 
     def move(self, surface: Surface):
         pass
+        # self._angle += 0.3
+        # if self._is_zooming:
+        #     self._scale += 0.003
+        #     if self._scale > 1.01:
+        #         self._is_zooming = False
+        # else:
+        #     self._scale -= 0.003
+        #     if self._scale < 1.00:
+        #         self._is_zooming = True
+        # self._y += 0.5
