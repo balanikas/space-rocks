@@ -6,11 +6,11 @@ from pygame.surface import Surface
 import constants
 from space_rocks.models import Background, Asteroid, Spaceship, Bullet, AsteroidProperties, SpaceshipProperties, \
     GameObject
-from space_rocks.utils import get_random_position
+from space_rocks.utils import get_safe_asteroid_distance
 
 
 class Level:
-    MIN_ASTEROID_DISTANCE = 250
+
 
     def __init__(self, name: str):
         self._background: Background = Background("background")
@@ -63,23 +63,50 @@ class Level1(Level):
         self._bullets: List[Bullet] = []
         props = SpaceshipProperties(5, 0.15, 5, "laser")
         self._spaceship = Spaceship(props, "spaceship",
-                                    Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2),
+                                    constants.SCREEN_CENTER,
                                     self._bullets.append)
         self._asteroids: List[Asteroid] = []
-        for _ in range(3):
-            while True:
-                position = get_random_position(screen)
-                if (
-                        position.distance_to(self.spaceship.geometry.position)
-                        > self.MIN_ASTEROID_DISTANCE
-                ):
-                    break
+        for a in ["planet-1", "planet-2", "planet-3"]:
+            position = get_safe_asteroid_distance(screen, self.spaceship.geometry.position)
             properties = {
-                3: AsteroidProperties(1, 2, 3, 1, 2, "explosion5", "asteroid"),
-                2: AsteroidProperties(2, 4, 20, 0.5, 8, "explosion4", "asteroid"),
-                1: AsteroidProperties(1, 3, 3, 0.3, 4, "hit_big", "asteroid"),
+                3: AsteroidProperties(1, 2, 3, 1, 2, "explosion5", a),
+                2: AsteroidProperties(2, 4, 20, 0.5, 8, "explosion4", a),
+                1: AsteroidProperties(1, 3, 3, 0.3, 4, "hit_big", a),
             }
             self._asteroids.append(Asteroid(properties, position, self._asteroids.append, 3))
+
+'''
+{
+    name: "level1",
+    ship: {
+        manuverability: 1,
+        ...
+        
+    },
+    asteroids: [
+        {
+            3: {
+                max_vel: 2,
+                min_vel: 3,
+                ...
+                "sound_hit": "expl1",
+                ...
+            }
+            2 : {
+                max_vel: 2,
+                min_vel: 3,
+                ...
+                "sound_hit": "expl1",
+                ...
+            },
+            ...
+        },
+        
+        
+    ]
+}
+
+'''
 
 
 class Level2(Level):
@@ -92,13 +119,7 @@ class Level2(Level):
                                     self._bullets.append)
         self._asteroids: List[Asteroid] = []
         for _ in range(6):
-            while True:
-                position = get_random_position(screen)
-                if (
-                        position.distance_to(self.spaceship.geometry.position)
-                        > self.MIN_ASTEROID_DISTANCE
-                ):
-                    break
+            position = get_safe_asteroid_distance(screen, self.spaceship.geometry.position)
 
             properties = {
                 4: AsteroidProperties(1, 2, 3, 1, 4, "hit_big", "asteroid"),
@@ -115,17 +136,11 @@ class Level3(Level):
         self._bullets: List[Bullet] = []
         props = SpaceshipProperties(5, 0.15, 5, "laser")
         self._spaceship = Spaceship(props, "spaceship",
-                                    Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2),
+                                    constants.SCREEN_CENTER,
                                     self._bullets.append)
         self._asteroids: List[Asteroid] = []
         for _ in range(16):
-            while True:
-                position = get_random_position(screen)
-                if (
-                        position.distance_to(self.spaceship.geometry.position)
-                        > self.MIN_ASTEROID_DISTANCE
-                ):
-                    break
+            position = get_safe_asteroid_distance(screen, self.spaceship.geometry.position)
 
             properties = {
                 2: AsteroidProperties(2, 3, 7, 0.4, 2, "hit_big", "asteroid"),
@@ -134,9 +149,11 @@ class Level3(Level):
             self._asteroids.append(Asteroid(properties, position, self._asteroids.append, 2))
 
 
+
 class World:
     def __init__(self, screen: Surface):
 
+        # todo get level names by folder structure, use only class 'Level', pass the json (from definition.json), instantiate 'Level' props from json data.
         self._levels = {
             0: ("level1", lambda: Level1(screen, "level1")),
             1: ("level2", lambda: Level2(screen, "level2")),

@@ -66,3 +66,15 @@ def get_random_rotation(min_rotation: int, max_rotation):
 def collides_with(obj: Geometry, other_obj: Geometry) -> bool:
     distance = obj.position.distance_to(other_obj.position)
     return distance < obj.radius + other_obj.radius
+
+
+def get_safe_asteroid_distance(screen, ship_position: Vector2):
+    MIN_ASTEROID_DISTANCE = 250
+    while True:
+        position = get_random_position(screen)
+        if (
+                position.distance_to(ship_position)
+                > MIN_ASTEROID_DISTANCE
+        ):
+            break
+    return position
