@@ -74,13 +74,12 @@ class Level1(Level):
                         > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
-            properties = AsteroidProperties(1, 2, "hit_big", {
-                4: 2,
-                3: 1,
-                2: 0.5,
-                1: 0.25,
-            })
-            self._asteroids.append(Asteroid(properties, "asteroid", position, self._asteroids.append, 3))
+            properties = {
+                3: AsteroidProperties(1, 2, 3, 1, 2, "explosion5", "asteroid"),
+                2: AsteroidProperties(2, 4, 20, 0.5, 8, "explosion4", "asteroid"),
+                1: AsteroidProperties(1, 3, 3, 0.3, 4, "hit_big", "asteroid"),
+            }
+            self._asteroids.append(Asteroid(properties, position, self._asteroids.append, 3))
 
 
 class Level2(Level):
@@ -100,14 +99,14 @@ class Level2(Level):
                         > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
-            properties = AsteroidProperties(1, 3, "hit_big",
-                                            {
-                                                4: 2,
-                                                3: 1,
-                                                2: 0.5,
-                                                1: 0.25,
-                                            })
-            self._asteroids.append(Asteroid(properties, "asteroid", position, self._asteroids.append, 4))
+
+            properties = {
+                4: AsteroidProperties(1, 2, 3, 1, 4, "hit_big", "asteroid"),
+                3: AsteroidProperties(1, 3, 3, 0.5, 4, "hit_big", "asteroid"),
+                2: AsteroidProperties(1, 3, 3, 0.2, 8, "hit_big", "asteroid"),
+                1: AsteroidProperties(1, 3, 3, 0.1, 4, "hit_big", "asteroid"),
+            }
+            self._asteroids.append(Asteroid(properties, position, self._asteroids.append, 4))
 
 
 class Level3(Level):
@@ -119,7 +118,7 @@ class Level3(Level):
                                     Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2),
                                     self._bullets.append)
         self._asteroids: List[Asteroid] = []
-        for _ in range(20):
+        for _ in range(16):
             while True:
                 position = get_random_position(screen)
                 if (
@@ -127,13 +126,12 @@ class Level3(Level):
                         > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
-            properties = AsteroidProperties(2, 4, "hit_big", {
-                4: 2,
-                3: 1,
-                2: 0.5,
-                1: 0.25,
-            })
-            self._asteroids.append(Asteroid(properties, "asteroid", position, self._asteroids.append, 2))
+
+            properties = {
+                2: AsteroidProperties(2, 3, 7, 0.4, 2, "hit_big", "asteroid"),
+                1: AsteroidProperties(1, 3, 3, 0.1, 4, "hit_big", "asteroid"),
+            }
+            self._asteroids.append(Asteroid(properties, position, self._asteroids.append, 2))
 
 
 class World:

@@ -22,9 +22,15 @@ from utils import collides_with
 # todo make internet fetched level
 # todo edge bounce a bit buggy, fix
 # todo even bounce asteroids? appearing/dissapearing looks not good, clipping, etc
-# todo mouse over crashes game
+# todo mouse over crashes game - The get_cursor method is unavailable in SDL2
 # todo create a RAL (rendering abstraction layer) so i can switch from SDL to other
 # todo win/lost sounds repeting, since they are in a draw call
+# todo game idea: 9 types of planets, each with own props like toughness, speed, how they split, rotation
+# todo game idea: asutogenerated levels with increasing difficulty
+# todo game idea: keep score, and perhaps highscore
+# todo : explosion as sprite anims
+
+
 class SpaceRocks:
 
     def set_level(self, level):
@@ -72,10 +78,26 @@ class SpaceRocks:
             self._process_game_logic()
             self._draw()
 
+    def gatherinfo(self):
+        lines = []
+        info = pygame.display.Info()
+        lines.append('Current Video Driver: %s' % pygame.display.get_driver())
+        lines.append('Video Mode is Accelerated: %s' % ('No', 'Yes')[info.hw])
+        lines.append('Display Depth (Bits Per Pixel): %d' % info.bitsize)
+
+        info = pygame.mixer.get_init()
+        lines.append('Sound Frequency: %d' % info[0])
+        lines.append('Sound Quality: %d bits' % abs(info[1]))
+        lines.append('Sound Channels: %s' % ('Mono', 'Stereo')[info[2] - 1])
+
+        print(lines)
+
     def _init_pygame(self):
         pygame.init()
         pygame.display.set_caption("Softwaroids")
         pygame.font.init()
+        pygame.mouse.set_visible(0)
+        self.gatherinfo()
 
     def _handle_input(self):
         for event in pygame.event.get():

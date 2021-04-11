@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 
 import pygame
 from pygame import Color
@@ -113,35 +113,48 @@ class Spaceship(GameObject):
 
 
 class AsteroidProperties:
-    def __init__(self, min_velocity: int, max_velocity: int, sound_hit: str, size_to_scale: dict):
+    def __init__(
+            self,
+            min_velocity: int,
+            max_velocity: int,
+            max_rotation: float,
+            scale: float,
+            children: int,
+            sound_hit: str,
+            sprite_name: str
+    ):
         self.min_velocity = min_velocity
         self.max_velocity = max_velocity
+        self.max_rotation = max_rotation
+        self.scale = scale
+        self.children = children
         self.sound_hit = sound_hit
-        self.size_to_scale = size_to_scale
+        self.sprite_name = sprite_name
 
 
 class Asteroid(GameObject):
     def __init__(
             self,
-            properties: AsteroidProperties,
-            sprite_name: str,
+            properties: Dict[int, AsteroidProperties],
             position: Vector2,
             create_asteroid_callback: Callable[[Any], None],
-            size: int,
+            tier: int,
     ):
         self._properties = properties
-        self._sprite_name = sprite_name
         self._create_asteroid_callback = create_asteroid_callback
-        self._size: int = size
+        self._tier: int = tier
         self._direction = Vector2(0, -1)
         self._angle = 0
-        self._rotation = get_random_rotation(0, 3)
 
-        scale = self._properties.size_to_scale[size]
-        sprite = rotozoom(SpriteLibrary.load(self._sprite_name, resize=(200, 200)), 0, scale)
+        self._props: AsteroidProperties = self._properties[self._tier]
+        self._rotation = get_random_rotation(0, self._props.max_rotation)
 
-        super().__init__(position, sprite,
-                         get_random_velocity(self._properties.min_velocity, self._properties.max_velocity))
+        sprite = rotozoom(SpriteLibrary.load(self._props.sprite_name, resize=(200, 200)), 0, self._props.scale)
+
+        super().__init__(
+            position,
+            sprite,
+            get_random_velocity(self._props.min_velocity, self._props.max_velocity))
 
     def draw(self, surface: Surface):
         self._angle += self._rotation
@@ -149,20 +162,18 @@ class Asteroid(GameObject):
 
         rotated_surface = rotozoom(self.image, self._angle, 1)
         rotated_surface_size = Vector2(rotated_surface.get_size())
-
         blit_position: Vector2 = self.geometry.position - rotated_surface_size * 0.5
         surface.blit(rotated_surface, blit_position)
 
     def split(self):
-        SoundLibrary.play(self._properties.sound_hit)
-        if self._size > 1:
-            for _ in range(4):
+        SoundLibrary.play(self._props.sound_hit)
+        if self._tier > 1:
+            for _ in range(self._props.children):
                 asteroid = Asteroid(
                     self._properties,
-                    self._sprite_name,
                     self.geometry.position,
                     self._create_asteroid_callback,
-                    self._size - 1)
+                    self._tier - 1)
                 self._create_asteroid_callback(asteroid)
 
 
