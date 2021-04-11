@@ -8,15 +8,15 @@ class Geometry:
         self._radius: float = radius
 
     @property
-    def velocity(self):
+    def velocity(self) -> Vector2:
         return self._velocity
 
     @property
-    def position(self):
+    def position(self) -> Vector2:
         return self._position
 
     @property
-    def radius(self):
+    def radius(self) -> float:
         return self._radius
 
     def update_pos(self, position: Vector2):

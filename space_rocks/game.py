@@ -13,21 +13,21 @@ from utils import collides_with
 
 
 # todo more accurate coll detection
-# todo more sound effects
-# todo more ..stuff: lifes, bonus, weapon types, etc
 # todo: more asteroid sprites
-# todo soundtrack
 # todo profiling
 # todo move game logic to per-level?
 # todo: find subclasses of Level and autocreate _levels
 #  todo same badass sound for every menu change
 # todo extract asteroid split into props
-# todo paralax effect on background
 # todo make internet fetched level
-
+# todo edge bounce a bit buggy, fix
+# todo even bounce asteroids? appearing/dissapearing looks not good, clipping, etc
+# todo mouse over crashes game
+# todo create a RAL (rendering abstraction layer) so i can switch from SDL to other
+# todo win/lost sounds repeting, since they are in a draw call
 class SpaceRocks:
 
-    def set_level(self, value, level):
+    def set_level(self, level):
         self._world.set_current_level(level)
 
     def start_the_game(self):
@@ -167,6 +167,8 @@ class SpaceRocks:
         if self._state is GameState.NOT_RUNNING:
             return
 
+        self._level.background.draw(self._screen, self._level.spaceship.geometry.position)
+
         for o in self._get_game_objects():
             o.draw(self._screen)
 
@@ -185,7 +187,8 @@ class SpaceRocks:
                         1
                     )
 
-            self._stats.draw(self._screen)
+            self._stats.draw(self._screen, self._level.spaceship.geometry.position,
+                             self._level.spaceship.geometry.velocity)
 
         self._ui.draw(self._screen, self._state)
 

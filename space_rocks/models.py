@@ -11,6 +11,7 @@ from pygame.transform import rotozoom
 from audio import SoundLibrary
 from geometry import Geometry
 from graphics import SpriteLibrary
+from space_rocks import constants
 from utils import wrap_position, get_random_velocity, get_random_rotation
 
 
@@ -69,16 +70,26 @@ class Spaceship(GameObject):
         self._properties = properties
         self._create_bullet_callback = create_bullet_callback
         self._direction = Vector2(self.UP)
-        super().__init__(position, SpriteLibrary.load(sprite_name, resize=(100, 100)), Vector2(0))
+        super().__init__(position, SpriteLibrary.load(sprite_name, resize=(150, 150)), Vector2(0))
 
     def rotate(self, clockwise: bool = True):
         sign = 1 if clockwise else -1
         angle = self._properties.maneuverability * sign
         self._direction.rotate_ip(angle)
 
+    def move(self, surface: Surface):
+
+        position = self.geometry.position + self.geometry.velocity
+        w, h = surface.get_size()
+        if position.x >= w - 50 or position.x <= 50:
+            self.deccelerate()
+        elif position.y >= h - 50 or position.y <= 50:
+            self.deccelerate()
+
+        self.geometry = self.geometry.update_pos(position)
+
     def draw(self, surface: Surface):
         angle = self._direction.angle_to(self.UP)
-
         rotated_surface = rotozoom(self.image, angle, 1)
         rotated_surface_size = Vector2(rotated_surface.get_size())
         blit_position: Vector2 = self.geometry.position - rotated_surface_size * 0.5
@@ -88,6 +99,11 @@ class Spaceship(GameObject):
         self.geometry = self.geometry.update_vel(
             self.geometry.velocity + (self._direction * self._properties.acceleration)
         )
+
+    def deccelerate(self):
+        vel = self.geometry.velocity
+        vel.x = (vel.x * 0.8) * -1
+        vel.y = (vel.y * 0.8) * -1
 
     def shoot(self):
         bullet_velocity = self._direction * self._properties.bullet_speed + self.geometry.velocity
@@ -156,7 +172,7 @@ class Bullet(GameObject):
             sprite_name: str,
             position: Vector2,
             velocity: Vector2):
-        super().__init__(position, SpriteLibrary.load(sprite_name), velocity)
+        super().__init__(position, SpriteLibrary.load(sprite_name, resize=(40, 40)), velocity)
 
     def move(self, surface: Surface):
         self.geometry = self.geometry.update_pos(
@@ -164,19 +180,22 @@ class Bullet(GameObject):
         )
 
 
-class Stats(GameObject):
+class Stats():
     def __init__(
             self,
             clock: pygame.time.Clock):
         self._clock = clock
         self._font = pygame.font.Font(None, 30)
-        super().__init__(Vector2(0, 0), None, Vector2(0, 0))
+        # super().__init__(Vector2(0, 0), None, Vector2(0, 0))
 
-    def draw(self, surface: Surface):
+    def draw(self, surface: Surface, pos: Vector2, vel: Vector2):
         fps = self._clock.get_fps()
 
         text_surface = self._font.render(
-            str(round(fps, 0)) + " fps", False, (255, 255, 0)
+            f"{round(fps, 0)} fps | x:{round(pos.x, 1)} y:{round(pos.y, 1)} | vel: {vel} | "
+            f"win:{(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)} | "
+            f"display: {(pygame.display.Info().current_w, pygame.display.Info().current_h)}",
+            False, (255, 255, 0)
         )
         surface.blit(text_surface, (0, 0))
 
@@ -198,9 +217,11 @@ class UI:
 
     def draw(self, surface: Surface, state: GameState):
         if state == GameState.WON:
-            self._message = "You won! Press RETURN to replay"
+            self._message = "You won! Press RETURN to continue"
+            SoundLibrary.play("win_level")
         if state == GameState.LOST:
-            self._message = "You lost! Press RETURN to replay"
+            self._message = "You lost! Press RETURN to restart"
+            SoundLibrary.play("game_over")
         if state == GameState.RUNNING:
             self._message = ""
         if state == GameState.NOT_RUNNING:
@@ -212,26 +233,18 @@ class UI:
 class Background:
     def __init__(self, sprite_name: str):
         self._background = SpriteLibrary.load(sprite_name, False)
-        # self._y = -500
-        # self._x = -500
-        # self._scale = 1
-        # self._angle = 0
-        # self._is_zooming = True
 
-    def draw(self, surface: Surface):
-        # rotated_surface = rotozoom(self._background, self._angle, self._scale)
-        # surface.blit(rotated_surface, (self._x, self._y))
-        surface.blit(self._background, (0, 0))
+        # ensure image is larger than 1280x1024 for this effect to work.
+        (s_x, s_y) = self._background.get_size()
+        x = ((s_x - constants.SCREEN_WIDTH) / 2) * -1
+        y = ((s_y - constants.SCREEN_HEIGHT) / 2) * -1
+        self._offset = (x, y)
+        self._position = Vector2(0, 0)
+        self._center = Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2)
+        SoundLibrary.play("background", True)  # better to create new method playForever ?
 
-    def move(self, surface: Surface):
-        pass
-        # self._angle += 0.3
-        # if self._is_zooming:
-        #     self._scale += 0.003
-        #     if self._scale > 1.01:
-        #         self._is_zooming = False
-        # else:
-        #     self._scale -= 0.003
-        #     if self._scale < 1.00:
-        #         self._is_zooming = True
-        # self._y += 0.5
+    def draw(self, surface: Surface, pos: Vector2):
+        self._position = (pos - self._center) * -0.2  # ensures background moves slower than ship
+        self._position += self._offset
+
+        surface.blit(self._background, self._position)

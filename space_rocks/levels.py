@@ -4,7 +4,8 @@ from pygame import Vector2
 from pygame.surface import Surface
 
 import constants
-from space_rocks.models import Background, Asteroid, Spaceship, Bullet, AsteroidProperties, SpaceshipProperties
+from space_rocks.models import Background, Asteroid, Spaceship, Bullet, AsteroidProperties, SpaceshipProperties, \
+    GameObject
 from space_rocks.utils import get_random_position
 
 
@@ -19,7 +20,7 @@ class Level:
         self._name = name
 
     @property
-    def background(self):
+    def background(self) -> Background:
         return self._background
 
     @property
@@ -47,8 +48,8 @@ class Level:
     def remove_asteroid(self, a: Asteroid):
         self._asteroids.remove(a)
 
-    def get_game_objects(self):
-        game_objects = [self._background, *self._asteroids, *self._bullets]
+    def get_game_objects(self) -> Sequence[GameObject]:
+        game_objects = [*self._asteroids, *self._bullets]
 
         if self._spaceship:
             game_objects.append(self._spaceship)
@@ -86,7 +87,7 @@ class Level2(Level):
     def __init__(self, screen: Surface, name: str):
         super().__init__(name)
         self._bullets: List[Bullet] = []
-        props = SpaceshipProperties(3, 0.05, 3, "laser")
+        props = SpaceshipProperties(5, 0.15, 5, "laser")
         self._spaceship = Spaceship(props, "spaceship",
                                     Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2),
                                     self._bullets.append)
@@ -113,7 +114,7 @@ class Level3(Level):
     def __init__(self, screen: Surface, name: str):
         super().__init__(name)
         self._bullets: List[Bullet] = []
-        props = SpaceshipProperties(3, 0.05, 3, "laser")
+        props = SpaceshipProperties(5, 0.15, 5, "laser")
         self._spaceship = Spaceship(props, "spaceship",
                                     Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2),
                                     self._bullets.append)
@@ -172,7 +173,6 @@ class World:
             self._current_level_id = 0
         else:
             self._current_level_id += 1
-
 
     def get_all_levels(self) -> List[Tuple[str, int]]:
         levels = []

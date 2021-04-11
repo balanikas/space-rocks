@@ -22,12 +22,22 @@ class SoundLibrary:
 
                 cls._bank[f.split(".")[0]] = s
 
+        for f in os.listdir(f"../assets/sounds/"):
+            f = f.lower()
+            if f.endswith(".wav"):
+                try:
+                    s = Sound(f"../assets/sounds/{f}")
+                except:
+                    s = Sound(f"../assets/sounds/not_found.wav")
+
+                cls._bank[f.split(".")[0]] = s
+
     @classmethod
-    def play(cls, name: str):
+    def play(cls, name: str, repeat: bool = False):
         if name not in cls._bank:
             name = "not_found"
 
-        cls._bank[name].play()
+        cls._bank[name].play(1000 if repeat else 0)
 
     @classmethod
     def stop(cls, name: str):
