@@ -1,6 +1,7 @@
-from typing import List, Sequence, Tuple, Optional
+import json
+import os
+from typing import List, Sequence, Tuple
 
-from pygame import Vector2
 from pygame.surface import Surface
 
 import constants
@@ -11,13 +12,41 @@ from space_rocks.utils import get_safe_asteroid_distance
 
 class Level:
 
+    def __init__(self, screen: Surface, json_path: str):
 
-    def __init__(self, name: str):
-        self._background: Background = Background("background")
         self._bullets: List[Bullet] = []
-        self._spaceship: Optional[Spaceship] = None
-        self._asteroids: List[Asteroid] = []
-        self._name = name
+
+        with open(json_path, "r") as read_file:
+            data = json.load(read_file)
+            ship = data["ship"]
+            props = SpaceshipProperties(
+                ship["maneuverability"],
+                ship["acceleration"],
+                ship["bullet_speed"],
+                ship["sound_shoot"])
+            self._spaceship = Spaceship(props, "spaceship",
+                                        constants.SCREEN_CENTER,
+                                        self._bullets.append)
+
+            self._asteroids: List[Asteroid] = []
+            for a in data["asteroids"]:
+                props = {}
+                for k, v in a.items():
+                    props[int(k)] = AsteroidProperties(
+                        v["max_velocity"],
+                        v["min_velocity"],
+                        v["max_rotation"],
+                        v["scale"],
+                        v["children"],
+                        v["sound_hit"],
+                        v["sprite_name"]
+                    )
+
+                position = get_safe_asteroid_distance(screen, self.spaceship.geometry.position)
+
+                self._asteroids.append(Asteroid(props, position, self._asteroids.append, 3))
+
+        self._background: Background = Background("background")
 
     @property
     def background(self) -> Background:
@@ -34,10 +63,6 @@ class Level:
     @property
     def asteroids(self) -> Sequence[Asteroid]:
         return self._asteroids
-
-    @property
-    def name(self) -> str:
-        return self._name
 
     def remove_spaceship(self):
         self._spaceship = None
@@ -57,108 +82,15 @@ class Level:
         return game_objects
 
 
-class Level1(Level):
-    def __init__(self, screen: Surface, name: str):
-        super().__init__(name)
-        self._bullets: List[Bullet] = []
-        props = SpaceshipProperties(5, 0.15, 5, "laser")
-        self._spaceship = Spaceship(props, "spaceship",
-                                    constants.SCREEN_CENTER,
-                                    self._bullets.append)
-        self._asteroids: List[Asteroid] = []
-        for a in ["planet-1", "planet-2", "planet-3"]:
-            position = get_safe_asteroid_distance(screen, self.spaceship.geometry.position)
-            properties = {
-                3: AsteroidProperties(1, 2, 3, 1, 2, "explosion5", a),
-                2: AsteroidProperties(2, 4, 20, 0.5, 8, "explosion4", a),
-                1: AsteroidProperties(1, 3, 3, 0.3, 4, "hit_big", a),
-            }
-            self._asteroids.append(Asteroid(properties, position, self._asteroids.append, 3))
-
-'''
-{
-    name: "level1",
-    ship: {
-        manuverability: 1,
-        ...
-        
-    },
-    asteroids: [
-        {
-            3: {
-                max_vel: 2,
-                min_vel: 3,
-                ...
-                "sound_hit": "expl1",
-                ...
-            }
-            2 : {
-                max_vel: 2,
-                min_vel: 3,
-                ...
-                "sound_hit": "expl1",
-                ...
-            },
-            ...
-        },
-        
-        
-    ]
-}
-
-'''
-
-
-class Level2(Level):
-    def __init__(self, screen: Surface, name: str):
-        super().__init__(name)
-        self._bullets: List[Bullet] = []
-        props = SpaceshipProperties(5, 0.15, 5, "laser")
-        self._spaceship = Spaceship(props, "spaceship",
-                                    Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2),
-                                    self._bullets.append)
-        self._asteroids: List[Asteroid] = []
-        for _ in range(6):
-            position = get_safe_asteroid_distance(screen, self.spaceship.geometry.position)
-
-            properties = {
-                4: AsteroidProperties(1, 2, 3, 1, 4, "hit_big", "asteroid"),
-                3: AsteroidProperties(1, 3, 3, 0.5, 4, "hit_big", "asteroid"),
-                2: AsteroidProperties(1, 3, 3, 0.2, 8, "hit_big", "asteroid"),
-                1: AsteroidProperties(1, 3, 3, 0.1, 4, "hit_big", "asteroid"),
-            }
-            self._asteroids.append(Asteroid(properties, position, self._asteroids.append, 4))
-
-
-class Level3(Level):
-    def __init__(self, screen: Surface, name: str):
-        super().__init__(name)
-        self._bullets: List[Bullet] = []
-        props = SpaceshipProperties(5, 0.15, 5, "laser")
-        self._spaceship = Spaceship(props, "spaceship",
-                                    constants.SCREEN_CENTER,
-                                    self._bullets.append)
-        self._asteroids: List[Asteroid] = []
-        for _ in range(16):
-            position = get_safe_asteroid_distance(screen, self.spaceship.geometry.position)
-
-            properties = {
-                2: AsteroidProperties(2, 3, 7, 0.4, 2, "hit_big", "asteroid"),
-                1: AsteroidProperties(1, 3, 3, 0.1, 4, "hit_big", "asteroid"),
-            }
-            self._asteroids.append(Asteroid(properties, position, self._asteroids.append, 2))
-
-
-
 class World:
     def __init__(self, screen: Surface):
+        path = "../levels/"
+        self._levels = {}
+        for item in os.listdir(path):
+            if not item.startswith('.') and os.path.isdir(os.path.join(path, item)):
+                (k, v) = item.split("_")
+                self._levels[int(k)] = (item, lambda: Level(screen, os.path.join(path, item, ".json")))
 
-        # todo get level names by folder structure, use only class 'Level', pass the json (from definition.json), instantiate 'Level' props from json data.
-        self._levels = {
-            0: ("level1", lambda: Level1(screen, "level1")),
-            1: ("level2", lambda: Level2(screen, "level2")),
-            2: ("level3", lambda: Level3(screen, "level3")),
-        }
         self._current_level_id = -1
 
     def start_current_level(self):

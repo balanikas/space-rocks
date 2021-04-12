@@ -14,11 +14,22 @@ class SpriteLibrary:
 
         cls._bank = {}
         level_name = level_name.lower()
-        for f in os.listdir(f"../{level_name}/sprites/"):
+        # cls._bank["not_found"] = load(f"../assets/sprites/not_found.png")
+
+        for f in os.listdir(f"../levels/{level_name}/sprites/"):
             f = f.lower()
             if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
                 try:
-                    g = load(f"../{level_name}/sprites/{f}")
+                    g = load(f"../levels/{level_name}/sprites/{f}")
+                except:
+                    g = load(f"../assets/sprites/not_found.png")
+                cls._bank[f.split(".")[0]] = g
+
+        for f in os.listdir(f"../assets/sprites/"):
+            f = f.lower()
+            if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
+                try:
+                    g = load(f"../assets/sprites/{f}")
                 except:
                     g = load(f"../assets/sprites/not_found.png")
                 cls._bank[f.split(".")[0]] = g
@@ -26,6 +37,7 @@ class SpriteLibrary:
     @classmethod
     def load(cls, name: str, with_alpha: bool = True, resize: Tuple[int, int] = None):
         if name not in cls._bank:
+            print(f"sprite {name} not found")
             name = "not_found"
 
         loaded_sprite = cls._bank[name]
