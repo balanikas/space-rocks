@@ -1,6 +1,8 @@
 import os
 from typing import Dict
 
+import pygame.mixer
+
 
 class SoundLibrary:
     from pygame.mixer import Sound
@@ -39,6 +41,7 @@ class SoundLibrary:
             name = "not_found"
 
         cls._bank[name].play(1000 if repeat else 0)
+        pygame.mixer.pause()
 
     @classmethod
     def stop(cls, name: str):

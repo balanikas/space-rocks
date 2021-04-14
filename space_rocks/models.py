@@ -259,3 +259,61 @@ class Background:
         self._position += self._offset
 
         surface.blit(self._background, self._position)
+
+
+class Animation():
+
+    def animstrip(self, img, width=0):
+        if not width:
+            width = img.get_height()
+        size = width, img.get_height()
+        images = []
+        origalpha = img.get_alpha()
+        origckey = img.get_colorkey()
+        img.set_colorkey(None)
+        img.set_alpha(None)
+        for x in range(0, img.get_width(), width):
+            i = pygame.Surface(size)
+            i.blit(img, (0, 0), ((x, 0), size))
+            if origalpha:
+                i.set_colorkey((0, 0, 0))
+            elif origckey:
+                i.set_colorkey(origckey)
+
+            i = pygame.transform.scale(i, (200,200))
+            images.append(i.convert())
+        img.set_alpha(origalpha)
+        img.set_colorkey(origckey)
+        return images
+
+
+
+
+
+    def __init__(self, image_name:str, position: Vector2):
+
+        img = SpriteLibrary.load(image_name, False)
+        self._images = self.animstrip(img)
+        self._time = 0.0
+        self._img_index = 0
+        self._position = position
+
+    @property
+    def done(self):
+        return self._img_index >= len(self._images) - 1
+
+    def move(self):
+        self._time += 1
+        if self._time > 1:
+            self._img_index += 1
+            self._time = 0
+
+    def draw(self, surface: Surface):
+        if self.done:
+            return
+
+        img = self._images[self._img_index]
+        blit_position: Vector2 = self._position - Vector2(img.get_size()) * 0.5
+        surface.blit(img, blit_position)
+
+

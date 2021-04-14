@@ -10,29 +10,29 @@
             "3": {
                 "max_velocity": 1,
                 "min_velocity": 2,
-                "max_rotation": 5,
-                "scale": 1,
-                "children": 4,
+                "max_rotation": 500,
+                "scale": 0.55,
+                "children": 8,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-1"
+                "sprite_name": "planet-11"
             },
             "2" : {
                 "max_velocity": 1,
                 "min_velocity": 2,
                 "max_rotation": 5,
-                "scale": 1,
+                "scale": 0.34,
                 "children": 4,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-1"
+                "sprite_name": "planet-11"
             },
             "1" : {
                 "max_velocity": 1,
                 "min_velocity": 2,
                 "max_rotation": 5,
-                "scale": 1,
+                "scale": 0.33,
                 "children": 4,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-1"
+                "sprite_name": "planet-11"
             }
         },
 
@@ -41,11 +41,11 @@
             "3": {
                 "max_velocity": 2,
                 "min_velocity": 4,
-                "max_rotation": 150,
+                "max_rotation": 5,
                 "scale": 1,
                 "children": 4,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
+                "sprite_name": "planet-9"
             },
             "2" : {
                 "max_velocity": 1,
@@ -54,7 +54,7 @@
                 "scale": 1,
                 "children": 4,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
+                "sprite_name": "planet-9"
             },
             "1" : {
                 "max_velocity": 1,
@@ -63,7 +63,7 @@
                 "scale": 1,
                 "children": 4,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
+                "sprite_name": "planet-9"
             }
         }
     ]

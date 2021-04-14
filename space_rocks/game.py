@@ -2,24 +2,20 @@ from typing import List
 
 import pygame
 from pygame import surface
-
+from pygame.math import Vector2
 import constants
 from audio import SoundLibrary, init_sounds
 from graphics import init_sprites
 from menu import Menu
-from models import GameObject, Stats, UI, GameState
+from models import GameObject, Stats, UI, GameState, Animation
 from space_rocks.levels import World
 from utils import collides_with
 
 
 # todo more accurate coll detection
 # todo: more asteroid sprites
-# todo profiling
+# todo profiling: add flags to control stuff: enable_coldet, enable_rotation, enable_bla.. see perf graph and optimize.
 # todo move game logic to per-level?
-# todo: find subclasses of Level and autocreate _levels
-#  todo same badass sound for every menu change
-# todo extract asteroid split into props
-# todo make internet fetched level
 # todo edge bounce a bit buggy, fix
 # todo even bounce asteroids? appearing/dissapearing looks not good, clipping, etc
 # todo mouse over crashes game - The get_cursor method is unavailable in SDL2
@@ -41,6 +37,8 @@ class SpaceRocks:
 
     def __init__(self):
         self._init_pygame()
+
+
 
         self._debug = False
         self._clock = pygame.time.Clock()
@@ -71,6 +69,9 @@ class SpaceRocks:
         init_sprites(current_level[1])
         self._level = self._world.start_level(current_level[0])
         self._state = GameState.RUNNING
+        self._effects : List[Animation] = []
+
+
 
     def main_loop(self):
         while True:
@@ -96,7 +97,7 @@ class SpaceRocks:
         pygame.init()
         pygame.display.set_caption("Softwaroids")
         pygame.font.init()
-        pygame.mouse.set_visible(0)
+        pygame.mouse.set_visible(False)
         self.gatherinfo()
 
     def _handle_input(self):
@@ -157,6 +158,9 @@ class SpaceRocks:
         for game_object in self._get_game_objects():
             game_object.move(self._screen)
 
+        for e in self._effects:
+            e.move()
+
         if self._level.spaceship:
 
             self._level.spaceship.rect.center = self._level.spaceship.geometry.position
@@ -172,6 +176,7 @@ class SpaceRocks:
         for bullet in self._level.bullets[:]:
             for asteroid in self._level.asteroids[:]:
                 if collides_with(asteroid.geometry, bullet.geometry):
+                    self._effects.append(Animation("explosion", asteroid.geometry.position))
                     self._level.remove_asteroid(asteroid)
                     self._level.remove_bullet(bullet)
                     asteroid.split()
@@ -184,7 +189,10 @@ class SpaceRocks:
         if not self._level.asteroids and self._level.spaceship:
             self._state = GameState.WON
 
+
     def _draw(self):
+
+
 
         if self._state is GameState.NOT_RUNNING:
             return
@@ -193,6 +201,9 @@ class SpaceRocks:
 
         for o in self._get_game_objects():
             o.draw(self._screen)
+
+        for e in self._effects:
+            e.draw(self._screen)
 
         if self._debug:
             for o in self._get_game_objects():
@@ -213,6 +224,8 @@ class SpaceRocks:
                              self._level.spaceship.geometry.velocity)
 
         self._ui.draw(self._screen, self._state)
+
+
 
         pygame.display.flip()
         self._clock.tick(60)

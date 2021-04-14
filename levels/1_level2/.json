@@ -11,28 +11,28 @@
                 "max_velocity": 1,
                 "min_velocity": 2,
                 "max_rotation": 5,
-                "scale": 1,
-                "children": 4,
+                "scale": 1.5,
+                "children": 2,
                 "sound_hit": "explosion4",
-                "sprite_name": "asteroid"
+                "sprite_name": "planet-6"
             },
             "2" : {
                 "max_velocity": 1,
                 "min_velocity": 2,
                 "max_rotation": 5,
-                "scale": 1,
-                "children": 4,
+                "scale": 0.8,
+                "children": 2,
                 "sound_hit": "explosion4",
-                "sprite_name": "asteroid"
+                "sprite_name": "planet-6"
             },
             "1" : {
                 "max_velocity": 1,
                 "min_velocity": 2,
                 "max_rotation": 5,
-                "scale": 1,
-                "children": 4,
+                "scale": 0.4,
+                "children": 2,
                 "sound_hit": "explosion4",
-                "sprite_name": "asteroid"
+                "sprite_name": "planet-6"
             }
         },
 
@@ -41,29 +41,29 @@
             "3": {
                 "max_velocity": 2,
                 "min_velocity": 4,
-                "max_rotation": 150,
-                "scale": 1,
-                "children": 4,
+                "max_rotation": 4,
+                "scale": 1.5,
+                "children": 3,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
+                "sprite_name": "planet-7"
             },
             "2" : {
                 "max_velocity": 1,
                 "min_velocity": 2,
                 "max_rotation": 5,
                 "scale": 1,
-                "children": 4,
+                "children": 3,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
+                "sprite_name": "planet-7"
             },
             "1" : {
                 "max_velocity": 1,
                 "min_velocity": 2,
                 "max_rotation": 5,
-                "scale": 1,
-                "children": 4,
+                "scale": 0.4,
+                "children": 1,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
+                "sprite_name": "planet-7"
             }
         }
     ]

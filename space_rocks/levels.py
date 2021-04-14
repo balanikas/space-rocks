@@ -83,13 +83,17 @@ class Level:
 
 
 class World:
+
+    def load_level(self, screen, path, item):
+        return lambda: Level(screen, os.path.join(path, item, ".json"))
+
     def __init__(self, screen: Surface):
         path = "../levels/"
         self._levels = {}
         for item in os.listdir(path):
             if not item.startswith('.') and os.path.isdir(os.path.join(path, item)):
                 (k, v) = item.split("_")
-                self._levels[int(k)] = (item, lambda: Level(screen, os.path.join(path, item, ".json")))
+                self._levels[int(k)] = (item, self.load_level(screen, path, item))
 
         self._current_level_id = -1
 
