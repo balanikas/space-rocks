@@ -5,13 +5,19 @@ from typing import List, Sequence, Tuple
 from pygame.surface import Surface
 
 import constants
-from space_rocks.models import Background, Asteroid, Spaceship, Bullet, AsteroidProperties, SpaceshipProperties, \
-    GameObject
+from space_rocks.models import (
+    Background,
+    Asteroid,
+    Spaceship,
+    Bullet,
+    AsteroidProperties,
+    SpaceshipProperties,
+    GameObject,
+)
 from space_rocks.utils import get_safe_asteroid_distance
 
 
 class Level:
-
     def __init__(self, screen: Surface, json_path: str):
 
         self._bullets: List[Bullet] = []
@@ -23,10 +29,11 @@ class Level:
                 ship["maneuverability"],
                 ship["acceleration"],
                 ship["bullet_speed"],
-                ship["sound_shoot"])
-            self._spaceship = Spaceship(props, "spaceship",
-                                        constants.SCREEN_CENTER,
-                                        self._bullets.append)
+                ship["sound_shoot"],
+            )
+            self._spaceship = Spaceship(
+                props, "spaceship", constants.SCREEN_CENTER, self._bullets.append
+            )
 
             self._asteroids: List[Asteroid] = []
             for a in data["asteroids"]:
@@ -39,12 +46,16 @@ class Level:
                         v["scale"],
                         v["children"],
                         v["sound_hit"],
-                        v["sprite_name"]
+                        v["sprite_name"],
                     )
 
-                position = get_safe_asteroid_distance(screen, self.spaceship.geometry.position)
+                position = get_safe_asteroid_distance(
+                    screen, self.spaceship.geometry.position
+                )
 
-                self._asteroids.append(Asteroid(props, position, self._asteroids.append, 3))
+                self._asteroids.append(
+                    Asteroid(props, position, self._asteroids.append, 3)
+                )
 
         self._background: Background = Background("background")
 
@@ -83,7 +94,6 @@ class Level:
 
 
 class World:
-
     def load_level(self, screen, path, item):
         return lambda: Level(screen, os.path.join(path, item, ".json"))
 
@@ -91,7 +101,7 @@ class World:
         path = "../levels/"
         self._levels = {}
         for item in os.listdir(path):
-            if not item.startswith('.') and os.path.isdir(os.path.join(path, item)):
+            if not item.startswith(".") and os.path.isdir(os.path.join(path, item)):
                 (k, v) = item.split("_")
                 self._levels[int(k)] = (item, self.load_level(screen, path, item))
 

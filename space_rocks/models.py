@@ -23,11 +23,7 @@ class GameState(Enum):
 
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(
-            self,
-            position: Vector2,
-            image: Surface,
-            velocity: Vector2):
+    def __init__(self, position: Vector2, image: Surface, velocity: Vector2):
 
         super(GameObject, self).__init__()
         if image:
@@ -50,7 +46,13 @@ class GameObject(pygame.sprite.Sprite):
 
 
 class SpaceshipProperties:
-    def __init__(self, maneuverability: float, acceleration: float, bullet_speed: float, sound_shoot: str):
+    def __init__(
+        self,
+        maneuverability: float,
+        acceleration: float,
+        bullet_speed: float,
+        sound_shoot: str,
+    ):
         self.maneuverability = maneuverability
         self.acceleration = acceleration
         self.bullet_speed = bullet_speed
@@ -61,16 +63,18 @@ class Spaceship(GameObject):
     UP = Vector2(0, -1)
 
     def __init__(
-            self,
-            properties: SpaceshipProperties,
-            sprite_name: str,
-            position: Vector2,
-            create_bullet_callback: Callable[[Any], None]
+        self,
+        properties: SpaceshipProperties,
+        sprite_name: str,
+        position: Vector2,
+        create_bullet_callback: Callable[[Any], None],
     ):
         self._properties = properties
         self._create_bullet_callback = create_bullet_callback
         self._direction = Vector2(self.UP)
-        super().__init__(position, SpriteLibrary.load(sprite_name, resize=(150, 150)), Vector2(0))
+        super().__init__(
+            position, SpriteLibrary.load(sprite_name, resize=(150, 150)), Vector2(0)
+        )
 
     def rotate(self, clockwise: bool = True):
         sign = 1 if clockwise else -1
@@ -106,7 +110,9 @@ class Spaceship(GameObject):
         vel.y = (vel.y * 0.8) * -1
 
     def shoot(self):
-        bullet_velocity = self._direction * self._properties.bullet_speed + self.geometry.velocity
+        bullet_velocity = (
+            self._direction * self._properties.bullet_speed + self.geometry.velocity
+        )
         bullet = Bullet("bullet", self.geometry.position, bullet_velocity)
         self._create_bullet_callback(bullet)
         SoundLibrary.play(self._properties.sound_shoot)
@@ -114,14 +120,14 @@ class Spaceship(GameObject):
 
 class AsteroidProperties:
     def __init__(
-            self,
-            min_velocity: int,
-            max_velocity: int,
-            max_rotation: float,
-            scale: float,
-            children: int,
-            sound_hit: str,
-            sprite_name: str
+        self,
+        min_velocity: int,
+        max_velocity: int,
+        max_rotation: float,
+        scale: float,
+        children: int,
+        sound_hit: str,
+        sprite_name: str,
     ):
         self.min_velocity = min_velocity
         self.max_velocity = max_velocity
@@ -134,11 +140,11 @@ class AsteroidProperties:
 
 class Asteroid(GameObject):
     def __init__(
-            self,
-            properties: Dict[int, AsteroidProperties],
-            position: Vector2,
-            create_asteroid_callback: Callable[[Any], None],
-            tier: int,
+        self,
+        properties: Dict[int, AsteroidProperties],
+        position: Vector2,
+        create_asteroid_callback: Callable[[Any], None],
+        tier: int,
     ):
         self._properties = properties
         self._create_asteroid_callback = create_asteroid_callback
@@ -149,12 +155,17 @@ class Asteroid(GameObject):
         self._props: AsteroidProperties = self._properties[self._tier]
         self._rotation = get_random_rotation(0, self._props.max_rotation)
 
-        sprite = rotozoom(SpriteLibrary.load(self._props.sprite_name, resize=(200, 200)), 0, self._props.scale)
+        sprite = rotozoom(
+            SpriteLibrary.load(self._props.sprite_name, resize=(200, 200)),
+            0,
+            self._props.scale,
+        )
 
         super().__init__(
             position,
             sprite,
-            get_random_velocity(self._props.min_velocity, self._props.max_velocity))
+            get_random_velocity(self._props.min_velocity, self._props.max_velocity),
+        )
 
     def draw(self, surface: Surface):
         self._angle += self._rotation
@@ -173,17 +184,16 @@ class Asteroid(GameObject):
                     self._properties,
                     self.geometry.position,
                     self._create_asteroid_callback,
-                    self._tier - 1)
+                    self._tier - 1,
+                )
                 self._create_asteroid_callback(asteroid)
 
 
 class Bullet(GameObject):
-    def __init__(
-            self,
-            sprite_name: str,
-            position: Vector2,
-            velocity: Vector2):
-        super().__init__(position, SpriteLibrary.load(sprite_name, resize=(40, 40)), velocity)
+    def __init__(self, sprite_name: str, position: Vector2, velocity: Vector2):
+        super().__init__(
+            position, SpriteLibrary.load(sprite_name, resize=(40, 40)), velocity
+        )
 
     def move(self, surface: Surface):
         self.geometry = self.geometry.update_pos(
@@ -191,10 +201,8 @@ class Bullet(GameObject):
         )
 
 
-class Stats():
-    def __init__(
-            self,
-            clock: pygame.time.Clock):
+class Stats:
+    def __init__(self, clock: pygame.time.Clock):
         self._clock = clock
         self._font = pygame.font.Font(None, 30)
         # super().__init__(Vector2(0, 0), None, Vector2(0, 0))
@@ -206,7 +214,8 @@ class Stats():
             f"{round(fps, 0)} fps | x:{round(pos.x, 1)} y:{round(pos.y, 1)} | vel: {vel} | "
             f"win:{(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)} | "
             f"display: {(pygame.display.Info().current_w, pygame.display.Info().current_h)}",
-            False, (255, 255, 0)
+            False,
+            (255, 255, 0),
         )
         surface.blit(text_surface, (0, 0))
 
@@ -219,7 +228,9 @@ class UI:
         self._font = pygame.font.Font(None, 64)
         self._message = ""
 
-    def _print_text(self, surface: Surface, text: str, font: Font, color: Color = Color("white")):
+    def _print_text(
+        self, surface: Surface, text: str, font: Font, color: Color = Color("white")
+    ):
         text_surface: Surface = font.render(text, True, color)
 
         rect = text_surface.get_rect()
@@ -252,17 +263,20 @@ class Background:
         self._offset = (x, y)
         self._position = Vector2(0, 0)
         self._center = Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2)
-        SoundLibrary.play("background", True)  # better to create new method playForever ?
+        SoundLibrary.play(
+            "background", True
+        )  # better to create new method playForever ?
 
     def draw(self, surface: Surface, pos: Vector2):
-        self._position = (pos - self._center) * -0.2  # ensures background moves slower than ship
+        self._position = (
+            pos - self._center
+        ) * -0.2  # ensures background moves slower than ship
         self._position += self._offset
 
         surface.blit(self._background, self._position)
 
 
-class Animation():
-
+class Animation:
     def animstrip(self, img, width=0):
         if not width:
             width = img.get_height()
@@ -280,17 +294,13 @@ class Animation():
             elif origckey:
                 i.set_colorkey(origckey)
 
-            i = pygame.transform.scale(i, (200,200))
+            i = pygame.transform.scale(i, (200, 200))
             images.append(i.convert())
         img.set_alpha(origalpha)
         img.set_colorkey(origckey)
         return images
 
-
-
-
-
-    def __init__(self, image_name:str, position: Vector2):
+    def __init__(self, image_name: str, position: Vector2):
 
         img = SpriteLibrary.load(image_name, False)
         self._images = self.animstrip(img)
@@ -315,5 +325,3 @@ class Animation():
         img = self._images[self._img_index]
         blit_position: Vector2 = self._position - Vector2(img.get_size()) * 0.5
         surface.blit(img, blit_position)
-
-

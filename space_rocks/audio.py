@@ -6,12 +6,14 @@ import pygame.mixer
 
 class SoundLibrary:
     from pygame.mixer import Sound
+
     _bank: Dict[str, Sound] = {}
 
     @classmethod
     def __init__(cls, level_name: str) -> None:
 
         from pygame.mixer import Sound
+
         cls._bank = {}
         level_name = level_name.lower()
         for f in os.listdir(f"../levels/{level_name}/sounds/"):
