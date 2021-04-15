@@ -1,4 +1,5 @@
 import os
+from space_rocks import constants
 from typing import Dict, Tuple
 
 import pygame
@@ -11,10 +12,8 @@ class SpriteLibrary:
 
     @classmethod
     def __init__(cls, level_name: str) -> None:
-
         cls._bank = {}
         level_name = level_name.lower()
-        # cls._bank["not_found"] = load(f"../assets/sprites/not_found.png")
 
         for f in os.listdir(f"../levels/{level_name}/sprites/"):
             f = f.lower()
@@ -22,16 +21,16 @@ class SpriteLibrary:
                 try:
                     g = load(f"../levels/{level_name}/sprites/{f}")
                 except:
-                    g = load(f"../assets/sprites/not_found.png")
+                    g = load(f"{constants.GFX_ASSETS_ROOT}not_found.png")
                 cls._bank[f.split(".")[0]] = g
 
-        for f in os.listdir(f"../assets/sprites/"):
+        for f in os.listdir(f"{constants.GFX_ASSETS_ROOT}"):
             f = f.lower()
             if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
                 try:
-                    g = load(f"../assets/sprites/{f}")
+                    g = load(f"{constants.GFX_ASSETS_ROOT}{f}")
                 except:
-                    g = load(f"../assets/sprites/not_found.png")
+                    g = load(f"{constants.GFX_ASSETS_ROOT}not_found.png")
                 cls._bank[f.split(".")[0]] = g
 
     @classmethod

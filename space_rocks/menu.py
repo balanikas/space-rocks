@@ -4,6 +4,8 @@ import pygame_menu
 from pygame.surface import Surface
 from pygame_menu import sound
 
+from space_rocks import constants
+
 
 class Menu:
     def __init__(
@@ -16,7 +18,7 @@ class Menu:
         all_levels: List[Tuple[str, int]],
     ):
         engine = sound.Sound()
-        engine.set_sound(sound.SOUND_TYPE_EVENT, "../assets/sounds/menu/default.wav")
+        engine.set_sound(sound.SOUND_TYPE_EVENT, f"{constants.SOUND_ASSETS_ROOT}menu/default.wav")
 
         theme = pygame_menu.themes.THEME_DARK.copy()
         theme.set_background_color_opacity(0)
@@ -31,8 +33,6 @@ class Menu:
         )
 
         self.menu.get_menubar().hide()
-
-        # self.menu.set_onmouseover(None)
 
         def on_select_level(x, level):
             self.menu.get_sound().play_event()

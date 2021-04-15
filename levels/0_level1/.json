@@ -65,6 +65,126 @@
                 "sound_hit": "explosion4",
                 "sprite_name": "planet-2"
             }
+        },
+
+         {
+            "3": {
+                "max_velocity": 2,
+                "min_velocity": 4,
+                "max_rotation": 50,
+                "scale": 1,
+                "children": 1,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            },
+            "2" : {
+                "max_velocity": 1,
+                "min_velocity": 2,
+                "max_rotation": 50,
+                "scale": 0.3,
+                "children": 8,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            },
+            "1" : {
+                "max_velocity": 1,
+                "min_velocity": 2,
+                "max_rotation": 5,
+                "scale": 0.2,
+                "children": 1,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            }
+        },
+
+         {
+            "3": {
+                "max_velocity": 2,
+                "min_velocity": 4,
+                "max_rotation": 50,
+                "scale": 1,
+                "children": 1,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            },
+            "2" : {
+                "max_velocity": 1,
+                "min_velocity": 2,
+                "max_rotation": 50,
+                "scale": 0.3,
+                "children": 8,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            },
+            "1" : {
+                "max_velocity": 1,
+                "min_velocity": 2,
+                "max_rotation": 5,
+                "scale": 0.2,
+                "children": 1,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            }
+        },
+
+         {
+            "3": {
+                "max_velocity": 2,
+                "min_velocity": 4,
+                "max_rotation": 50,
+                "scale": 1,
+                "children": 1,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            },
+            "2" : {
+                "max_velocity": 1,
+                "min_velocity": 2,
+                "max_rotation": 50,
+                "scale": 0.3,
+                "children": 8,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            },
+            "1" : {
+                "max_velocity": 1,
+                "min_velocity": 2,
+                "max_rotation": 5,
+                "scale": 0.2,
+                "children": 1,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            }
+        },
+
+         {
+            "3": {
+                "max_velocity": 2,
+                "min_velocity": 4,
+                "max_rotation": 50,
+                "scale": 1,
+                "children": 1,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            },
+            "2" : {
+                "max_velocity": 1,
+                "min_velocity": 2,
+                "max_rotation": 50,
+                "scale": 0.3,
+                "children": 8,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            },
+            "1" : {
+                "max_velocity": 1,
+                "min_velocity": 2,
+                "max_rotation": 5,
+                "scale": 0.2,
+                "children": 1,
+                "sound_hit": "explosion4",
+                "sprite_name": "planet-2"
+            }
         }
     ]
 }

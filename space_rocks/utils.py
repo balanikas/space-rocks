@@ -1,5 +1,7 @@
 import random
 
+import pygame
+
 from pygame.math import Vector2
 from pygame.surface import Surface
 
@@ -44,3 +46,17 @@ def get_safe_asteroid_distance(screen, ship_position: Vector2):
         if position.distance_to(ship_position) > MIN_ASTEROID_DISTANCE:
             break
     return position
+
+def print_info():
+    lines = []
+    info = pygame.display.Info()
+    lines.append("Current Video Driver: %s" % pygame.display.get_driver())
+    lines.append("Video Mode is Accelerated: %s" % ("No", "Yes")[info.hw])
+    lines.append("Display Depth (Bits Per Pixel): %d" % info.bitsize)
+
+    info = pygame.mixer.get_init()
+    lines.append("Sound Frequency: %d" % info[0])
+    lines.append("Sound Quality: %d bits" % abs(info[1]))
+    lines.append("Sound Channels: %s" % ("Mono", "Stereo")[info[2] - 1])
+
+    print(lines)

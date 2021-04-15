@@ -3,6 +3,8 @@ from typing import Dict
 
 import pygame.mixer
 
+from space_rocks import constants
+
 
 class SoundLibrary:
     from pygame.mixer import Sound
@@ -13,7 +15,6 @@ class SoundLibrary:
     def __init__(cls, level_name: str) -> None:
 
         from pygame.mixer import Sound
-
         cls._bank = {}
         level_name = level_name.lower()
         for f in os.listdir(f"../levels/{level_name}/sounds/"):
@@ -22,17 +23,17 @@ class SoundLibrary:
                 try:
                     s = Sound(f"../levels/{level_name}/sounds/{f}")
                 except:
-                    s = Sound(f"../assets/sounds/not_found.wav")
+                    s = Sound(f"{constants.SOUND_ASSETS_ROOT}not_found.wav")
 
                 cls._bank[f.split(".")[0]] = s
 
-        for f in os.listdir(f"../assets/sounds/"):
+        for f in os.listdir(f"{constants.SOUND_ASSETS_ROOT}"):
             f = f.lower()
             if f.endswith(".wav"):
                 try:
-                    s = Sound(f"../assets/sounds/{f}")
+                    s = Sound(f"{constants.SOUND_ASSETS_ROOT}{f}")
                 except:
-                    s = Sound(f"../assets/sounds/not_found.wav")
+                    s = Sound(f"{constants.SOUND_ASSETS_ROOT}not_found.wav")
 
                 cls._bank[f.split(".")[0]] = s
 
@@ -42,8 +43,9 @@ class SoundLibrary:
             print(f"sound {name} not found")
             name = "not_found"
 
-        cls._bank[name].play(1000 if repeat else 0)
-        pygame.mixer.pause()
+        if constants.ENABLE_AUDIO:
+            cls._bank[name].play(1000 if repeat else 0)
+
 
     @classmethod
     def stop(cls, name: str):

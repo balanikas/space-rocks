@@ -205,7 +205,6 @@ class Stats:
     def __init__(self, clock: pygame.time.Clock):
         self._clock = clock
         self._font = pygame.font.Font(None, 30)
-        # super().__init__(Vector2(0, 0), None, Vector2(0, 0))
 
     def draw(self, surface: Surface, pos: Vector2, vel: Vector2):
         fps = self._clock.get_fps()
@@ -241,12 +240,12 @@ class UI:
         if state == GameState.WON:
             self._message = "You won! Press RETURN to continue"
             SoundLibrary.play("win_level")
-        if state == GameState.LOST:
+        elif state == GameState.LOST:
             self._message = "You lost! Press RETURN to restart"
             SoundLibrary.play("game_over")
-        if state == GameState.RUNNING:
+        elif state == GameState.RUNNING:
             self._message = ""
-        if state == GameState.NOT_RUNNING:
+        elif state == GameState.NOT_RUNNING:
             self._message = "Press RETURN to start"
 
         self._print_text(surface, self._message, self._font)
@@ -282,22 +281,22 @@ class Animation:
             width = img.get_height()
         size = width, img.get_height()
         images = []
-        origalpha = img.get_alpha()
-        origckey = img.get_colorkey()
+        orig_alpha = img.get_alpha()
+        orig_ckey = img.get_colorkey()
         img.set_colorkey(None)
         img.set_alpha(None)
         for x in range(0, img.get_width(), width):
             i = pygame.Surface(size)
             i.blit(img, (0, 0), ((x, 0), size))
-            if origalpha:
+            if orig_alpha:
                 i.set_colorkey((0, 0, 0))
-            elif origckey:
-                i.set_colorkey(origckey)
+            elif orig_ckey:
+                i.set_colorkey(orig_ckey)
 
             i = pygame.transform.scale(i, (200, 200))
             images.append(i.convert())
-        img.set_alpha(origalpha)
-        img.set_colorkey(origckey)
+        img.set_alpha(orig_alpha)
+        img.set_colorkey(orig_ckey)
         return images
 
     def __init__(self, image_name: str, position: Vector2):

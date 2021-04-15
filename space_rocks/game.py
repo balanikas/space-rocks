@@ -2,14 +2,13 @@ from typing import List
 
 import pygame
 from pygame import surface
-from pygame.math import Vector2
 import constants
 from audio import SoundLibrary, init_sounds
 from graphics import init_sprites
 from menu import Menu
 from models import GameObject, Stats, UI, GameState, Animation
 from space_rocks.levels import World
-from utils import collides_with
+from utils import collides_with, print_info
 
 
 # todo more accurate coll detection
@@ -24,7 +23,11 @@ from utils import collides_with
 # todo game idea: 9 types of planets, each with own props like toughness, speed, how they split, rotation
 # todo game idea: asutogenerated levels with increasing difficulty
 # todo game idea: keep score, and perhaps highscore
-# todo : explosion as sprite anims
+# todo have a "record" option and record all game input and then replay it
+# todo preload all png sprites
+# todo embed QT in the game window or vice versa, so game can be paused, .json file edited and restart game
+# todo state machine for GameState ?
+# todo https://realpython.com/pyinstaller-python/
 
 
 class SpaceRocks:
@@ -75,27 +78,15 @@ class SpaceRocks:
             self._handle_input()
             self._process_game_logic()
             self._draw()
-
-    def gatherinfo(self):
-        lines = []
-        info = pygame.display.Info()
-        lines.append("Current Video Driver: %s" % pygame.display.get_driver())
-        lines.append("Video Mode is Accelerated: %s" % ("No", "Yes")[info.hw])
-        lines.append("Display Depth (Bits Per Pixel): %d" % info.bitsize)
-
-        info = pygame.mixer.get_init()
-        lines.append("Sound Frequency: %d" % info[0])
-        lines.append("Sound Quality: %d bits" % abs(info[1]))
-        lines.append("Sound Channels: %s" % ("Mono", "Stereo")[info[2] - 1])
-
-        print(lines)
+            if self._state == GameState.LOST or self._state == GameState.WON:
+                self._state = GameState.NOT_RUNNING
 
     def _init_pygame(self):
         pygame.init()
-        pygame.display.set_caption("Softwaroids")
+        pygame.display.set_caption("video game by Balanikas")
         pygame.font.init()
         pygame.mouse.set_visible(False)
-        self.gatherinfo()
+        print_info()
 
     def _handle_input(self):
         for event in pygame.event.get():
@@ -196,7 +187,6 @@ class SpaceRocks:
             self._state = GameState.WON
 
     def _draw(self):
-
         if self._state is GameState.NOT_RUNNING:
             return
 
@@ -244,6 +234,4 @@ class SpaceRocks:
         self._clock.tick(60)
 
     def _get_game_objects(self) -> List[GameObject]:
-        game_objects: List[GameObject] = self._level.get_game_objects()
-
-        return game_objects
+        return self._level.get_game_objects()
