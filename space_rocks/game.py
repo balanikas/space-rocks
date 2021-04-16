@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 import pygame
@@ -19,15 +20,18 @@ from utils import collides_with, print_info
 # todo even bounce asteroids? appearing/dissapearing looks not good, clipping, etc
 # todo mouse over crashes game - The get_cursor method is unavailable in SDL2
 # todo create a RAL (rendering abstraction layer) so i can switch from SDL to other
-# todo win/lost sounds repeting, since they are in a draw call
 # todo game idea: 9 types of planets, each with own props like toughness, speed, how they split, rotation
 # todo game idea: asutogenerated levels with increasing difficulty
 # todo game idea: keep score, and perhaps highscore
 # todo have a "record" option and record all game input and then replay it
-# todo preload all png sprites
 # todo embed QT in the game window or vice versa, so game can be paused, .json file edited and restart game
 # todo state machine for GameState ?
 # todo https://realpython.com/pyinstaller-python/
+# todo check if ship not rotated to avoid a rotozoom call
+# todo https://realpython.com/python-logging-source-code/#what-does-getlogger-really-do
+# todo find catastrophic errors, print error and raise SystemExit
+# todo refactor so most magic numbers are gone
+# todo schema validation
 
 
 class SpaceRocks:
@@ -38,7 +42,13 @@ class SpaceRocks:
         self._initialize()
 
     def __init__(self):
-        self._init_pygame()
+        logging.basicConfig(level=logging.DEBUG)
+
+        pygame.mixer.pre_init(44100, -16, 2, 4096)
+        pygame.init()
+        pygame.display.set_caption("video game by Balanikas")
+        pygame.font.init()
+        print_info()
 
         self._debug = False
         self._clock = pygame.time.Clock()
@@ -47,9 +57,8 @@ class SpaceRocks:
         self._stats = Stats(self._clock)
         self._ui = UI()
         screen_size = (constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
-        self._screen: surface.Surface = pygame.display.set_mode(
-            screen_size, pygame.HWSURFACE
-        )
+        flags = pygame.DOUBLEBUF  # | pygame.FULLSCREEN
+        self._screen: surface.Surface = pygame.display.set_mode(screen_size, flags, 16)
         self._screen.fill((0, 0, 0))
 
         self._world = World(self._screen)
@@ -80,13 +89,6 @@ class SpaceRocks:
             self._draw()
             if self._state == GameState.LOST or self._state == GameState.WON:
                 self._state = GameState.NOT_RUNNING
-
-    def _init_pygame(self):
-        pygame.init()
-        pygame.display.set_caption("video game by Balanikas")
-        pygame.font.init()
-        pygame.mouse.set_visible(False)
-        print_info()
 
     def _handle_input(self):
         for event in pygame.event.get():

@@ -1,5 +1,9 @@
 import json
+import logging
 import os
+import jsonschema
+from jsonschema import validate
+
 from typing import List, Sequence, Tuple
 
 from pygame.surface import Surface
@@ -17,45 +21,68 @@ from space_rocks.models import (
 from space_rocks.utils import get_safe_asteroid_distance
 
 
+logger = logging.getLogger(__name__)
+
+
+def _load_schema() -> str:
+    with open(f"../levels/level_schema.json", "r") as read_file:
+        return json.load(read_file)
+
+
 class Level:
+
+    schema = _load_schema()
+
+    def _load_level(self, json_path: str):
+        with open(json_path, "r") as read_file:
+            data = json.load(read_file)
+
+            try:
+                # todo schema is not complete, improve
+                validate(instance=data, schema=self.schema)
+            except jsonschema.exceptions.ValidationError as err:
+                print(f"invalid json at: {json_path}: " + err.message)
+                raise SystemExit
+
+            logger.info(f"{json_path} loaded and appears valid")
+            return data
+
     def __init__(self, screen: Surface, json_path: str):
 
         self._bullets: List[Bullet] = []
 
-        with open(json_path, "r") as read_file:
-            data = json.load(read_file)
-            ship = data["ship"]
-            props = SpaceshipProperties(
-                ship["maneuverability"],
-                ship["acceleration"],
-                ship["bullet_speed"],
-                ship["sound_shoot"],
-            )
-            self._spaceship = Spaceship(
-                props, "spaceship", constants.SCREEN_CENTER, self._bullets.append
-            )
+        data = self._load_level(json_path)
 
-            self._asteroids: List[Asteroid] = []
-            for a in data["asteroids"]:
-                props = {}
-                for k, v in a.items():
-                    props[int(k)] = AsteroidProperties(
-                        v["max_velocity"],
-                        v["min_velocity"],
-                        v["max_rotation"],
-                        v["scale"],
-                        v["children"],
-                        v["sound_hit"],
-                        v["sprite_name"],
-                    )
+        ship = data["ship"]
+        props = SpaceshipProperties(
+            ship["maneuverability"],
+            ship["acceleration"],
+            ship["bullet_speed"],
+            ship["sound_shoot"],
+        )
+        self._spaceship = Spaceship(
+            props, "spaceship", constants.SCREEN_CENTER, self._bullets.append
+        )
 
-                position = get_safe_asteroid_distance(
-                    screen, self.spaceship.geometry.position
+        self._asteroids: List[Asteroid] = []
+        for a in data["asteroids"]:
+            props = {}
+            for k, v in a.items():
+                props[int(k)] = AsteroidProperties(
+                    v["max_velocity"],
+                    v["min_velocity"],
+                    v["max_rotation"],
+                    v["scale"],
+                    v["children"],
+                    v["sound_hit"],
+                    v["sprite_name"],
                 )
 
-                self._asteroids.append(
-                    Asteroid(props, position, self._asteroids.append, 3)
-                )
+            position = get_safe_asteroid_distance(
+                screen, self.spaceship.geometry.position
+            )
+
+            self._asteroids.append(Asteroid(props, position, self._asteroids.append, 3))
 
         self._background: Background = Background("background")
 

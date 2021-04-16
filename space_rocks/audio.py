@@ -1,9 +1,10 @@
+import logging
 import os
 from typing import Dict
 
-import pygame.mixer
-
 from space_rocks import constants
+
+logger = logging.getLogger(__name__)
 
 
 class SoundLibrary:
@@ -15,6 +16,7 @@ class SoundLibrary:
     def __init__(cls, level_name: str) -> None:
 
         from pygame.mixer import Sound
+
         cls._bank = {}
         level_name = level_name.lower()
         for f in os.listdir(f"../levels/{level_name}/sounds/"):
@@ -39,6 +41,7 @@ class SoundLibrary:
 
     @classmethod
     def play(cls, name: str, repeat: bool = False):
+        name = name.lower()
         if name not in cls._bank:
             print(f"sound {name} not found")
             name = "not_found"
@@ -46,9 +49,9 @@ class SoundLibrary:
         if constants.ENABLE_AUDIO:
             cls._bank[name].play(1000 if repeat else 0)
 
-
     @classmethod
     def stop(cls, name: str):
+        name = name.lower()
         if name not in cls._bank:
             name = "not_found"
 
@@ -59,7 +62,12 @@ class SoundLibrary:
         for k, v in cls._bank.items():
             v.stop()
 
+    @classmethod
+    def print_state(cls):
+        logger.info("sounds loaded")
+        logger.info(cls._bank.keys())
+
 
 def init_sounds(level_name: str):
     SoundLibrary(level_name)
-    print(f"sounds loaded for level {level_name}")
+    SoundLibrary.print_state()

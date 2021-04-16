@@ -18,7 +18,9 @@ class Menu:
         all_levels: List[Tuple[str, int]],
     ):
         engine = sound.Sound()
-        engine.set_sound(sound.SOUND_TYPE_EVENT, f"{constants.SOUND_ASSETS_ROOT}menu/default.wav")
+        engine.set_sound(
+            sound.SOUND_TYPE_EVENT, f"{constants.SOUND_ASSETS_ROOT}menu/default.wav"
+        )
 
         theme = pygame_menu.themes.THEME_DARK.copy()
         theme.set_background_color_opacity(0)

@@ -1,3 +1,4 @@
+import logging
 import os
 from space_rocks import constants
 from typing import Dict, Tuple
@@ -5,6 +6,8 @@ from typing import Dict, Tuple
 import pygame
 from pygame.image import load
 from pygame.surface import Surface
+
+logger = logging.getLogger(__name__)
 
 
 class SpriteLibrary:
@@ -35,6 +38,7 @@ class SpriteLibrary:
 
     @classmethod
     def load(cls, name: str, with_alpha: bool = True, resize: Tuple[int, int] = None):
+        name = name.lower()
         if name not in cls._bank:
             print(f"sprite {name} not found")
             name = "not_found"
@@ -44,7 +48,12 @@ class SpriteLibrary:
             loaded_sprite = pygame.transform.scale(loaded_sprite, resize)
         return loaded_sprite.convert_alpha() if with_alpha else loaded_sprite.convert()
 
+    @classmethod
+    def print_state(cls):
+        logger.info("gfx loaded")
+        logger.info(cls._bank.keys())
+
 
 def init_sprites(level_name: str):
     SpriteLibrary(level_name)
-    print(f"sprites loaded for level {level_name}")
+    SpriteLibrary.print_state()

@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "ship": {
+      "type": "object",
+      "properties": {
+        "maneuverability": {
+          "type": "integer"
+        },
+        "acceleration": {
+          "type": "number"
+        },
+        "bullet_speed": {
+          "type": "integer"
+        },
+        "sound_shoot": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "maneuverability",
+        "acceleration",
+        "bullet_speed",
+        "sound_shoot"
+      ]
+    },
+    "asteroids": {
+      "type": "array",
+      "items": {}
+    }
+  },
+  "required": [
+    "ship",
+    "asteroids"
+  ]
+}

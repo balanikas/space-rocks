@@ -47,6 +47,7 @@ def get_safe_asteroid_distance(screen, ship_position: Vector2):
             break
     return position
 
+
 def print_info():
     lines = []
     info = pygame.display.Info()
