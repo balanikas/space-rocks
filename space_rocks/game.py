@@ -1,19 +1,20 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 import pygame
 from pygame import surface
-import constants
+from pygame.locals import *
+
 from audio import SoundLibrary, init_sounds
 from graphics import init_sprites
 from menu import Menu
 from models import GameObject, Stats, UI, GameState, Animation
-from space_rocks.levels import World
+from space_rocks.levels import World, Level
+from space_rocks.window import window
 from utils import collides_with, print_info
 
 
 # todo more accurate coll detection
-# todo: more asteroid sprites
 # todo profiling: add flags to control stuff: enable_coldet, enable_rotation, enable_bla.. see perf graph and optimize.
 # todo move game logic to per-level?
 # todo edge bounce a bit buggy, fix
@@ -30,8 +31,9 @@ from utils import collides_with, print_info
 # todo check if ship not rotated to avoid a rotozoom call
 # todo https://realpython.com/python-logging-source-code/#what-does-getlogger-really-do
 # todo find catastrophic errors, print error and raise SystemExit
-# todo refactor so most magic numbers are gone
-# todo schema validation
+# todo fix 3 nice playable balanced levels, settle tha, experiment on level4
+# todo organize imports
+# todo key to toggle fullscreen but pygame.display.toggle_fullscreen() is buggy
 
 
 class SpaceRocks:
@@ -39,7 +41,7 @@ class SpaceRocks:
         self._world.set_current_level(level)
 
     def start_the_game(self):
-        self._initialize()
+        self._initialize_level()
 
     def __init__(self):
         logging.basicConfig(level=logging.DEBUG)
@@ -56,23 +58,20 @@ class SpaceRocks:
         self._state = GameState.NOT_RUNNING
         self._stats = Stats(self._clock)
         self._ui = UI()
-        screen_size = (constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
-        flags = pygame.DOUBLEBUF  # | pygame.FULLSCREEN
-        self._screen: surface.Surface = pygame.display.set_mode(screen_size, flags, 16)
+        flags = pygame.RESIZABLE
+        self._screen: surface.Surface = pygame.display.set_mode(window.size, flags, 16)
         self._screen.fill((0, 0, 0))
 
         self._world = World(self._screen)
-
+        self._level: Optional[Level]
         self._menu = Menu(
-            constants.SCREEN_WIDTH,
-            constants.SCREEN_HEIGHT,
             self.set_level,
             self.start_the_game,
-            self._screen,
             self._world.get_all_levels(),
         )
+        self._menu.menu.mainloop(self._screen)
 
-    def _initialize(self):
+    def _initialize_level(self):
         SoundLibrary.stop_all()
 
         current_level = self._world.get_current_level()
@@ -87,13 +86,27 @@ class SpaceRocks:
             self._handle_input()
             self._process_game_logic()
             self._draw()
-            if self._state == GameState.LOST or self._state == GameState.WON:
-                self._state = GameState.NOT_RUNNING
 
     def _handle_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
+            elif event.type == VIDEORESIZE:
+                window.resize()
+
+                self._level.background.resize()
+                self._level.spaceship.resize()
+                for a in self._level.asteroids:
+                    a.resize()
+
+                self._menu = Menu(
+                    self.set_level,
+                    self.start_the_game,
+                    self._world.get_all_levels(),
+                )
+
+            elif event.type == VIDEOEXPOSE:  # handles window minimising/maximising
+                pass
 
             if event.type == pygame.KEYDOWN:
 
@@ -107,25 +120,22 @@ class SpaceRocks:
                 if event.key == pygame.K_1:
                     self._state = GameState.RUNNING
                     self._level = self._world.set_current_level(0)
-                    self._initialize()
+                    self._initialize_level()
                 if event.key == pygame.K_2:
                     self._state = GameState.RUNNING
                     self._level = self._world.set_current_level(1)
-                    self._initialize()
+                    self._initialize_level()
                 if event.key == pygame.K_3:
                     self._state = GameState.RUNNING
                     self._level = self._world.set_current_level(2)
-                    self._initialize()
+                    self._initialize_level()
 
-                if (
-                    event.key == pygame.K_RETURN
-                    and self._state is not GameState.RUNNING
-                ):
+                if event.key == pygame.K_RETURN:
                     if self._state == GameState.WON:
                         self._level = self._world.advance_level()
                     if self._state == GameState.LOST:
                         self._level = self._world.set_current_level(0)
-                    self._initialize()
+                    self._initialize_level()
 
         is_key_pressed = pygame.key.get_pressed()
 
@@ -166,6 +176,9 @@ class SpaceRocks:
                     False,
                     pygame.sprite.collide_mask,
                 ):
+                    self._effects.append(
+                        Animation("explosion", asteroid.geometry.position)
+                    )
                     # self._level.remove_spaceship()
                     self._state = GameState.LOST
                     break
@@ -189,8 +202,6 @@ class SpaceRocks:
             self._state = GameState.WON
 
     def _draw(self):
-        if self._state is GameState.NOT_RUNNING:
-            return
 
         self._level.background.draw(
             self._screen, self._level.spaceship.geometry.position
@@ -228,6 +239,7 @@ class SpaceRocks:
                 self._screen,
                 self._level.spaceship.geometry.position,
                 self._level.spaceship.geometry.velocity,
+                self._level.spaceship._direction,
             )
 
         self._ui.draw(self._screen, self._state)

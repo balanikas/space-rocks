@@ -1,14 +1,12 @@
 import json
 import logging
 import os
-import jsonschema
-from jsonschema import validate
-
 from typing import List, Sequence, Tuple
 
+import jsonschema
+from jsonschema import validate
 from pygame.surface import Surface
 
-import constants
 from space_rocks.models import (
     Background,
     Asteroid,
@@ -19,7 +17,7 @@ from space_rocks.models import (
     GameObject,
 )
 from space_rocks.utils import get_safe_asteroid_distance
-
+from space_rocks.window import window
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +28,6 @@ def _load_schema() -> str:
 
 
 class Level:
-
     schema = _load_schema()
 
     def _load_level(self, json_path: str):
@@ -59,10 +56,9 @@ class Level:
             ship["acceleration"],
             ship["bullet_speed"],
             ship["sound_shoot"],
+            "spaceship",
         )
-        self._spaceship = Spaceship(
-            props, "spaceship", constants.SCREEN_CENTER, self._bullets.append
-        )
+        self._spaceship = Spaceship(props, window.center, self._bullets.append)
 
         self._asteroids: List[Asteroid] = []
         for a in data["asteroids"]:

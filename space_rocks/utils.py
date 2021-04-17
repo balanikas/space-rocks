@@ -1,11 +1,13 @@
+import math
 import random
+from typing import Tuple
 
 import pygame
-
 from pygame.math import Vector2
 from pygame.surface import Surface
 
 from geometry import Geometry
+from space_rocks.window import window
 
 
 def wrap_position(position: Vector2, surface: Surface):
@@ -61,3 +63,8 @@ def print_info():
     lines.append("Sound Channels: %s" % ("Mono", "Stereo")[info[2] - 1])
 
     print(lines)
+
+
+def get_resize_factor(factor: float) -> Tuple[int, int]:
+    max_ratio = max(window.size)
+    return math.floor(max_ratio * factor), math.floor(max_ratio * factor)

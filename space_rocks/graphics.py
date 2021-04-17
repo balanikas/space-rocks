@@ -1,17 +1,35 @@
+import io
 import logging
 import os
-from space_rocks import constants
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Any
 
 import pygame
+from PIL import Image, ImageDraw, ImageFont
 from pygame.image import load
 from pygame.surface import Surface
+
+from space_rocks import constants
 
 logger = logging.getLogger(__name__)
 
 
 class SpriteLibrary:
     _bank: Dict[str, Surface] = {}
+
+    @classmethod
+    def load_from_text(cls, text: str) -> Any:
+
+        text = text.strip("text:")
+        img: Image = Image.new("RGBA", (200, 200))
+
+        d = ImageDraw.Draw(img)
+        font = ImageFont.truetype("../assets/font.ttf", 20)
+        d.text((0, 100), text, fill=(255, 0, 255), font=font)
+        s = io.BytesIO()
+        img.save(s, "png")
+        bytes = img.tobytes()
+
+        return pygame.image.fromstring(bytes, img.size, img.mode)
 
     @classmethod
     def __init__(cls, level_name: str) -> None:
@@ -41,7 +59,10 @@ class SpriteLibrary:
         name = name.lower()
         if name not in cls._bank:
             print(f"sprite {name} not found")
-            name = "not_found"
+            if name.startswith("text:"):
+                cls._bank[name] = cls.load_from_text(name)
+            else:
+                name = "not_found"
 
         loaded_sprite = cls._bank[name]
         if resize:

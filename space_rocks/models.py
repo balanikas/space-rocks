@@ -11,8 +11,13 @@ from pygame.transform import rotozoom
 from audio import SoundLibrary
 from geometry import Geometry
 from graphics import SpriteLibrary
-from space_rocks import constants
-from utils import wrap_position, get_random_velocity, get_random_rotation
+from space_rocks.window import window
+from utils import (
+    wrap_position,
+    get_random_velocity,
+    get_random_rotation,
+    get_resize_factor,
+)
 
 
 class GameState(Enum):
@@ -44,6 +49,13 @@ class GameObject(pygame.sprite.Sprite):
             wrap_position(self.geometry.position + self.geometry.velocity, surface)
         )
 
+    def reposition(self):
+        new_pos = Vector2(
+            window.factor.x * self.geometry.position.x,
+            window.factor.y * self.geometry.position.y,
+        )
+        self.geometry = self.geometry.update_pos(new_pos)
+
 
 class SpaceshipProperties:
     def __init__(
@@ -52,11 +64,13 @@ class SpaceshipProperties:
         acceleration: float,
         bullet_speed: float,
         sound_shoot: str,
+        image_name: str,
     ):
         self.maneuverability = maneuverability
         self.acceleration = acceleration
         self.bullet_speed = bullet_speed
         self.sound_shoot = sound_shoot
+        self.image_name = image_name
 
 
 class Spaceship(GameObject):
@@ -65,16 +79,27 @@ class Spaceship(GameObject):
     def __init__(
         self,
         properties: SpaceshipProperties,
-        sprite_name: str,
         position: Vector2,
         create_bullet_callback: Callable[[Any], None],
     ):
         self._properties = properties
         self._create_bullet_callback = create_bullet_callback
         self._direction = Vector2(self.UP)
+        self._edge_distance = 50
+
         super().__init__(
-            position, SpriteLibrary.load(sprite_name, resize=(150, 150)), Vector2(0)
+            position,
+            SpriteLibrary.load(
+                self._properties.image_name, resize=get_resize_factor(0.1)
+            ),
+            Vector2(0),
         )
+
+    def resize(self):
+        self.image = SpriteLibrary.load(
+            self._properties.image_name, resize=get_resize_factor(0.1)
+        )
+        self.reposition()
 
     def rotate(self, clockwise: bool = True):
         sign = 1 if clockwise else -1
@@ -85,10 +110,13 @@ class Spaceship(GameObject):
 
         position = self.geometry.position + self.geometry.velocity
         w, h = surface.get_size()
-        if position.x >= w - 50 or position.x <= 50:
-            self.deccelerate()
-        elif position.y >= h - 50 or position.y <= 50:
-            self.deccelerate()
+        e = self._edge_distance
+        if position.x >= w - e or position.x <= e:
+            vel = self.geometry.velocity
+            vel.x = (vel.x * 0.6) * -1
+        if position.y >= h - e or position.y <= e:
+            vel = self.geometry.velocity
+            vel.y = (vel.y * 0.6) * -1
 
         self.geometry = self.geometry.update_pos(position)
 
@@ -103,11 +131,6 @@ class Spaceship(GameObject):
         self.geometry = self.geometry.update_vel(
             self.geometry.velocity + (self._direction * self._properties.acceleration)
         )
-
-    def deccelerate(self):
-        vel = self.geometry.velocity
-        vel.x = (vel.x * 0.8) * -1
-        vel.y = (vel.y * 0.8) * -1
 
     def shoot(self):
         bullet_velocity = (
@@ -156,7 +179,7 @@ class Asteroid(GameObject):
         self._rotation = get_random_rotation(0, self._props.max_rotation)
 
         sprite = rotozoom(
-            SpriteLibrary.load(self._props.sprite_name, resize=(200, 200)),
+            SpriteLibrary.load(self._props.sprite_name, resize=get_resize_factor(0.1)),
             0,
             self._props.scale,
         )
@@ -166,6 +189,13 @@ class Asteroid(GameObject):
             sprite,
             get_random_velocity(self._props.min_velocity, self._props.max_velocity),
         )
+
+    def resize(self):
+        self.image = SpriteLibrary.load(
+            self._props.sprite_name, resize=get_resize_factor(0.1)
+        )
+        self._props.scale *= max(window.factor)
+        self.reposition()
 
     def draw(self, surface: Surface):
         self._angle += self._rotation
@@ -192,13 +222,22 @@ class Asteroid(GameObject):
 class Bullet(GameObject):
     def __init__(self, sprite_name: str, position: Vector2, velocity: Vector2):
         super().__init__(
-            position, SpriteLibrary.load(sprite_name, resize=(40, 40)), velocity
+            position,
+            SpriteLibrary.load(sprite_name, resize=get_resize_factor(0.03)),
+            velocity,
         )
+        self._sprite_name = sprite_name
 
     def move(self, surface: Surface):
         self.geometry = self.geometry.update_pos(
             self.geometry.position + self.geometry.velocity
         )
+
+    def resize(self):
+        self.image = SpriteLibrary.load(
+            self._sprite_name, resize=get_resize_factor(0.03)
+        )
+        self.reposition()
 
 
 class Stats:
@@ -206,12 +245,12 @@ class Stats:
         self._clock = clock
         self._font = pygame.font.Font(None, 30)
 
-    def draw(self, surface: Surface, pos: Vector2, vel: Vector2):
+    def draw(self, surface: Surface, pos: Vector2, vel: Vector2, dir: Vector2):
         fps = self._clock.get_fps()
 
         text_surface = self._font.render(
-            f"{round(fps, 0)} fps | x:{round(pos.x, 1)} y:{round(pos.y, 1)} | vel: {vel} | "
-            f"win:{(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)} | "
+            f"{round(fps, 0)} fps | x:{round(pos.x, 1)} y:{round(pos.y, 1)} | vel: {vel} | dir: {dir} | "
+            f"win:{window.size} | "
             f"display: {(pygame.display.Info().current_w, pygame.display.Info().current_h)}",
             False,
             (255, 255, 0),
@@ -226,6 +265,7 @@ class UI:
     def __init__(self):
         self._font = pygame.font.Font(None, 64)
         self._message = ""
+        self._sound_played = False
 
     def _print_text(
         self, surface: Surface, text: str, font: Font, color: Color = Color("white")
@@ -239,11 +279,16 @@ class UI:
     def draw(self, surface: Surface, state: GameState):
         if state == GameState.WON:
             self._message = "You won! Press RETURN to continue"
-            SoundLibrary.play("win_level")
+            if not self._sound_played:
+                SoundLibrary.play("win_level")
+                self._sound_played = not self._sound_played
         elif state == GameState.LOST:
             self._message = "You lost! Press RETURN to restart"
-            SoundLibrary.play("game_over")
+            if not self._sound_played:
+                SoundLibrary.play("game_over")
+                self._sound_played = not self._sound_played
         elif state == GameState.RUNNING:
+            self._sound_played = False
             self._message = ""
         elif state == GameState.NOT_RUNNING:
             self._message = "Press RETURN to start"
@@ -252,27 +297,35 @@ class UI:
 
 
 class Background:
-    def __init__(self, sprite_name: str):
-        self._background = SpriteLibrary.load(sprite_name, False)
+    def _initialize(self):
+        self._background = SpriteLibrary.load(
+            self._sprite_name, False, resize=get_resize_factor(1.2)
+        )
 
-        # ensure image is larger than 1280x1024 for this effect to work.
         (s_x, s_y) = self._background.get_size()
-        x = ((s_x - constants.SCREEN_WIDTH) / 2) * -1
-        y = ((s_y - constants.SCREEN_HEIGHT) / 2) * -1
+        x = ((s_x - window.width) / 2) * -1
+        y = ((s_y - window.height) / 2) * -1
         self._offset = (x, y)
         self._position = Vector2(0, 0)
-        self._center = Vector2(constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2)
+
+    def __init__(self, sprite_name: str):
+        self._sprite_name = sprite_name
+        self._initialize()
+
         SoundLibrary.play(
             "background", True
         )  # better to create new method playForever ?
 
     def draw(self, surface: Surface, pos: Vector2):
         self._position = (
-            pos - self._center
+            pos - window.center
         ) * -0.2  # ensures background moves slower than ship
         self._position += self._offset
 
         surface.blit(self._background, self._position)
+
+    def resize(self):
+        self._initialize()
 
 
 class Animation:
@@ -293,7 +346,7 @@ class Animation:
             elif orig_ckey:
                 i.set_colorkey(orig_ckey)
 
-            i = pygame.transform.scale(i, (200, 200))
+            i = pygame.transform.scale(i, get_resize_factor(0.2))
             images.append(i.convert())
         img.set_alpha(orig_alpha)
         img.set_colorkey(orig_ckey)

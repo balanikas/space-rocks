@@ -10,29 +10,29 @@
             "3": {
                 "max_velocity": 1,
                 "min_velocity": 2,
-                "max_rotation": 5,
+                "max_rotation": 2,
                 "scale": 1,
-                "children": 2,
+                "children": 30,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-1"
+                "sprite_name": "text:a"
             },
             "2" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 5,
-                "scale": 0.5,
+                "max_velocity": 3,
+                "min_velocity": 10,
+                "max_rotation": 20,
+                "scale": 0.7,
                 "children": 2,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-1"
+                "sprite_name": "text:b"
             },
             "1" : {
                 "max_velocity": 1,
                 "min_velocity": 2,
                 "max_rotation": 5,
-                "scale": 0.25,
+                "scale": 0.4,
                 "children": 2,
                 "sound_hit": "explosion4",
-                "sprite_name": "planet-1"
+                "sprite_name": "text:c"
             }
         },
 
@@ -41,149 +41,29 @@
             "3": {
                 "max_velocity": 2,
                 "min_velocity": 4,
-                "max_rotation": 50,
-                "scale": 1,
-                "children": 1,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
+                "max_rotation": 0,
+                "scale": 2,
+                "children": 40,
+                "sound_hit": "explosion3",
+                "sprite_name": "text:Python"
             },
             "2" : {
                 "max_velocity": 1,
                 "min_velocity": 2,
-                "max_rotation": 50,
-                "scale": 0.3,
+                "max_rotation": 0,
+                "scale": 1.2,
                 "children": 8,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
+                "sound_hit": "explosion3",
+                "sprite_name": "text:is awesome"
             },
             "1" : {
                 "max_velocity": 1,
                 "min_velocity": 2,
-                "max_rotation": 5,
-                "scale": 0.2,
+                "max_rotation": 0,
+                "scale": 0.5,
                 "children": 1,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            }
-        },
-
-         {
-            "3": {
-                "max_velocity": 2,
-                "min_velocity": 4,
-                "max_rotation": 50,
-                "scale": 1,
-                "children": 1,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            },
-            "2" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 50,
-                "scale": 0.3,
-                "children": 8,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            },
-            "1" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 5,
-                "scale": 0.2,
-                "children": 1,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            }
-        },
-
-         {
-            "3": {
-                "max_velocity": 2,
-                "min_velocity": 4,
-                "max_rotation": 50,
-                "scale": 1,
-                "children": 1,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            },
-            "2" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 50,
-                "scale": 0.3,
-                "children": 8,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            },
-            "1" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 5,
-                "scale": 0.2,
-                "children": 1,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            }
-        },
-
-         {
-            "3": {
-                "max_velocity": 2,
-                "min_velocity": 4,
-                "max_rotation": 50,
-                "scale": 1,
-                "children": 1,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            },
-            "2" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 50,
-                "scale": 0.3,
-                "children": 8,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            },
-            "1" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 5,
-                "scale": 0.2,
-                "children": 1,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            }
-        },
-
-         {
-            "3": {
-                "max_velocity": 2,
-                "min_velocity": 4,
-                "max_rotation": 50,
-                "scale": 1,
-                "children": 1,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            },
-            "2" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 50,
-                "scale": 0.3,
-                "children": 8,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
-            },
-            "1" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 5,
-                "scale": 0.2,
-                "children": 1,
-                "sound_hit": "explosion4",
-                "sprite_name": "planet-2"
+                "sound_hit": "explosion3",
+                "sprite_name": "text:crazyness"
             }
         }
     ]

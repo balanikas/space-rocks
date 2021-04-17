@@ -1,20 +1,17 @@
 from typing import Callable, List, Tuple
 
 import pygame_menu
-from pygame.surface import Surface
 from pygame_menu import sound
 
 from space_rocks import constants
+from space_rocks.window import window
 
 
 class Menu:
     def __init__(
         self,
-        width: int,
-        height: int,
         on_change_level: Callable,
         on_start_game: Callable,
-        screen: Surface,
         all_levels: List[Tuple[str, int]],
     ):
         engine = sound.Sound()
@@ -25,15 +22,14 @@ class Menu:
         theme = pygame_menu.themes.THEME_DARK.copy()
         theme.set_background_color_opacity(0)
         theme.title_bar_style = pygame_menu.widgets.MENUBAR_STYLE_NONE
-        theme.widget_font_size = 60
+        theme.widget_font_size = int(50 * min(window.factor))
         self.menu = pygame_menu.Menu(
             "menu",
-            width * 0.8,
-            height * 0.8,
+            window.width * 0.8,
+            window.height * 0.8,
             theme=theme,
             onclose=pygame_menu.events.CLOSE,
         )
-
         self.menu.get_menubar().hide()
 
         def on_select_level(x, level):
@@ -47,11 +43,3 @@ class Menu:
         self.menu.set_sound(engine, recursive=True)
         for w in self.menu.get_widgets():
             w.set_onselect(self.menu.get_sound().play_event)
-
-        def main_background() -> None:
-            background_image = pygame_menu.BaseImage(
-                image_path=pygame_menu.baseimage.IMAGE_EXAMPLE_METAL
-            )
-            background_image.draw(screen)
-
-        self.menu.mainloop(screen)
