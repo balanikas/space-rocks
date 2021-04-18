@@ -14,30 +14,26 @@ class SoundLibrary:
 
     @classmethod
     def __init__(cls, level_name: str) -> None:
-
         from pygame.mixer import Sound
-
         cls._bank = {}
-        level_name = level_name.lower()
-        for f in os.listdir(f"../levels/{level_name}/sounds/"):
-            f = f.lower()
-            if f.endswith(".wav"):
-                try:
-                    s = Sound(f"../levels/{level_name}/sounds/{f}")
-                except:
-                    s = Sound(f"{constants.SOUND_ASSETS_ROOT}not_found.wav")
 
-                cls._bank[f.split(".")[0]] = s
+        def load_from(path:str):
+            for root, _, files in os.walk(path):
+                for f in files:
+                    f = f.lower()
+                    if f.endswith(".wav") or f.endswith(".ogg"):
+                        try:
+                            s = Sound(f"{os.path.join(root, f)}")
+                        except:
+                            s = Sound(f"{constants.SOUND_ASSETS_ROOT}not_found.wav")
+                        key = os.path.join(root.replace(path, ""), f)
+                        cls._bank[key.split(".")[0]] = s
 
-        for f in os.listdir(f"{constants.SOUND_ASSETS_ROOT}"):
-            f = f.lower()
-            if f.endswith(".wav"):
-                try:
-                    s = Sound(f"{constants.SOUND_ASSETS_ROOT}{f}")
-                except:
-                    s = Sound(f"{constants.SOUND_ASSETS_ROOT}not_found.wav")
+        # load default assets
+        load_from(f"../levels/{level_name.lower()}/sounds/")
 
-                cls._bank[f.split(".")[0]] = s
+        # load default assets
+        load_from(constants.SOUND_ASSETS_ROOT)
 
     @classmethod
     def play(cls, name: str, repeat: bool = False):

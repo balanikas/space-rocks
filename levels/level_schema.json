@@ -27,7 +27,52 @@
     },
     "asteroids": {
       "type": "array",
-      "items": {}
+      "items": {
+        "type": "object",
+        "properties": {
+          "tiers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "max_velocity": {
+                  "type": "integer"
+                },
+                "min_velocity": {
+                  "type": "integer"
+                },
+                "max_rotation": {
+                  "type": "integer"
+                },
+                "scale": {
+                  "type": "number"
+                },
+                "children": {
+                  "type": "integer"
+                },
+                "sound_hit": {
+                  "type": "string"
+                },
+                "sprite_name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "max_velocity",
+                "min_velocity",
+                "max_rotation",
+                "scale",
+                "children",
+                "sound_hit",
+                "sprite_name"
+              ]
+            }
+          }
+        },
+        "required": [
+          "tiers"
+        ]
+      }
     }
   },
   "required": [

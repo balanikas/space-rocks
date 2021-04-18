@@ -1,70 +1,76 @@
 {
     "ship": {
-        "maneuverability": 5,
+        "maneuverability": 6,
         "acceleration" : 0.15,
         "bullet_speed" : 5,
-        "sound_shoot": "laser"
+        "sound_shoot": "effects/explosions/dirt_rocks02"
     },
     "asteroids": [
         {
-            "3": {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 2,
-                "scale": 1,
-                "children": 30,
-                "sound_hit": "explosion4",
-                "sprite_name": "text:a"
-            },
-            "2" : {
-                "max_velocity": 3,
-                "min_velocity": 10,
-                "max_rotation": 20,
-                "scale": 0.7,
-                "children": 2,
-                "sound_hit": "explosion4",
-                "sprite_name": "text:b"
-            },
-            "1" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 5,
-                "scale": 0.4,
-                "children": 2,
-                "sound_hit": "explosion4",
-                "sprite_name": "text:c"
-            }
+            "tiers": [
+                {
+                    "max_velocity": 2,
+                    "min_velocity": 2,
+                    "max_rotation": 5,
+                    "scale": 2.1,
+                    "children": 2,
+                    "sound_hit": "explosion3",
+                    "sprite_name": "planet-4"
+
+                },
+                {
+                    "max_velocity": 1,
+                    "min_velocity": 1,
+                    "max_rotation": 20,
+                    "scale": 0.7,
+                    "children": 4,
+                    "sound_hit": "explosion3",
+                    "sprite_name": "planet-4"
+                },
+                {
+                    "max_velocity": 1,
+                    "min_velocity": 1,
+                    "max_rotation": 5,
+                    "scale": 0.4,
+                    "children": 2,
+                    "sound_hit": "explosion3",
+                    "sprite_name": "planet-4"
+                }
+            ]
         },
 
 
         {
-            "3": {
-                "max_velocity": 2,
-                "min_velocity": 4,
-                "max_rotation": 0,
-                "scale": 2,
-                "children": 40,
-                "sound_hit": "explosion3",
-                "sprite_name": "text:Python"
-            },
-            "2" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 0,
-                "scale": 1.2,
-                "children": 8,
-                "sound_hit": "explosion3",
-                "sprite_name": "text:is awesome"
-            },
-            "1" : {
-                "max_velocity": 1,
-                "min_velocity": 2,
-                "max_rotation": 0,
-                "scale": 0.5,
-                "children": 1,
-                "sound_hit": "explosion3",
-                "sprite_name": "text:crazyness"
-            }
+            "tiers": [
+                {
+                    "max_velocity": 2,
+                    "min_velocity": 2,
+                    "max_rotation": 8,
+                    "scale": 2.1,
+                    "children": 2,
+                    "sound_hit": "explosion3",
+                    "sprite_name": "planet-4"
+
+                },
+                {
+                    "max_velocity": 1,
+                    "min_velocity": 1,
+                    "max_rotation": 20,
+                    "scale": 0.7,
+                    "children": 4,
+                    "sound_hit": "explosion3",
+                    "sprite_name": "planet-4"
+                },
+                {
+                    "max_velocity": 1,
+                    "min_velocity": 1,
+                    "max_rotation": 5,
+                    "scale": 0.4,
+                    "children": 2,
+                    "sound_hit": "explosion3",
+                    "sprite_name": "planet-4"
+                }
+            ]
         }
     ]
 }

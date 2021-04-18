@@ -9,9 +9,12 @@ from audio import SoundLibrary, init_sounds
 from graphics import init_sprites
 from menu import Menu
 from models import GameObject, Stats, UI, GameState, Animation
+from space_rocks.editing import FileHandler
 from space_rocks.levels import World, Level
 from space_rocks.window import window
 from utils import collides_with, print_info
+
+from watchdog.observers import Observer
 
 
 # todo more accurate coll detection
@@ -31,9 +34,15 @@ from utils import collides_with, print_info
 # todo check if ship not rotated to avoid a rotozoom call
 # todo https://realpython.com/python-logging-source-code/#what-does-getlogger-really-do
 # todo find catastrophic errors, print error and raise SystemExit
-# todo fix 3 nice playable balanced levels, settle tha, experiment on level4
-# todo organize imports
 # todo key to toggle fullscreen but pygame.display.toggle_fullscreen() is buggy
+# todo on ship collision animation freezes
+# todo organize imports
+# todo fix 3 nice playable balanced levels, settle tha, experiment on level4
+# todo add ADSW key layout, place debug somehwere else
+# todo pressing enter in middle of gaem shoudlnt be allowed
+# todo add toughness param to asteroids
+# todo variable size of explosion, maybe as json prop
+# todo correct the speed of bullets, should be constant across win sizes
 
 
 class SpaceRocks:
@@ -44,7 +53,12 @@ class SpaceRocks:
         self._initialize_level()
 
     def __init__(self):
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.INFO)
+
+        event_handler = FileHandler(self._initialize_level)
+        observer = Observer()
+        observer.schedule(event_handler, f"../levels/", recursive=True)
+        observer.start()
 
         pygame.mixer.pre_init(44100, -16, 2, 4096)
         pygame.init()
@@ -72,17 +86,20 @@ class SpaceRocks:
         self._menu.menu.mainloop(self._screen)
 
     def _initialize_level(self):
+        self._state = GameState.LOADING_LEVEL
         SoundLibrary.stop_all()
 
         current_level = self._world.get_current_level()
         init_sounds(current_level[1])
         init_sprites(current_level[1])
         self._level = self._world.start_level(current_level[0])
-        self._state = GameState.RUNNING
         self._effects: List[Animation] = []
+        self._state = GameState.RUNNING
 
     def main_loop(self):
         while True:
+            if self._state is GameState.LOADING_LEVEL:
+                continue
             self._handle_input()
             self._process_game_logic()
             self._draw()
@@ -180,7 +197,7 @@ class SpaceRocks:
                         Animation("explosion", asteroid.geometry.position)
                     )
                     # self._level.remove_spaceship()
-                    self._state = GameState.LOST
+                    #self._state = GameState.LOST
                     break
 
         for bullet in self._level.bullets[:]:
@@ -249,3 +266,5 @@ class SpaceRocks:
 
     def _get_game_objects(self) -> List[GameObject]:
         return self._level.get_game_objects()
+
+

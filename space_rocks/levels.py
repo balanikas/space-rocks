@@ -63,22 +63,24 @@ class Level:
         self._asteroids: List[Asteroid] = []
         for a in data["asteroids"]:
             props = {}
-            for k, v in a.items():
-                props[int(k)] = AsteroidProperties(
-                    v["max_velocity"],
-                    v["min_velocity"],
-                    v["max_rotation"],
-                    v["scale"],
-                    v["children"],
-                    v["sound_hit"],
-                    v["sprite_name"],
+            c = len(a["tiers"])
+            for t in a["tiers"]:
+                props[c] = AsteroidProperties(
+                    t["max_velocity"],
+                    t["min_velocity"],
+                    t["max_rotation"],
+                    t["scale"],
+                    t["children"],
+                    t["sound_hit"],
+                    t["sprite_name"],
                 )
+                c = c -1
 
             position = get_safe_asteroid_distance(
                 screen, self.spaceship.geometry.position
             )
 
-            self._asteroids.append(Asteroid(props, position, self._asteroids.append, 3))
+            self._asteroids.append(Asteroid(props, position, self._asteroids.append, len(a["tiers"])))
 
         self._background: Background = Background("background")
 
@@ -117,7 +119,7 @@ class Level:
 
 
 class World:
-    def load_level(self, screen, path, item):
+    def load_level(self, screen : Surface, path: str, item: str):
         return lambda: Level(screen, os.path.join(path, item, ".json"))
 
     def __init__(self, screen: Surface):

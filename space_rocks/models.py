@@ -25,6 +25,7 @@ class GameState(Enum):
     NOT_RUNNING = 2
     LOST = 3
     WON = 4
+    LOADING_LEVEL = 5
 
 
 class GameObject(pygame.sprite.Sprite):
@@ -318,7 +319,7 @@ class Background:
 
     def draw(self, surface: Surface, pos: Vector2):
         self._position = (
-            pos - window.center
+            pos - Vector2(window.center)
         ) * -0.2  # ensures background moves slower than ship
         self._position += self._offset
 
@@ -346,7 +347,7 @@ class Animation:
             elif orig_ckey:
                 i.set_colorkey(orig_ckey)
 
-            i = pygame.transform.scale(i, get_resize_factor(0.2))
+            i = pygame.transform.scale(i, get_resize_factor(0.07))
             images.append(i.convert())
         img.set_alpha(orig_alpha)
         img.set_colorkey(orig_ckey)

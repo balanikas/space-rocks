@@ -34,25 +34,24 @@ class SpriteLibrary:
     @classmethod
     def __init__(cls, level_name: str) -> None:
         cls._bank = {}
-        level_name = level_name.lower()
 
-        for f in os.listdir(f"../levels/{level_name}/sprites/"):
-            f = f.lower()
-            if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
-                try:
-                    g = load(f"../levels/{level_name}/sprites/{f}")
-                except:
-                    g = load(f"{constants.GFX_ASSETS_ROOT}not_found.png")
-                cls._bank[f.split(".")[0]] = g
+        def load_from(path:str):
+            for root, _, files in os.walk(path):
+                for f in files:
+                    f = f.lower()
+                    if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
+                        try:
+                            g = load(f"{os.path.join(root, f)}")
+                        except:
+                            g = load(f"{constants.GFX_ASSETS_ROOT}not_found.png")
+                        key = os.path.join(root.replace(path, ""), f)
+                        cls._bank[key.split(".")[0]] = g
 
-        for f in os.listdir(f"{constants.GFX_ASSETS_ROOT}"):
-            f = f.lower()
-            if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
-                try:
-                    g = load(f"{constants.GFX_ASSETS_ROOT}{f}")
-                except:
-                    g = load(f"{constants.GFX_ASSETS_ROOT}not_found.png")
-                cls._bank[f.split(".")[0]] = g
+        # load default assets
+        load_from(f"../levels/{level_name.lower()}/sprites/")
+
+        # load default assets
+        load_from(constants.GFX_ASSETS_ROOT)
 
     @classmethod
     def load(cls, name: str, with_alpha: bool = True, resize: Tuple[int, int] = None):
