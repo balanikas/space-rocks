@@ -7,6 +7,7 @@ import jsonschema
 from jsonschema import validate
 from pygame.surface import Surface
 
+from space_rocks import constants
 from space_rocks.models import (
     Background,
     Asteroid,
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 def _load_schema() -> str:
-    with open(f"../levels/level_schema.json", "r") as read_file:
+    with open(f"{constants.LEVELS_ROOT}level_schema.json", "r") as read_file:
         return json.load(read_file)
 
 
@@ -35,7 +36,6 @@ class Level:
             data = json.load(read_file)
 
             try:
-                # todo schema is not complete, improve
                 validate(instance=data, schema=self.schema)
             except jsonschema.exceptions.ValidationError as err:
                 print(f"invalid json at: {json_path}: " + err.message)
@@ -56,6 +56,7 @@ class Level:
             ship["acceleration"],
             ship["bullet_speed"],
             ship["sound_shoot"],
+            ship["sound_hit"],
             "spaceship",
         )
         self._spaceship = Spaceship(props, window.center, self._bullets.append)
@@ -123,12 +124,11 @@ class World:
         return lambda: Level(screen, os.path.join(path, item, ".json"))
 
     def __init__(self, screen: Surface):
-        path = "../levels/"
         self._levels = {}
-        for item in os.listdir(path):
-            if not item.startswith(".") and os.path.isdir(os.path.join(path, item)):
+        for item in os.listdir(constants.LEVELS_ROOT):
+            if not item.startswith(".") and os.path.isdir(os.path.join(constants.LEVELS_ROOT, item)):
                 (k, v) = item.split("_")
-                self._levels[int(k)] = (item, self.load_level(screen, path, item))
+                self._levels[int(k)] = (item, self.load_level(screen, constants.LEVELS_ROOT, item))
 
         self._current_level_id = -1
 

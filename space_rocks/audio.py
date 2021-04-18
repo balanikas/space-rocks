@@ -30,7 +30,7 @@ class SoundLibrary:
                         cls._bank[key.split(".")[0]] = s
 
         # load default assets
-        load_from(f"../levels/{level_name.lower()}/sounds/")
+        load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/sounds/")
 
         # load default assets
         load_from(constants.SOUND_ASSETS_ROOT)

@@ -65,12 +65,14 @@ class SpaceshipProperties:
         acceleration: float,
         bullet_speed: float,
         sound_shoot: str,
+        sound_hit: str,
         image_name: str,
     ):
         self.maneuverability = maneuverability
         self.acceleration = acceleration
         self.bullet_speed = bullet_speed
         self.sound_shoot = sound_shoot
+        self.sound_hit = sound_hit
         self.image_name = image_name
 
 
@@ -137,9 +139,16 @@ class Spaceship(GameObject):
         bullet_velocity = (
             self._direction * self._properties.bullet_speed + self.geometry.velocity
         )
+
+        bullet_velocity = Vector2(
+            bullet_velocity.x * window.factor.x, bullet_velocity.y * window.factor.y
+        )
         bullet = Bullet("bullet", self.geometry.position, bullet_velocity)
         self._create_bullet_callback(bullet)
         SoundLibrary.play(self._properties.sound_shoot)
+
+    def hit(self):
+        SoundLibrary.play(self._properties.sound_hit)
 
 
 class AsteroidProperties:
@@ -347,15 +356,20 @@ class Animation:
             elif orig_ckey:
                 i.set_colorkey(orig_ckey)
 
-            i = pygame.transform.scale(i, get_resize_factor(0.07))
+            factor = get_resize_factor(0.007)
+            i = pygame.transform.scale(i,
+                (int(self._radius * factor[0]), int(self._radius * factor[1])))
+
             images.append(i.convert())
         img.set_alpha(orig_alpha)
         img.set_colorkey(orig_ckey)
         return images
 
-    def __init__(self, image_name: str, position: Vector2):
+    def __init__(self, image_name: str, position: Vector2, radius: float):
 
         img = SpriteLibrary.load(image_name, False)
+        self._radius = radius
+
         self._images = self.animstrip(img)
         self._time = 0.0
         self._img_index = 0
@@ -374,7 +388,6 @@ class Animation:
     def draw(self, surface: Surface):
         if self.done:
             return
-
         img = self._images[self._img_index]
         blit_position: Vector2 = self._position - Vector2(img.get_size()) * 0.5
         surface.blit(img, blit_position)

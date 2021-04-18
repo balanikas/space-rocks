@@ -3,7 +3,8 @@
         "maneuverability": 6,
         "acceleration" : 0.15,
         "bullet_speed" : 5,
-        "sound_shoot": "effects/explosions/dirt_rocks02"
+        "sound_shoot": "effects/explosions/dirt_rocks02",
+        "sound_hit": "effects/explosions/fiery02"
     },
     "asteroids": [
         {
@@ -16,7 +17,6 @@
                     "children": 2,
                     "sound_hit": "explosion3",
                     "sprite_name": "planet-4"
-
                 },
                 {
                     "max_velocity": 1,

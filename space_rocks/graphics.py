@@ -48,7 +48,7 @@ class SpriteLibrary:
                         cls._bank[key.split(".")[0]] = g
 
         # load default assets
-        load_from(f"../levels/{level_name.lower()}/sprites/")
+        load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/sprites/")
 
         # load default assets
         load_from(constants.GFX_ASSETS_ROOT)

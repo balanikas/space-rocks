@@ -3,7 +3,9 @@
         "maneuverability": 6,
         "acceleration" : 0.15,
         "bullet_speed" : 5,
-        "sound_shoot": "other/haste"
+        "sound_shoot": "other/haste",
+        "sound_hit": "effects/explosions/fiery02"
+
     },
     "asteroids": [
         {

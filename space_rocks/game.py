@@ -9,12 +9,11 @@ from audio import SoundLibrary, init_sounds
 from graphics import init_sprites
 from menu import Menu
 from models import GameObject, Stats, UI, GameState, Animation
-from space_rocks.editing import FileHandler
+from space_rocks.editing import LevelObserver
 from space_rocks.levels import World, Level
 from space_rocks.window import window
 from utils import collides_with, print_info
 
-from watchdog.observers import Observer
 
 
 # todo more accurate coll detection
@@ -35,11 +34,8 @@ from watchdog.observers import Observer
 # todo https://realpython.com/python-logging-source-code/#what-does-getlogger-really-do
 # todo find catastrophic errors, print error and raise SystemExit
 # todo key to toggle fullscreen but pygame.display.toggle_fullscreen() is buggy
-# todo on ship collision animation freezes
 # todo organize imports
 # todo fix 3 nice playable balanced levels, settle tha, experiment on level4
-# todo add ADSW key layout, place debug somehwere else
-# todo pressing enter in middle of gaem shoudlnt be allowed
 # todo add toughness param to asteroids
 # todo variable size of explosion, maybe as json prop
 # todo correct the speed of bullets, should be constant across win sizes
@@ -54,12 +50,7 @@ class SpaceRocks:
 
     def __init__(self):
         logging.basicConfig(level=logging.INFO)
-
-        event_handler = FileHandler(self._initialize_level)
-        observer = Observer()
-        observer.schedule(event_handler, f"../levels/", recursive=True)
-        observer.start()
-
+        LevelObserver(self._initialize_level)
         pygame.mixer.pre_init(44100, -16, 2, 4096)
         pygame.init()
         pygame.display.set_caption("video game by Balanikas")
@@ -88,7 +79,6 @@ class SpaceRocks:
     def _initialize_level(self):
         self._state = GameState.LOADING_LEVEL
         SoundLibrary.stop_all()
-
         current_level = self._world.get_current_level()
         init_sounds(current_level[1])
         init_sprites(current_level[1])
@@ -130,7 +120,7 @@ class SpaceRocks:
                 if event.key == pygame.K_ESCAPE:
                     self._menu.menu.enable()
                     self._menu.menu.mainloop(self._screen)
-                if event.key == pygame.K_d:
+                if event.key == pygame.K_q:
                     self._debug = not self._debug
                 if event.key == pygame.K_z:
                     self._state = GameState.WON
@@ -150,18 +140,20 @@ class SpaceRocks:
                 if event.key == pygame.K_RETURN:
                     if self._state == GameState.WON:
                         self._level = self._world.advance_level()
+                        self._initialize_level()
                     if self._state == GameState.LOST:
                         self._level = self._world.set_current_level(0)
-                    self._initialize_level()
+                        self._initialize_level()
+
 
         is_key_pressed = pygame.key.get_pressed()
 
         if self._state is GameState.RUNNING and self._level.spaceship:
-            if is_key_pressed[pygame.K_RIGHT]:
+            if is_key_pressed[pygame.K_RIGHT] or is_key_pressed[pygame.K_d]:
                 self._level.spaceship.rotate(clockwise=True)
-            elif is_key_pressed[pygame.K_LEFT]:
+            elif is_key_pressed[pygame.K_LEFT] or is_key_pressed[pygame.K_a]:
                 self._level.spaceship.rotate(clockwise=False)
-            if is_key_pressed[pygame.K_UP]:
+            if is_key_pressed[pygame.K_UP] or is_key_pressed[pygame.K_w]:
                 self._level.spaceship.accelerate()
             if is_key_pressed[pygame.K_SPACE]:
                 if self._ellapsed_frames > 10:
@@ -172,43 +164,49 @@ class SpaceRocks:
 
     def _process_game_logic(self):
 
+        for e in self._effects:
+            e.move()
+
         if self._state is not GameState.RUNNING:
             return
 
         for game_object in self._get_game_objects():
             game_object.move(self._screen)
 
-        for e in self._effects:
-            e.move()
 
-        if self._level.spaceship:
+        ship = self._level.spaceship
+        if ship:
 
-            self._level.spaceship.rect.center = self._level.spaceship.geometry.position
-            for asteroid in self._level.asteroids:
-                asteroid.rect.center = asteroid.geometry.position
+            ship.rect.center = ship.geometry.position
+            for a in self._level.asteroids:
+                a.rect.center = a.geometry.position
 
                 if pygame.sprite.spritecollide(
-                    self._level.spaceship,
-                    pygame.sprite.Group(asteroid),
+                    ship,
+                    pygame.sprite.Group(a),
                     False,
                     pygame.sprite.collide_mask,
                 ):
                     self._effects.append(
-                        Animation("explosion", asteroid.geometry.position)
+                        Animation("explosion", ship.geometry.position, a.geometry.radius)
                     )
-                    # self._level.remove_spaceship()
-                    #self._state = GameState.LOST
+                    ship.hit()
+                    #self._level.remove_spaceship()
+                    self._level.remove_asteroid(a)
+
+                    self._state = GameState.LOST
                     break
 
         for bullet in self._level.bullets[:]:
-            for asteroid in self._level.asteroids[:]:
-                if collides_with(asteroid.geometry, bullet.geometry):
+            for a in self._level.asteroids[:]:
+                if collides_with(a.geometry, bullet.geometry):
                     self._effects.append(
-                        Animation("explosion", asteroid.geometry.position)
+                        Animation("explosion", a.geometry.position, a.geometry.radius)
                     )
-                    self._level.remove_asteroid(asteroid)
+                    self._level.remove_asteroid(a)
                     self._level.remove_bullet(bullet)
-                    asteroid.split()
+
+                    a.split()
                     break
 
         for bullet in self._level.bullets[:]:
