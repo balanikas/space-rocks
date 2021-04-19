@@ -35,7 +35,7 @@ class SpriteLibrary:
     def __init__(cls, level_name: str) -> None:
         cls._bank = {}
 
-        def load_from(path:str):
+        def load_from(path: str):
             for root, _, files in os.walk(path):
                 for f in files:
                     f = f.lower()
@@ -57,7 +57,7 @@ class SpriteLibrary:
     def load(cls, name: str, with_alpha: bool = True, resize: Tuple[int, int] = None):
         name = name.lower()
         if name not in cls._bank:
-            print(f"sprite {name} not found")
+            logger.warning(f"sprite {name} not found")
             if name.startswith("text:"):
                 cls._bank[name] = cls.load_from_text(name)
             else:
@@ -69,11 +69,11 @@ class SpriteLibrary:
         return loaded_sprite.convert_alpha() if with_alpha else loaded_sprite.convert()
 
     @classmethod
-    def print_state(cls):
+    def log_state(cls):
         logger.info("gfx loaded")
         logger.info(cls._bank.keys())
 
 
 def init_sprites(level_name: str):
     SpriteLibrary(level_name)
-    SpriteLibrary.print_state()
+    SpriteLibrary.log_state()

@@ -10,19 +10,11 @@
         },
         "acceleration": {
           "type": "number"
-        },
-        "bullet_speed": {
-          "type": "integer"
-        },
-        "sound_shoot": {
-          "type": "string"
         }
       },
       "required": [
         "maneuverability",
-        "acceleration",
-        "bullet_speed",
-        "sound_shoot"
+        "acceleration"
       ]
     },
     "asteroids": {

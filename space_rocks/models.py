@@ -1,16 +1,16 @@
 from enum import Enum
 from typing import Any, Callable, Dict
-
+from typing import NamedTuple
 import pygame
-from pygame import Color
+from pygame.color import Color
 from pygame.font import Font
 from pygame.math import Vector2
 from pygame.surface import Surface
 from pygame.transform import rotozoom
-
 from audio import SoundLibrary
 from geometry import Geometry
 from graphics import SpriteLibrary
+from space_rocks.animation import AnimationLibrary, Animation
 from space_rocks.window import window
 from utils import (
     wrap_position,
@@ -30,16 +30,10 @@ class GameState(Enum):
 
 class GameObject(pygame.sprite.Sprite):
     def __init__(self, position: Vector2, image: Surface, velocity: Vector2):
-
         super(GameObject, self).__init__()
-        if image:
-            self.image: Surface = image
-            self.geometry: Geometry = Geometry(
-                position, image.get_width() / 2, velocity
-            )
-
-        if hasattr(self, "image"):
-            self.rect: pygame.rect.Rect = self.image.get_rect(center=position)
+        self.image: Surface = image
+        self.geometry: Geometry = Geometry(position, image.get_width() / 2, velocity)
+        self.rect: pygame.rect.Rect = self.image.get_rect(center=position)
 
     def draw(self, surface: Surface):
         blit_position = self.geometry.position - Vector2(self.geometry.radius)
@@ -58,22 +52,53 @@ class GameObject(pygame.sprite.Sprite):
         self.geometry = self.geometry.update_pos(new_pos)
 
 
-class SpaceshipProperties:
-    def __init__(
-        self,
-        maneuverability: float,
-        acceleration: float,
-        bullet_speed: float,
-        sound_shoot: str,
-        sound_hit: str,
-        image_name: str,
-    ):
-        self.maneuverability = maneuverability
-        self.acceleration = acceleration
-        self.bullet_speed = bullet_speed
-        self.sound_shoot = sound_shoot
-        self.sound_hit = sound_hit
-        self.image_name = image_name
+class BulletProperties(NamedTuple):
+    damage: float
+    speed: float
+    sound: str
+    reload: int
+    image: str
+
+
+class Bullet(GameObject):  # rename class to weapon
+    def __init__(self, props: BulletProperties, position: Vector2, velocity: Vector2):
+        super().__init__(
+            position,
+            SpriteLibrary.load(props.image, resize=get_resize_factor(0.03)),
+            velocity,
+        )
+        self._p = props
+        SoundLibrary.play(self._p.sound)
+
+    @property
+    def props(self):
+        return self._p
+
+    def move(self, surface: Surface):
+        self.geometry = self.geometry.update_pos(
+            self.geometry.position + self.geometry.velocity
+        )
+
+    def resize(self):
+        self.image = SpriteLibrary.load(
+            self.props.image, resize=get_resize_factor(0.03)
+        )
+        self.reposition()
+
+
+class SpaceshipProperties(NamedTuple):
+    maneuverability: float
+    acceleration: float
+    sound_hit: str
+    image_name: str
+    on_impact: str
+    primary_weapon: BulletProperties
+    secondary_weapon: BulletProperties
+
+
+class ActiveWeapon(Enum):
+    PRIMARY = 1
+    SECONDARY = 2
 
 
 class Spaceship(GameObject):
@@ -85,32 +110,39 @@ class Spaceship(GameObject):
         position: Vector2,
         create_bullet_callback: Callable[[Any], None],
     ):
-        self._properties = properties
+        self._p = properties
         self._create_bullet_callback = create_bullet_callback
         self._direction = Vector2(self.UP)
         self._edge_distance = 50
+        self._active_weapon = ActiveWeapon.PRIMARY
+        self._last_shot = 0
 
         super().__init__(
             position,
-            SpriteLibrary.load(
-                self._properties.image_name, resize=get_resize_factor(0.1)
-            ),
+            SpriteLibrary.load(self._p.image_name, resize=get_resize_factor(0.1)),
             Vector2(0),
         )
 
+    @property
+    def props(self):
+        return self._p
+
+    @property
+    def direction(self):
+        return self._direction
+
     def resize(self):
         self.image = SpriteLibrary.load(
-            self._properties.image_name, resize=get_resize_factor(0.1)
+            self._p.image_name, resize=get_resize_factor(0.1)
         )
         self.reposition()
 
     def rotate(self, clockwise: bool = True):
         sign = 1 if clockwise else -1
-        angle = self._properties.maneuverability * sign
+        angle = self._p.maneuverability * sign
         self._direction.rotate_ip(angle)
 
     def move(self, surface: Surface):
-
         position = self.geometry.position + self.geometry.velocity
         w, h = surface.get_size()
         e = self._edge_distance
@@ -132,43 +164,51 @@ class Spaceship(GameObject):
 
     def accelerate(self):
         self.geometry = self.geometry.update_vel(
-            self.geometry.velocity + (self._direction * self._properties.acceleration)
+            self.geometry.velocity + (self._direction * self._p.acceleration)
         )
+
+    def switch_weapon(self):
+        if self._active_weapon == ActiveWeapon.PRIMARY:
+            self._active_weapon = ActiveWeapon.SECONDARY
+        else:
+            self._active_weapon = ActiveWeapon.PRIMARY
 
     def shoot(self):
-        bullet_velocity = (
-            self._direction * self._properties.bullet_speed + self.geometry.velocity
+        weapon = (
+            self._p.primary_weapon
+            if self._active_weapon == ActiveWeapon.PRIMARY
+            else self._p.secondary_weapon
         )
 
+        if pygame.time.get_ticks() - self._last_shot < weapon.reload:
+            return
+
+        self._last_shot = pygame.time.get_ticks()
+        bullet_velocity = self._direction * weapon.speed + self.geometry.velocity
         bullet_velocity = Vector2(
             bullet_velocity.x * window.factor.x, bullet_velocity.y * window.factor.y
         )
-        bullet = Bullet("bullet", self.geometry.position, bullet_velocity)
+        bullet = Bullet(weapon, self.geometry.position, bullet_velocity)
         self._create_bullet_callback(bullet)
-        SoundLibrary.play(self._properties.sound_shoot)
 
-    def hit(self):
-        SoundLibrary.play(self._properties.sound_hit)
+    def hit(self) -> Animation:
+        SoundLibrary.play(self._p.sound_hit)
+        return AnimationLibrary.load(
+            self._p.on_impact, self.geometry.position, 1, resize=(200, 200)
+        )
 
 
-class AsteroidProperties:
-    def __init__(
-        self,
-        min_velocity: int,
-        max_velocity: int,
-        max_rotation: float,
-        scale: float,
-        children: int,
-        sound_hit: str,
-        sprite_name: str,
-    ):
-        self.min_velocity = min_velocity
-        self.max_velocity = max_velocity
-        self.max_rotation = max_rotation
-        self.scale = scale
-        self.children = children
-        self.sound_hit = sound_hit
-        self.sprite_name = sprite_name
+class AsteroidProperties(NamedTuple):
+    armor: float
+    max_velocity: float
+    min_velocity: float
+    max_rotation: float
+    scale: float
+    children: int
+    sound_destroy: str
+    sound_hit: str
+    sprite_name: str
+    on_impact: str
 
 
 class Asteroid(GameObject):
@@ -182,44 +222,58 @@ class Asteroid(GameObject):
         self._properties = properties
         self._create_asteroid_callback = create_asteroid_callback
         self._tier: int = tier
-        self._direction = Vector2(0, -1)
         self._angle = 0
-
-        self._props: AsteroidProperties = self._properties[self._tier]
-        self._rotation = get_random_rotation(0, self._props.max_rotation)
-
+        self._p: AsteroidProperties = self._properties[self._tier]
+        self._armor = self._p.armor
+        self._scale = self._p.scale
+        self._rotation = get_random_rotation(0, self._p.max_rotation)
         sprite = rotozoom(
-            SpriteLibrary.load(self._props.sprite_name, resize=get_resize_factor(0.1)),
+            SpriteLibrary.load(self._p.sprite_name, resize=get_resize_factor(0.1)),
             0,
-            self._props.scale,
+            self._p.scale,
         )
 
         super().__init__(
             position,
             sprite,
-            get_random_velocity(self._props.min_velocity, self._props.max_velocity),
+            get_random_velocity(int(self._p.min_velocity), int(self._p.max_velocity)),
         )
+
+    @property
+    def props(self):
+        return self._p
 
     def resize(self):
         self.image = SpriteLibrary.load(
-            self._props.sprite_name, resize=get_resize_factor(0.1)
+            self._p.sprite_name, resize=get_resize_factor(0.1)
         )
-        self._props.scale *= max(window.factor)
+        self._p.scale *= max(window.factor)
         self.reposition()
 
     def draw(self, surface: Surface):
         self._angle += self._rotation
-        self._direction.rotate_ip(self._angle)
-
         rotated_surface = rotozoom(self.image, self._angle, 1)
         rotated_surface_size = Vector2(rotated_surface.get_size())
         blit_position: Vector2 = self.geometry.position - rotated_surface_size * 0.5
         surface.blit(rotated_surface, blit_position)
 
+    def move(self, surface: Surface):
+        position = self.geometry.position + self.geometry.velocity
+        w, h = surface.get_size()
+        e = 50
+        if position.x >= w - e or position.x <= e:
+            vel = self.geometry.velocity
+            vel.x = (vel.x * 1) * -1
+        if position.y >= h - e or position.y <= e:
+            vel = self.geometry.velocity
+            vel.y = (vel.y * 1) * -1
+
+        self.geometry = self.geometry.update_pos(position)
+
     def split(self):
-        SoundLibrary.play(self._props.sound_hit)
+        SoundLibrary.play(self._p.sound_destroy)
         if self._tier > 1:
-            for _ in range(self._props.children):
+            for _ in range(self._p.children):
                 asteroid = Asteroid(
                     self._properties,
                     self.geometry.position,
@@ -228,82 +282,22 @@ class Asteroid(GameObject):
                 )
                 self._create_asteroid_callback(asteroid)
 
-
-class Bullet(GameObject):
-    def __init__(self, sprite_name: str, position: Vector2, velocity: Vector2):
-        super().__init__(
-            position,
-            SpriteLibrary.load(sprite_name, resize=get_resize_factor(0.03)),
-            velocity,
-        )
-        self._sprite_name = sprite_name
-
-    def move(self, surface: Surface):
-        self.geometry = self.geometry.update_pos(
-            self.geometry.position + self.geometry.velocity
+    def hit(self, bullet_vel: Vector2, damage: float):
+        SoundLibrary.play(self._p.sound_hit)
+        self._armor -= damage
+        # todo make vel change dep on scale so small asteroids knock back hardder?
+        self.geometry = self.geometry.update_vel(
+            self.geometry.velocity + (bullet_vel * 0.2)
         )
 
-    def resize(self):
-        self.image = SpriteLibrary.load(
-            self._sprite_name, resize=get_resize_factor(0.03)
+    def destroy(self) -> Animation:
+        SoundLibrary.play(self._p.sound_destroy)
+        return AnimationLibrary.load(
+            self._p.on_impact, self.geometry.position, 1, resize=(200, 200)
         )
-        self.reposition()
 
-
-class Stats:
-    def __init__(self, clock: pygame.time.Clock):
-        self._clock = clock
-        self._font = pygame.font.Font(None, 30)
-
-    def draw(self, surface: Surface, pos: Vector2, vel: Vector2, dir: Vector2):
-        fps = self._clock.get_fps()
-
-        text_surface = self._font.render(
-            f"{round(fps, 0)} fps | x:{round(pos.x, 1)} y:{round(pos.y, 1)} | vel: {vel} | dir: {dir} | "
-            f"win:{window.size} | "
-            f"display: {(pygame.display.Info().current_w, pygame.display.Info().current_h)}",
-            False,
-            (255, 255, 0),
-        )
-        surface.blit(text_surface, (0, 0))
-
-    def move(self, surface: Surface):
-        pass
-
-
-class UI:
-    def __init__(self):
-        self._font = pygame.font.Font(None, 64)
-        self._message = ""
-        self._sound_played = False
-
-    def _print_text(
-        self, surface: Surface, text: str, font: Font, color: Color = Color("white")
-    ):
-        text_surface: Surface = font.render(text, True, color)
-
-        rect = text_surface.get_rect()
-        rect.center = Vector2(surface.get_size()) / 2
-        surface.blit(text_surface, rect)
-
-    def draw(self, surface: Surface, state: GameState):
-        if state == GameState.WON:
-            self._message = "You won! Press RETURN to continue"
-            if not self._sound_played:
-                SoundLibrary.play("win_level")
-                self._sound_played = not self._sound_played
-        elif state == GameState.LOST:
-            self._message = "You lost! Press RETURN to restart"
-            if not self._sound_played:
-                SoundLibrary.play("game_over")
-                self._sound_played = not self._sound_played
-        elif state == GameState.RUNNING:
-            self._sound_played = False
-            self._message = ""
-        elif state == GameState.NOT_RUNNING:
-            self._message = "Press RETURN to start"
-
-        self._print_text(surface, self._message, self._font)
+    def get_armor(self):
+        return self._armor
 
 
 class Background:
@@ -316,78 +310,54 @@ class Background:
         x = ((s_x - window.width) / 2) * -1
         y = ((s_y - window.height) / 2) * -1
         self._offset = (x, y)
-        self._position = Vector2(0, 0)
 
     def __init__(self, sprite_name: str):
         self._sprite_name = sprite_name
         self._initialize()
 
-        SoundLibrary.play(
-            "background", True
-        )  # better to create new method playForever ?
+        SoundLibrary.play("background", True)
 
     def draw(self, surface: Surface, pos: Vector2):
-        self._position = (
+        position = (
             pos - Vector2(window.center)
         ) * -0.2  # ensures background moves slower than ship
-        self._position += self._offset
-
-        surface.blit(self._background, self._position)
+        position += self._offset
+        surface.blit(self._background, position)
 
     def resize(self):
         self._initialize()
 
 
-class Animation:
-    def animstrip(self, img, width=0):
-        if not width:
-            width = img.get_height()
-        size = width, img.get_height()
-        images = []
-        orig_alpha = img.get_alpha()
-        orig_ckey = img.get_colorkey()
-        img.set_colorkey(None)
-        img.set_alpha(None)
-        for x in range(0, img.get_width(), width):
-            i = pygame.Surface(size)
-            i.blit(img, (0, 0), ((x, 0), size))
-            if orig_alpha:
-                i.set_colorkey((0, 0, 0))
-            elif orig_ckey:
-                i.set_colorkey(orig_ckey)
+class UI:
+    def __init__(self):
+        self._font = pygame.font.Font(None, 64)
+        self._message = ""
+        self._sound_played = False
 
-            factor = get_resize_factor(0.007)
-            i = pygame.transform.scale(i,
-                (int(self._radius * factor[0]), int(self._radius * factor[1])))
+    def _print_text(
+        self, surface: Surface, text: str, font: Font, color: Color = Color("white")
+    ):
+        text_surface: Surface = font.render(text, True, color)
+        rect = text_surface.get_rect()
+        rect.center = Vector2(surface.get_size()) / 2
+        surface.blit(text_surface, rect)
 
-            images.append(i.convert())
-        img.set_alpha(orig_alpha)
-        img.set_colorkey(orig_ckey)
-        return images
+    def draw(self, surface: Surface, state: GameState):
 
-    def __init__(self, image_name: str, position: Vector2, radius: float):
+        if state.value == GameState.WON.value:
+            self._message = "You won! Press RETURN to continue"
+            if not self._sound_played:
+                SoundLibrary.play("win_level")
+                self._sound_played = not self._sound_played
+        elif state.value == GameState.LOST.value:
+            self._message = "You lost! Press RETURN to restart"
+            if not self._sound_played:
+                SoundLibrary.play("game_over")
+                self._sound_played = not self._sound_played
+        elif state.value == GameState.RUNNING.value:
+            self._sound_played = False
+            self._message = ""
+        elif state == GameState.NOT_RUNNING:
+            self._message = "Press RETURN to start"
 
-        img = SpriteLibrary.load(image_name, False)
-        self._radius = radius
-
-        self._images = self.animstrip(img)
-        self._time = 0.0
-        self._img_index = 0
-        self._position = position
-
-    @property
-    def done(self):
-        return self._img_index >= len(self._images) - 1
-
-    def move(self):
-        self._time += 1
-        if self._time > 1:
-            self._img_index += 1
-            self._time = 0
-
-    def draw(self, surface: Surface):
-        if self.done:
-            return
-        img = self._images[self._img_index]
-        blit_position: Vector2 = self._position - Vector2(img.get_size()) * 0.5
-        surface.blit(img, blit_position)
+        self._print_text(surface, self._message, self._font)

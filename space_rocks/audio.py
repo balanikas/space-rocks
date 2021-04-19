@@ -15,9 +15,10 @@ class SoundLibrary:
     @classmethod
     def __init__(cls, level_name: str) -> None:
         from pygame.mixer import Sound
+
         cls._bank = {}
 
-        def load_from(path:str):
+        def load_from(path: str):
             for root, _, files in os.walk(path):
                 for f in files:
                     f = f.lower()
@@ -29,7 +30,7 @@ class SoundLibrary:
                         key = os.path.join(root.replace(path, ""), f)
                         cls._bank[key.split(".")[0]] = s
 
-        # load default assets
+        # load level assets
         load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/sounds/")
 
         # load default assets
@@ -39,7 +40,7 @@ class SoundLibrary:
     def play(cls, name: str, repeat: bool = False):
         name = name.lower()
         if name not in cls._bank:
-            print(f"sound {name} not found")
+            logger.warning(f"sound {name} not found")
             name = "not_found"
 
         if constants.ENABLE_AUDIO:
@@ -59,11 +60,11 @@ class SoundLibrary:
             v.stop()
 
     @classmethod
-    def print_state(cls):
+    def log_state(cls):
         logger.info("sounds loaded")
         logger.info(cls._bank.keys())
 
 
 def init_sounds(level_name: str):
     SoundLibrary(level_name)
-    SoundLibrary.print_state()
+    SoundLibrary.log_state()

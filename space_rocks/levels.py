@@ -16,7 +16,9 @@ from space_rocks.models import (
     AsteroidProperties,
     SpaceshipProperties,
     GameObject,
+    BulletProperties,
 )
+
 from space_rocks.utils import get_safe_asteroid_distance
 from space_rocks.window import window
 
@@ -29,59 +31,81 @@ def _load_schema() -> str:
 
 
 class Level:
-    schema = _load_schema()
+    _schema = _load_schema()
 
     def _load_level(self, json_path: str):
         with open(json_path, "r") as read_file:
             data = json.load(read_file)
 
             try:
-                validate(instance=data, schema=self.schema)
+                validate(instance=data, schema=self._schema)
             except jsonschema.exceptions.ValidationError as err:
-                print(f"invalid json at: {json_path}: " + err.message)
+                logger.error(f"invalid json at: {json_path}: " + err.message)
                 raise SystemExit
 
             logger.info(f"{json_path} loaded and appears valid")
             return data
 
     def __init__(self, screen: Surface, json_path: str):
-
         self._bullets: List[Bullet] = []
-
         data = self._load_level(json_path)
-
         ship = data["ship"]
+        prim = ship["primary_weapon"]
+        primary_weapon = BulletProperties(
+            prim["damage"],
+            prim["speed"],
+            prim["sound"],
+            prim["reload"],
+            prim["image"],
+        )
+
+        sec = ship["secondary_weapon"]
+        secondary_weapon = BulletProperties(
+            sec["damage"],
+            sec["speed"],
+            sec["sound"],
+            sec["reload"],
+            sec["image"],
+        )
+
         props = SpaceshipProperties(
             ship["maneuverability"],
             ship["acceleration"],
-            ship["bullet_speed"],
-            ship["sound_shoot"],
             ship["sound_hit"],
             "spaceship",
+            ship["on_impact"],
+            primary_weapon,
+            secondary_weapon,
         )
-        self._spaceship = Spaceship(props, window.center, self._bullets.append)
 
+        self._spaceship = Spaceship(props, window.center, self._bullets.append)
         self._asteroids: List[Asteroid] = []
+
         for a in data["asteroids"]:
             props = {}
             c = len(a["tiers"])
             for t in a["tiers"]:
                 props[c] = AsteroidProperties(
+                    t["armor"],
                     t["max_velocity"],
                     t["min_velocity"],
                     t["max_rotation"],
                     t["scale"],
                     t["children"],
+                    t["sound_destroy"],
                     t["sound_hit"],
                     t["sprite_name"],
+                    t["on_impact"],
                 )
-                c = c -1
+                c = c - 1
 
             position = get_safe_asteroid_distance(
                 screen, self.spaceship.geometry.position
             )
 
-            self._asteroids.append(Asteroid(props, position, self._asteroids.append, len(a["tiers"])))
+            self._asteroids.append(
+                Asteroid(props, position, self._asteroids.append, len(a["tiers"]))
+            )
 
         self._background: Background = Background("background")
 
@@ -112,36 +136,38 @@ class Level:
 
     def get_game_objects(self) -> Sequence[GameObject]:
         game_objects = [*self._asteroids, *self._bullets]
-
         if self._spaceship:
             game_objects.append(self._spaceship)
-
         return game_objects
 
 
 class World:
-    def load_level(self, screen : Surface, path: str, item: str):
-        return lambda: Level(screen, os.path.join(path, item, ".json"))
+    def load_level(self, screen: Surface, directory: str):
+        return lambda: Level(
+            screen, os.path.join(constants.LEVELS_ROOT, directory, ".json")
+        )
 
     def __init__(self, screen: Surface):
         self._levels = {}
-        for item in os.listdir(constants.LEVELS_ROOT):
-            if not item.startswith(".") and os.path.isdir(os.path.join(constants.LEVELS_ROOT, item)):
-                (k, v) = item.split("_")
-                self._levels[int(k)] = (item, self.load_level(screen, constants.LEVELS_ROOT, item))
+        for d in os.listdir(constants.LEVELS_ROOT):
+            if not d.startswith(".") and os.path.isdir(
+                os.path.join(constants.LEVELS_ROOT, d)
+            ):
+                (k, v) = d.split("_")
+                self._levels[int(k)] = (d, self.load_level(screen, d))
 
         self._current_level_id = -1
 
     def start_current_level(self):
         if self._current_level_id == -1:
             self._current_level_id = 0
-        return self._levels[self._current_level_id][1]()
+        self._levels[self._current_level_id][1]()
 
     def start_next_level(self):
         self.advance_level()
-        return self._levels[self._current_level_id][1]()
+        self._levels[self._current_level_id][1]()
 
-    def start_level(self, level_id: int):
+    def start_level(self, level_id: int) -> Level:
         return self._levels[level_id][1]()
 
     def get_current_level(self) -> Tuple[int, str]:

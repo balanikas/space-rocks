@@ -32,7 +32,7 @@ class Menu:
         )
         self.menu.get_menubar().hide()
 
-        def on_select_level(x, level):
+        def on_select_level(_, level):
             self.menu.get_sound().play_event()
             on_change_level(level)
 

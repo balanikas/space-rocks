@@ -1,0 +1,6 @@
+{
+    "animations": [
+        {"image": "explosion", "rows": 8, "columns": 8, "speed": 0.7},
+        {"image": "explosion2", "rows": 1, "columns": 16, "speed": 1}
+    ]
+}

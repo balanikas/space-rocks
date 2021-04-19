@@ -12,7 +12,12 @@ from space_rocks.window import window
 
 def wrap_position(position: Vector2, surface: Surface):
     w, h = surface.get_size()
-    return Vector2(position.x % w, position.y % h)
+
+    if position.x % (w + 100) < position.x:
+        position.x = -100
+    if position.y % (h + 100) < position.y:
+        position.y = -100
+    return Vector2(position.x, position.y)
 
 
 def get_random_position(surface: Surface):
@@ -42,25 +47,25 @@ def collides_with(obj: Geometry, other_obj: Geometry) -> bool:
 
 
 def get_safe_asteroid_distance(screen, ship_position: Vector2):
-    MIN_ASTEROID_DISTANCE = 250
+    min_asteroid_distance = 250
     while True:
         position = get_random_position(screen)
-        if position.distance_to(ship_position) > MIN_ASTEROID_DISTANCE:
+        if position.distance_to(ship_position) > min_asteroid_distance:
             break
     return position
 
 
-def print_info():
+def print_pygame_info():
     lines = []
     info = pygame.display.Info()
-    lines.append("Current Video Driver: %s" % pygame.display.get_driver())
-    lines.append("Video Mode is Accelerated: %s" % ("No", "Yes")[info.hw])
-    lines.append("Display Depth (Bits Per Pixel): %d" % info.bitsize)
+    lines.append(f"Current Video Driver: {pygame.display.get_driver()}")
+    lines.append(f"Video Mode is Accelerated: {('No', 'Yes')[info.hw]}")
+    lines.append(f"Display Depth (Bits Per Pixel): {info.bitsize:d}")
 
     info = pygame.mixer.get_init()
-    lines.append("Sound Frequency: %d" % info[0])
-    lines.append("Sound Quality: %d bits" % abs(info[1]))
-    lines.append("Sound Channels: %s" % ("Mono", "Stereo")[info[2] - 1])
+    lines.append(f"Sound Frequency: {info[0]:d}")
+    lines.append(f"Sound Quality: {abs(info[1]):d} bits")
+    lines.append(f"Sound Channels: {('Mono', 'Stereo')[info[2] - 1]}")
 
     print(lines)
 
