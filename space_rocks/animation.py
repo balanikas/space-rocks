@@ -114,7 +114,7 @@ class AnimationLibrary:
 
     @classmethod
     def load(
-        cls, name: str, position: Vector2, speed: float, resize: Tuple[int, int] = None
+        cls, name: str, position: Vector2, resize: Tuple[int, int] = None
     ) -> Animation:
         name = name.lower()
         name = random.choice(
@@ -135,7 +135,7 @@ class AnimationLibrary:
 
     @classmethod
     def log_state(cls):
-        logger.info("animations loaded")
+        logger.info(f"{len(cls._bank)} animations loaded:")
         logger.info(cls._bank.keys())
 
 

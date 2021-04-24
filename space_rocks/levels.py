@@ -8,17 +8,15 @@ from jsonschema import validate
 from pygame.surface import Surface
 
 import constants
+from background import Background
 from models import (
     Asteroid,
-    Spaceship,
     Bullet,
     AsteroidProperties,
-    SpaceshipProperties,
     GameObject,
     BulletProperties,
 )
-from background import Background
-
+from player import ShipProperties, Ship
 from utils import get_safe_asteroid_distance
 from window import window
 
@@ -68,17 +66,19 @@ class Level:
             sec["image"],
         )
 
-        props = SpaceshipProperties(
+        props = ShipProperties(
+            ship["damage"],
+            ship["armor"],
             ship["maneuverability"],
             ship["acceleration"],
             ship["sound_hit"],
-            "spaceship",
+            ship["image"],
             ship["on_impact"],
             primary_weapon,
             secondary_weapon,
         )
 
-        self._spaceship = Spaceship(props, window.center, self._bullets.append)
+        self._ship = Ship(props, window.center, self._bullets.append)
         self._asteroids: List[Asteroid] = []
 
         for a in data["asteroids"]:
@@ -86,6 +86,7 @@ class Level:
             c = len(a["tiers"])
             for t in a["tiers"]:
                 props[c] = AsteroidProperties(
+                    t["damage"],
                     t["armor"],
                     t["max_velocity"],
                     t["min_velocity"],
@@ -99,15 +100,15 @@ class Level:
                 )
                 c = c - 1
 
-            position = get_safe_asteroid_distance(
-                screen, self.spaceship.geometry.position
-            )
+            position = get_safe_asteroid_distance(screen, self.ship.geometry.position)
 
             self._asteroids.append(
                 Asteroid(props, position, self._asteroids.append, len(a["tiers"]))
             )
 
-        self._background: Background = Background("background")
+        self._background: Background = Background(
+            data["background"], data["soundtrack"]
+        )
 
     @property
     def background(self) -> Background:
@@ -118,8 +119,8 @@ class Level:
         return self._bullets
 
     @property
-    def spaceship(self):
-        return self._spaceship
+    def ship(self):
+        return self._ship
 
     @property
     def asteroids(self) -> Sequence[Asteroid]:
@@ -128,12 +129,12 @@ class Level:
     @property
     def game_objects(self) -> Sequence[GameObject]:
         game_objects = [*self._asteroids, *self._bullets]
-        if self._spaceship:
-            game_objects.append(self._spaceship)
+        if self._ship:
+            game_objects.append(self._ship)
         return game_objects
 
-    def remove_spaceship(self):
-        self._spaceship = None
+    def remove_ship(self):
+        self._ship = None
 
     def remove_bullet(self, bullet: Bullet):
         self._bullets.remove(bullet)

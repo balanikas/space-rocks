@@ -15,7 +15,7 @@ class UI:
         self._sound_played = False
 
     def _print_text(
-        self, surface: Surface, text: str, font: Font, color: Color = Color("white")
+        self, surface: Surface, text: str, font: Font, color: Color = Color(0, 255, 0)
     ):
         text_surface: Surface = font.render(text, True, color)
         rect = text_surface.get_rect()

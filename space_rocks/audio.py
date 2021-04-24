@@ -65,7 +65,7 @@ class SoundLibrary:
 
     @classmethod
     def log_state(cls):
-        logger.info("sounds loaded")
+        logger.info(f"{len(cls._bank)} sounds loaded")
         logger.info(cls._bank.keys())
 
 

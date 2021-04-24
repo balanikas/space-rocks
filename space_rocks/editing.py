@@ -1,5 +1,6 @@
-from watchdog.events import FileSystemEventHandler
 from typing import Callable
+
+from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 import constants

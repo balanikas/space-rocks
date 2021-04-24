@@ -4,6 +4,7 @@ from typing import Tuple
 
 import pygame
 from pygame.math import Vector2
+from pygame.sprite import Sprite
 from pygame.surface import Surface
 
 from geometry import Geometry
@@ -28,7 +29,7 @@ def get_random_position(surface: Surface) -> Vector2:
 
 
 def get_random_velocity(min_speed: float, max_speed: float) -> Vector2:
-    speed = random.uniform(min_speed, max_speed)
+    speed = random.uniform(min_speed, max_speed) * random.uniform(0.5, 1.5)
     angle = random.randrange(0, 360)
     return Vector2(speed, 0).rotate(angle)
 
@@ -41,6 +42,19 @@ def get_random_rotation(min_rotation: float, max_rotation: float) -> float:
 def collides_with(obj: Geometry, other_obj: Geometry) -> bool:
     distance = obj.position.distance_to(other_obj.position)
     return distance < obj.radius + other_obj.radius
+
+
+def is_in_screen(screen: Surface, geometry: Geometry):
+    return screen.get_rect().collidepoint(geometry.position)
+
+
+def sprite_collide(a: Sprite, b: Sprite):
+    return pygame.sprite.spritecollide(
+        a,
+        pygame.sprite.Group(b),
+        False,
+        pygame.sprite.collide_mask,
+    )
 
 
 def get_safe_asteroid_distance(screen, ship_position: Vector2) -> Vector2:
@@ -82,10 +96,35 @@ def bounce_edge(
     w, h = surface.get_size()
     e = edge_offset
     velocity = Vector2(geometry.velocity)
+    vel_decrease_threshold = 1
+
     if position.x >= w - e or position.x <= e:
-        velocity.x = (velocity.x * velocity_decrease) * -1
+        if abs(velocity.x) < vel_decrease_threshold:
+            velocity.x = velocity.x * -1
+        else:
+            velocity.x = (velocity.x * velocity_decrease) * -1
     if position.y >= h - e or position.y <= e:
-        velocity.y = (velocity.y * velocity_decrease) * -1
+        if abs(velocity.y) < vel_decrease_threshold:
+            velocity.y = velocity.y * -1
+        else:
+            velocity.y = (velocity.y * velocity_decrease) * -1
 
     geometry = geometry.update_vel(velocity)
     return geometry.update_pos(position)
+
+
+def bounce_other(obj: Geometry, other: Geometry) -> Geometry:
+    other_x, other_y = other.position
+    vel = Vector2(obj.velocity)
+
+    if other_x > 0:
+        vel.x = (abs(vel.x) * -1) if other_x > obj.position.x else abs(vel.x)
+    else:
+        vel.x = abs(vel.x) if other_x < obj.position.x else (abs(vel.x) * -1)
+
+    if other_y > 0:
+        vel.y = (abs(vel.y) * -1) if other_y > obj.position.y else abs(vel.y)
+    else:
+        vel.y = abs(vel.y) if other_y < obj.position.y else (abs(vel.y) * -1)
+
+    return obj.update_vel(vel)

@@ -1,6 +1,7 @@
 from typing import Callable, List, Tuple
 
 import pygame_menu
+from pygame import Color
 from pygame_menu import sound
 
 import constants
@@ -20,9 +21,11 @@ class Menu:
         )
 
         theme = pygame_menu.themes.THEME_DARK.copy()
-        theme.set_background_color_opacity(0)
+        theme.set_background_color_opacity(0.3)
         theme.title_bar_style = pygame_menu.widgets.MENUBAR_STYLE_NONE
         theme.widget_font_size = int(50 * min(window.factor))
+        # theme.background_color =
+        theme.selection_color = Color(0,255,0)
         self.menu = pygame_menu.Menu(
             "menu",
             window.width * 0.8,
@@ -30,6 +33,7 @@ class Menu:
             theme=theme,
             onclose=pygame_menu.events.CLOSE,
         )
+
         self.menu.get_menubar().hide()
 
         def on_select_level(_, level):
