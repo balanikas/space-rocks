@@ -2,7 +2,7 @@
     "ship": {
         "maneuverability": 6,
         "acceleration" : 0.15,
-        "on_impact" : "explosion2",
+        "on_impact" : "explosion1",
         "primary_weapon": {
             "damage": 1,
             "speed": 5,
@@ -44,7 +44,7 @@
                     "sound_destroy": "explosion3",
                     "sound_hit": "hit",
                     "sprite_name": "planet-4",
-                    "on_impact" : "explosion"
+                    "on_impact" : "explosion3"
 
                 },
                 {
@@ -57,7 +57,7 @@
                     "sound_destroy": "explosion3",
                     "sound_hit": "hit",
                     "sprite_name": "planet-4",
-                    "on_impact" : "explosion2"
+                    "on_impact" : "explosion5"
                 }
             ]
         },
@@ -74,8 +74,8 @@
                     "children": 2,
                     "sound_destroy": "explosion3",
                     "sound_hit": "hit",
-                    "sprite_name": "planet-4",
-                    "on_impact" : "explosion2"
+                    "sprite_name": "planet-2",
+                    "on_impact" : "explosion5"
 
 
                 },
@@ -88,8 +88,8 @@
                     "children": 4,
                     "sound_destroy": "explosion3",
                     "sound_hit": "hit",
-                    "sprite_name": "planet-4",
-                    "on_impact" : "explosion2"
+                    "sprite_name": "planet-2",
+                    "on_impact" : "explosion6"
                 },
                 {
                     "armor" : 1,
@@ -100,8 +100,8 @@
                     "children": 2,
                     "sound_destroy": "explosion3",
                     "sound_hit": "hit",
-                    "sprite_name": "planet-4",
-                    "on_impact" : "explosion2"
+                    "sprite_name": "planet-2",
+                    "on_impact" : "explosion7"
                 }
             ]
         }

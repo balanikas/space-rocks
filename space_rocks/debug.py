@@ -13,7 +13,9 @@ class Debug:
         self._font = pygame.font.Font(None, 30)
         self.enabled = False
 
-    def draw_text(self, surface: pygame.Surface, pos: Vector2, vel: Vector2, dir: Vector2):
+    def draw_text(
+        self, surface: pygame.Surface, pos: Vector2, vel: Vector2, dir: Vector2
+    ):
         if not self.enabled:
             return
 

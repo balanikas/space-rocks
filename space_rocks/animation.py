@@ -44,15 +44,11 @@ class Animation:
         surface.blit(img, blit_position)
 
 
-_bank: Dict[str, list[Surface]] = {}
-
-
 class AnimationLibrary:
+    _bank: Dict[str, list[Surface]] = {}
+
     @classmethod
     def __init__(cls, level_name: str) -> None:
-
-        cls._bank = {}
-
         def create_frames(img: Surface, rows, columns) -> list[Surface]:
             h = int(img.get_height() / rows)
             w = int(img.get_width() / columns)
@@ -95,7 +91,7 @@ class AnimationLibrary:
                 img = load(img_path)
                 g = create_frames(img, d["rows"], d["columns"])
 
-                _bank[img_name] = g
+                cls._bank[img_name] = g
 
         # load default assets
         load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/anim/")
@@ -108,16 +104,19 @@ class AnimationLibrary:
         cls, name: str, position: Vector2, speed: float, resize: Tuple[int, int] = None
     ) -> Animation:
         name = name.lower()
-        anims = _bank[name]
-        if resize:
-            anims = [pygame.transform.scale(img, resize) for img in anims]
+        if name not in cls._bank:
+            anims = []
+        else:
+            anims = cls._bank[name]
+            if resize:
+                anims = [pygame.transform.scale(img, resize) for img in anims]
 
         return Animation(anims, position, speed)
 
     @classmethod
     def log_state(cls):
         logger.info("animations loaded")
-        logger.info(_bank.keys())
+        logger.info(cls._bank.keys())
 
 
 def init_animations(level_name: str):

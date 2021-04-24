@@ -9,7 +9,6 @@ from pygame.surface import Surface
 
 import constants
 from models import (
-    Background,
     Asteroid,
     Spaceship,
     Bullet,
@@ -18,6 +17,7 @@ from models import (
     GameObject,
     BulletProperties,
 )
+from background import Background
 
 from utils import get_safe_asteroid_distance
 from window import window
@@ -125,6 +125,13 @@ class Level:
     def asteroids(self) -> Sequence[Asteroid]:
         return self._asteroids
 
+    @property
+    def game_objects(self) -> Sequence[GameObject]:
+        game_objects = [*self._asteroids, *self._bullets]
+        if self._spaceship:
+            game_objects.append(self._spaceship)
+        return game_objects
+
     def remove_spaceship(self):
         self._spaceship = None
 
@@ -133,12 +140,6 @@ class Level:
 
     def remove_asteroid(self, a: Asteroid):
         self._asteroids.remove(a)
-
-    def get_game_objects(self) -> Sequence[GameObject]:
-        game_objects = [*self._asteroids, *self._bullets]
-        if self._spaceship:
-            game_objects.append(self._spaceship)
-        return game_objects
 
 
 class World:

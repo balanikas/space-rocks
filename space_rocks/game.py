@@ -33,12 +33,9 @@ from utils import collides_with, print_pygame_info
 # todo https://realpython.com/pyinstaller-python/
 # todo check if ship not rotated to avoid a rotozoom call
 # todo https://realpython.com/python-logging-source-code/#what-does-getlogger-really-do
-# todo find catastrophic errors, print error and raise SystemExit
 # todo key to toggle fullscreen but pygame.display.toggle_fullscreen() is buggy
-# todo organize imports
 # todo fix 3 nice playable balanced levels, settle tha, experiment on level4
 # todo correct the speed of bullets, should be constant across win sizes
-# todo load assets in parallel for speedup
 # todo load default assets once and then level assets per level change. for performance
 
 
@@ -168,7 +165,7 @@ class SpaceRocks:
         if self._state is not GameState.RUNNING:
             return
 
-        for game_object in self._level.get_game_objects():
+        for game_object in self._level.game_objects:
             game_object.move(self._screen)
 
         ship = self._level.spaceship
@@ -212,13 +209,13 @@ class SpaceRocks:
             self._screen, self._level.spaceship.geometry.position
         )
 
-        for o in self._level.get_game_objects():
+        for o in self._level.game_objects:
             o.draw(self._screen)
 
         for e in self._effects:
             e.draw(self._screen)
 
-        self._debug.draw_visual(self._screen, self._level.get_game_objects())
+        self._debug.draw_visual(self._screen, self._level.game_objects)
         self._debug.draw_text(
             self._screen,
             self._level.spaceship.geometry.position,
