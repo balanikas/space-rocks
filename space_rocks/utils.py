@@ -10,34 +10,31 @@ from geometry import Geometry
 from window import window
 
 
-def wrap_position(position: Vector2, surface: Surface):
+def wrap_position(surface: Surface, geometry: Geometry) -> Geometry:
+    position = Vector2(geometry.position + geometry.velocity)
     w, h = surface.get_size()
-
     if position.x % (w + 100) < position.x:
         position.x = -100
     if position.y % (h + 100) < position.y:
         position.y = -100
-    return Vector2(position.x, position.y)
+    return geometry.update_vel(position)
 
 
-def get_random_position(surface: Surface):
+def get_random_position(surface: Surface) -> Vector2:
     return Vector2(
-        random.randrange(surface.get_width()), random.randrange(surface.get_height())
+        random.randrange(50, surface.get_width() - 50),
+        random.randrange(50, surface.get_height() - 50),
     )
 
 
-def get_random_velocity(min_speed: int, max_speed: int):
-    speed = random.randint(min_speed, max_speed) * random.random()
+def get_random_velocity(min_speed: float, max_speed: float) -> Vector2:
+    speed = random.uniform(min_speed, max_speed)
     angle = random.randrange(0, 360)
     return Vector2(speed, 0).rotate(angle)
 
 
-def get_random_rotation(min_rotation: int, max_rotation):
-    r = (
-        random.randint(min_rotation, max_rotation)
-        * random.random()
-        * random.choice([1, -1])
-    )
+def get_random_rotation(min_rotation: float, max_rotation: float) -> float:
+    r = random.uniform(min_rotation, max_rotation) * random.choice([1, -1])
     return r
 
 
@@ -46,7 +43,7 @@ def collides_with(obj: Geometry, other_obj: Geometry) -> bool:
     return distance < obj.radius + other_obj.radius
 
 
-def get_safe_asteroid_distance(screen, ship_position: Vector2):
+def get_safe_asteroid_distance(screen, ship_position: Vector2) -> Vector2:
     min_asteroid_distance = 250
     while True:
         position = get_random_position(screen)
@@ -73,3 +70,22 @@ def print_pygame_info():
 def get_resize_factor(factor: float) -> Tuple[int, int]:
     max_ratio = max(window.size)
     return math.floor(max_ratio * factor), math.floor(max_ratio * factor)
+
+
+def bounce_edge(
+    surface: Surface, edge_offset: int, velocity_decrease: float, geometry: Geometry
+) -> Geometry:
+    assert edge_offset > 0
+    assert 0 < velocity_decrease <= 1
+
+    position = geometry.position + geometry.velocity
+    w, h = surface.get_size()
+    e = edge_offset
+    velocity = Vector2(geometry.velocity)
+    if position.x >= w - e or position.x <= e:
+        velocity.x = (velocity.x * velocity_decrease) * -1
+    if position.y >= h - e or position.y <= e:
+        velocity.y = (velocity.y * velocity_decrease) * -1
+
+    geometry = geometry.update_vel(velocity)
+    return geometry.update_pos(position)
