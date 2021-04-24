@@ -17,9 +17,6 @@ from ui import UI
 from window import window
 from utils import collides_with, print_pygame_info
 
-# todo more accurate coll detection
-# todo profiling: add flags to control stuff: enable_coldet, enable_rotation, enable_bla.. see perf graph and optimize.
-# todo move game logic to per-level?
 # todo edge bounce a bit buggy, fix
 # todo even bounce asteroids? appearing/dissapearing looks not good, clipping, etc
 # todo mouse over crashes game - The get_cursor method is unavailable in SDL2
@@ -35,7 +32,6 @@ from utils import collides_with, print_pygame_info
 # todo https://realpython.com/python-logging-source-code/#what-does-getlogger-really-do
 # todo key to toggle fullscreen but pygame.display.toggle_fullscreen() is buggy
 # todo fix 3 nice playable balanced levels, settle tha, experiment on level4
-# todo correct the speed of bullets, should be constant across win sizes
 # todo load default assets once and then level assets per level change. for performance
 
 
@@ -96,6 +92,7 @@ class SpaceRocks:
             self._handle_input()
             self._process_game_logic()
             self._draw()
+            self._cleanup()
 
     def _handle_input(self):
         for event in pygame.event.get():
@@ -227,3 +224,8 @@ class SpaceRocks:
 
         pygame.display.flip()
         self._clock.tick(60)
+
+    def _cleanup(self):
+        for e in list(self._effects):
+            if e.complete:
+                self._effects.remove(e)

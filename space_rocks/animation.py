@@ -19,15 +19,19 @@ class Animation:
         frames: list[Surface],
         position: Vector2,
         speed: float,
+        repeat: bool = False
     ):
         self._frames = frames
         self._time = 0.0
         self._frame_index = 0
         self._position = position
         self._speed = speed
+        self._repeat = repeat
 
     @property
     def complete(self):
+        if self._repeat:
+            return False
         return self._frame_index >= len(self._frames) - 1
 
     def move(self):
@@ -36,10 +40,12 @@ class Animation:
             self._frame_index += 1
             self._time = 0
 
-
     def draw(self, surface: Surface):
         if self.complete:
             return
+        if self._frame_index >= len(self._frames) - 1:
+            self._frame_index = 0
+
         img = self._frames[self._frame_index]
         blit_position = self._position - (Vector2(img.get_size()) * 0.5)
         surface.blit(img, blit_position)
