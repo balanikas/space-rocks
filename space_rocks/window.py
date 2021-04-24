@@ -3,7 +3,7 @@ from typing import Tuple
 import pygame
 from pygame import Vector2
 
-from space_rocks import constants
+import constants
 
 
 class Window:

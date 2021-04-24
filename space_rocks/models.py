@@ -2,16 +2,15 @@ from enum import Enum
 from typing import Any, Callable, Dict
 from typing import NamedTuple
 import pygame
-from pygame.color import Color
-from pygame.font import Font
 from pygame.math import Vector2
 from pygame.surface import Surface
 from pygame.transform import rotozoom
+
 from audio import SoundLibrary
 from geometry import Geometry
 from graphics import SpriteLibrary
-from space_rocks.animation import AnimationLibrary, Animation
-from space_rocks.window import window
+from animation import AnimationLibrary, Animation
+from window import window
 from utils import (
     wrap_position,
     get_random_velocity,
@@ -327,37 +326,3 @@ class Background:
     def resize(self):
         self._initialize()
 
-
-class UI:
-    def __init__(self):
-        self._font = pygame.font.Font(None, 64)
-        self._message = ""
-        self._sound_played = False
-
-    def _print_text(
-        self, surface: Surface, text: str, font: Font, color: Color = Color("white")
-    ):
-        text_surface: Surface = font.render(text, True, color)
-        rect = text_surface.get_rect()
-        rect.center = Vector2(surface.get_size()) / 2
-        surface.blit(text_surface, rect)
-
-    def draw(self, surface: Surface, state: GameState):
-
-        if state.value == GameState.WON.value:
-            self._message = "You won! Press RETURN to continue"
-            if not self._sound_played:
-                SoundLibrary.play("win_level")
-                self._sound_played = not self._sound_played
-        elif state.value == GameState.LOST.value:
-            self._message = "You lost! Press RETURN to restart"
-            if not self._sound_played:
-                SoundLibrary.play("game_over")
-                self._sound_played = not self._sound_played
-        elif state.value == GameState.RUNNING.value:
-            self._sound_played = False
-            self._message = ""
-        elif state == GameState.NOT_RUNNING:
-            self._message = "Press RETURN to start"
-
-        self._print_text(surface, self._message, self._font)

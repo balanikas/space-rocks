@@ -3,8 +3,8 @@ from typing import Sequence
 import pygame
 from pygame.math import Vector2
 
-from space_rocks.models import GameObject
-from space_rocks.window import window
+from models import GameObject
+from window import window
 
 
 class Debug:

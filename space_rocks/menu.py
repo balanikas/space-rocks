@@ -3,8 +3,8 @@ from typing import Callable, List, Tuple
 import pygame_menu
 from pygame_menu import sound
 
-from space_rocks import constants
-from space_rocks.window import window
+import constants
+from window import window
 
 
 class Menu:

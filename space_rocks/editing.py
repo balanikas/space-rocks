@@ -2,7 +2,7 @@ from watchdog.events import FileSystemEventHandler
 from typing import Callable
 from watchdog.observers import Observer
 
-from space_rocks import constants
+import constants
 
 
 class _FileHandler(FileSystemEventHandler):

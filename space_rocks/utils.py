@@ -7,7 +7,7 @@ from pygame.math import Vector2
 from pygame.surface import Surface
 
 from geometry import Geometry
-from space_rocks.window import window
+from window import window
 
 
 def wrap_position(position: Vector2, surface: Surface):

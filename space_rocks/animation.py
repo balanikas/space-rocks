@@ -1,4 +1,3 @@
-import io
 import json
 import logging
 import os
@@ -9,7 +8,7 @@ from pygame.image import load
 from pygame.math import Vector2
 from pygame.surface import Surface
 
-from space_rocks import constants
+import constants
 
 logger = logging.getLogger(__name__)
 

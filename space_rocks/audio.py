@@ -2,7 +2,7 @@ import logging
 import os
 from typing import Dict
 
-from space_rocks import constants
+import constants
 
 logger = logging.getLogger(__name__)
 

@@ -8,12 +8,13 @@ from pygame.locals import *
 from audio import SoundLibrary, init_sounds
 from graphics import init_sprites
 from menu import Menu
-from models import GameState, UI
+from models import GameState
 from debug import Debug
-from space_rocks.animation import init_animations, Animation
-from space_rocks.editing import LevelObserver
-from space_rocks.levels import World, Level
-from space_rocks.window import window
+from animation import init_animations, Animation
+from editing import LevelObserver
+from levels import World, Level
+from ui import UI
+from window import window
 from utils import collides_with, print_pygame_info
 
 # todo more accurate coll detection
@@ -38,6 +39,7 @@ from utils import collides_with, print_pygame_info
 # todo fix 3 nice playable balanced levels, settle tha, experiment on level4
 # todo correct the speed of bullets, should be constant across win sizes
 # todo load assets in parallel for speedup
+# todo load default assets once and then level assets per level change. for performance
 
 
 class SpaceRocks:

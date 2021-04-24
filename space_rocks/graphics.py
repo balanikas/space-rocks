@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 from pygame.image import load
 from pygame.surface import Surface
 
-from space_rocks import constants
+import constants
 
 logger = logging.getLogger(__name__)
 

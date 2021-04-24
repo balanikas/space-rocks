@@ -7,8 +7,8 @@ import jsonschema
 from jsonschema import validate
 from pygame.surface import Surface
 
-from space_rocks import constants
-from space_rocks.models import (
+import constants
+from models import (
     Background,
     Asteroid,
     Spaceship,
@@ -19,8 +19,8 @@ from space_rocks.models import (
     BulletProperties,
 )
 
-from space_rocks.utils import get_safe_asteroid_distance
-from space_rocks.window import window
+from utils import get_safe_asteroid_distance
+from window import window
 
 logger = logging.getLogger(__name__)
 
