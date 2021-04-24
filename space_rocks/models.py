@@ -115,6 +115,7 @@ class Spaceship(GameObject):
         self._edge_distance = 50
         self._active_weapon = ActiveWeapon.PRIMARY
         self._last_shot = 0
+        self._dead = False
 
         super().__init__(
             position,
@@ -129,6 +130,10 @@ class Spaceship(GameObject):
     @property
     def direction(self):
         return self._direction
+
+    @property
+    def dead(self):
+        return self._dead
 
     def resize(self):
         self.image = SpriteLibrary.load(
@@ -155,6 +160,9 @@ class Spaceship(GameObject):
         self.geometry = self.geometry.update_pos(position)
 
     def draw(self, surface: Surface):
+        if self._dead:
+            return
+
         angle = self._direction.angle_to(self.UP)
         rotated_surface = rotozoom(self.image, angle, 1)
         rotated_surface_size = Vector2(rotated_surface.get_size())
@@ -192,6 +200,8 @@ class Spaceship(GameObject):
 
     def hit(self) -> Animation:
         SoundLibrary.play(self._p.sound_hit)
+        self._dead = True
+
         return AnimationLibrary.load(
             self._p.on_impact, self.geometry.position, 1, resize=(200, 200)
         )

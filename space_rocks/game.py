@@ -79,6 +79,8 @@ class SpaceRocks:
         SoundLibrary.stop_all()
         level_id, level_name = self._world.get_current_level()
         init_sounds(level_name)
+        SoundLibrary.play("change_level")
+
         init_sprites(level_name)
         init_animations(level_name)
         self._level = self._world.start_level(level_id)
@@ -134,6 +136,7 @@ class SpaceRocks:
                     self._world.set_current_level(2)
                     self._initialize_level()
                 if event.key == pygame.K_1:
+                    SoundLibrary.play("change_weapon")
                     self._level.spaceship.switch_weapon()
                 if event.key == pygame.K_RETURN:
                     if self._state == GameState.WON:
@@ -159,16 +162,13 @@ class SpaceRocks:
         for e in self._effects:
             e.move()
 
-        if self._state is not GameState.RUNNING:
-            return
-
         for game_object in self._level.game_objects:
             game_object.move(self._screen)
 
         ship = self._level.spaceship
-        if ship:
+        if ship and not ship.dead:
             ship.rect.center = ship.geometry.position
-            for a in self._level.asteroids:
+            for a in list(self._level.asteroids):
                 a.rect.center = a.geometry.position
                 if pygame.sprite.spritecollide(
                     ship,
@@ -177,8 +177,12 @@ class SpaceRocks:
                     pygame.sprite.collide_mask,
                 ):
                     self._effects.append(ship.hit())
-                    # self._level.remove_spaceship()
-                    self._level.remove_asteroid(a)
+                    a.hit(ship.geometry.velocity, 1)
+                    if a.get_armor() <= 0:
+                        anim = a.destroy()
+                        self._effects.append(anim)
+                        self._level.remove_asteroid(a)
+                        a.split()
                     self._state = GameState.LOST
                     break
 

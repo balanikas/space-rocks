@@ -6,14 +6,14 @@
         "primary_weapon": {
             "damage": 1,
             "speed": 6,
-            "sound": "laser",
+            "sound": "weapon1",
             "reload": 200,
             "image" : "bullet"
         },
         "secondary_weapon": {
             "damage": 3,
             "speed": 3,
-            "sound": "shoot2",
+            "sound": "weapon2",
             "reload": 1000,
             "image" : "big_bullet"
         },
@@ -29,9 +29,9 @@
                     "max_rotation": 5,
                     "scale": 2.1,
                     "children": 2,
-                    "sound_destroy": "explosion5",
-                    "sound_hit": "hit",
-                    "sprite_name": "planet-4",
+                    "sound_destroy": "explosion_big",
+                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
+                    "sprite_name": "planet-4, planet-9, planet-10",
                     "on_impact" : "explosion8"
                 },
                 {
@@ -41,8 +41,8 @@
                     "max_rotation": 20,
                     "scale": 0.7,
                     "children": 4,
-                    "sound_destroy": "explosion3",
-                    "sound_hit": "hit",
+                    "sound_destroy": "explosion_medium",
+                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
                     "sprite_name": "planet-4",
                     "on_impact" : "explosion20"
 
@@ -54,8 +54,8 @@
                     "max_rotation": 5,
                     "scale": 0.4,
                     "children": 2,
-                    "sound_destroy": "explosion3",
-                    "sound_hit": "hit",
+                    "sound_destroy": "explosion_small",
+                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
                     "sprite_name": "planet-4",
                     "on_impact" : "flat_effect_fire"
                 }
@@ -72,8 +72,8 @@
                     "max_rotation": 8,
                     "scale": 2.1,
                     "children": 2,
-                    "sound_destroy": "explosion5",
-                    "sound_hit": "hit",
+                    "sound_destroy": "explosion_big",
+                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
                     "sprite_name": "planet-2",
                     "on_impact" : "explosion8"
 
@@ -86,8 +86,8 @@
                     "max_rotation": 20,
                     "scale": 0.7,
                     "children": 4,
-                    "sound_destroy": "explosion3",
-                    "sound_hit": "hit",
+                    "sound_destroy": "explosion_medium",
+                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
                     "sprite_name": "planet-2",
                     "on_impact" : "explosion20"
                 },
@@ -98,8 +98,8 @@
                     "max_rotation": 5,
                     "scale": 0.4,
                     "children": 2,
-                    "sound_destroy": "explosion3",
-                    "sound_hit": "hit",
+                    "sound_destroy": "explosion_small",
+                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
                     "sprite_name": "planet-2",
                     "on_impact" : "flat_effect_fire"
                 }

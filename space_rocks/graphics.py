@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+import random
 from typing import Dict, Tuple, Any
 
 import pygame
@@ -56,6 +57,10 @@ class SpriteLibrary:
     @classmethod
     def load(cls, name: str, with_alpha: bool = True, resize: Tuple[int, int] = None):
         name = name.lower()
+        name = random.choice(
+            [x.strip(" ") for x in name.split(",")]
+        )  # randomize what to load if many
+
         if name not in cls._bank:
             logger.warning(f"sprite {name} not found")
             if name.startswith("text:"):

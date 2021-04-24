@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import random
 from typing import Dict, Tuple, NamedTuple
 
 import pygame
@@ -19,7 +20,7 @@ class Animation:
         frames: list[Surface],
         position: Vector2,
         speed: float,
-        repeat: bool = False
+        repeat: bool = False,
     ):
         self._frames = frames
         self._time = 0.0
@@ -116,6 +117,10 @@ class AnimationLibrary:
         cls, name: str, position: Vector2, speed: float, resize: Tuple[int, int] = None
     ) -> Animation:
         name = name.lower()
+        name = random.choice(
+            [x.strip(" ") for x in name.split(",")]
+        )  # randomize what to load if many
+
         if name not in cls._bank:
             anim_data = AnimationData([], 1)
         else:
