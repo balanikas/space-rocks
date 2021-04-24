@@ -6,4 +6,4 @@ GFX_ASSETS_ROOT = "../assets/sprites/"
 ANIM_ASSETS_ROOT = "../assets/anim/"
 LEVELS_ROOT = "../levels/"
 
-ENABLE_AUDIO = not True
+ENABLE_AUDIO = True

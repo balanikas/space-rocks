@@ -2,22 +2,22 @@
     "ship": {
         "maneuverability": 6,
         "acceleration" : 0.15,
-        "on_impact" : "explosion1",
+        "on_impact" : "ring_blueish_flame",
         "primary_weapon": {
             "damage": 1,
-            "speed": 5,
+            "speed": 6,
             "sound": "laser",
-            "reload": 250,
+            "reload": 200,
             "image" : "bullet"
         },
         "secondary_weapon": {
             "damage": 3,
             "speed": 3,
             "sound": "shoot2",
-            "reload": 800,
+            "reload": 1000,
             "image" : "big_bullet"
         },
-        "sound_hit": "hum1"
+        "sound_hit": "hit_big"
     },
     "asteroids": [
         {
@@ -29,10 +29,10 @@
                     "max_rotation": 5,
                     "scale": 2.1,
                     "children": 2,
-                    "sound_destroy": "explosion3",
+                    "sound_destroy": "explosion5",
                     "sound_hit": "hit",
                     "sprite_name": "planet-4",
-                    "on_impact" : "explosion2"
+                    "on_impact" : "explosion8"
                 },
                 {
                     "armor" : 2,
@@ -44,7 +44,7 @@
                     "sound_destroy": "explosion3",
                     "sound_hit": "hit",
                     "sprite_name": "planet-4",
-                    "on_impact" : "explosion3"
+                    "on_impact" : "explosion20"
 
                 },
                 {
@@ -57,7 +57,7 @@
                     "sound_destroy": "explosion3",
                     "sound_hit": "hit",
                     "sprite_name": "planet-4",
-                    "on_impact" : "explosion5"
+                    "on_impact" : "flat_effect_fire"
                 }
             ]
         },
@@ -72,10 +72,10 @@
                     "max_rotation": 8,
                     "scale": 2.1,
                     "children": 2,
-                    "sound_destroy": "explosion3",
+                    "sound_destroy": "explosion5",
                     "sound_hit": "hit",
                     "sprite_name": "planet-2",
-                    "on_impact" : "explosion5"
+                    "on_impact" : "explosion8"
 
 
                 },
@@ -89,7 +89,7 @@
                     "sound_destroy": "explosion3",
                     "sound_hit": "hit",
                     "sprite_name": "planet-2",
-                    "on_impact" : "explosion6"
+                    "on_impact" : "explosion20"
                 },
                 {
                     "armor" : 1,
@@ -101,7 +101,7 @@
                     "sound_destroy": "explosion3",
                     "sound_hit": "hit",
                     "sprite_name": "planet-2",
-                    "on_impact" : "explosion7"
+                    "on_impact" : "flat_effect_fire"
                 }
             ]
         }

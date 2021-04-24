@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from typing import Dict, Tuple
+from typing import Dict, Tuple, NamedTuple
 
 import pygame
 from pygame.image import load
@@ -36,6 +36,7 @@ class Animation:
             self._frame_index += 1
             self._time = 0
 
+
     def draw(self, surface: Surface):
         if self.complete:
             return
@@ -44,8 +45,13 @@ class Animation:
         surface.blit(img, blit_position)
 
 
+class AnimationData(NamedTuple):
+    frames: list[Surface]
+    speed: float
+
+
 class AnimationLibrary:
-    _bank: Dict[str, list[Surface]] = {}
+    _bank: Dict[str, AnimationData] = {}
 
     @classmethod
     def __init__(cls, level_name: str) -> None:
@@ -89,9 +95,9 @@ class AnimationLibrary:
                 img_path = f"{os.path.join(path, img_name + '.png')}"
 
                 img = load(img_path)
-                g = create_frames(img, d["rows"], d["columns"])
+                frames = create_frames(img, d["rows"], d["columns"])
 
-                cls._bank[img_name] = g
+                cls._bank[img_name] = AnimationData(frames, d["speed"])
 
         # load default assets
         load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/anim/")
@@ -105,13 +111,16 @@ class AnimationLibrary:
     ) -> Animation:
         name = name.lower()
         if name not in cls._bank:
-            anims = []
+            anim_data = AnimationData([], 1)
         else:
-            anims = cls._bank[name]
+            anim_data = cls._bank[name]
             if resize:
-                anims = [pygame.transform.scale(img, resize) for img in anims]
+                anim_data = AnimationData(
+                    [pygame.transform.scale(img, resize) for img in anim_data.frames],
+                    anim_data.speed,
+                )
 
-        return Animation(anims, position, speed)
+        return Animation(anim_data.frames, position, anim_data.speed)
 
     @classmethod
     def log_state(cls):

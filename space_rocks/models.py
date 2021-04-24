@@ -222,7 +222,7 @@ class Asteroid(GameObject):
         self._create_asteroid_callback = create_asteroid_callback
         self._tier: int = tier
         self._angle = 0
-        self._p: AsteroidProperties = self._properties[self._tier]
+        self._p = self._properties[self._tier]
         self._armor = self._p.armor
         self._scale = self._p.scale
         self._rotation = get_random_rotation(0, self._p.max_rotation)
