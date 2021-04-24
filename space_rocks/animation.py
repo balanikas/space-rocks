@@ -135,7 +135,7 @@ class AnimationLibrary:
 
     @classmethod
     def log_state(cls):
-        logger.info("animations loaded")
+        logger.info(f"{len(cls._bank)} animations loaded:")
         logger.info(cls._bank.keys())
 
 

@@ -10,7 +10,7 @@ from window import window
 class Debug:
     def __init__(self, clock: pygame.time.Clock):
         self._clock = clock
-        self._font = pygame.font.Font(None, 30)
+        self._font = pygame.font.Font(None, 20)
         self.enabled = False
 
     def draw_text(
@@ -38,16 +38,20 @@ class Debug:
             return
 
         for o in objs:
+            points = pygame.mask.from_surface(o.image).outline()
+            if len(points) < 2:
+                continue
+
             pygame.draw.polygon(
                 o.image,
                 (0, 255, 0),
-                pygame.mask.from_surface(o.image).outline(),
+                points,
                 1,
             )
             rect = o.rect
             pygame.draw.rect(
                 screen,
-                (0, 0, 255),
+                (0, 255, 0),
                 (
                     o.geometry.position.x - (rect.width / 2),
                     o.geometry.position.y - (rect.height / 2),

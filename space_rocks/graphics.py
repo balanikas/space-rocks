@@ -75,7 +75,7 @@ class SpriteLibrary:
 
     @classmethod
     def log_state(cls):
-        logger.info("gfx loaded")
+        logger.info(f"{len(cls._bank)} images loaded")
         logger.info(cls._bank.keys())
 
 

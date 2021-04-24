@@ -1,5 +1,5 @@
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 800
 
 SOUND_ASSETS_ROOT = "../assets/sounds/"
 GFX_ASSETS_ROOT = "../assets/sprites/"

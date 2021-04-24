@@ -17,8 +17,6 @@ from ui import UI
 from window import window
 from utils import collides_with, print_pygame_info
 
-# todo edge bounce a bit buggy, fix
-# todo even bounce asteroids? appearing/dissapearing looks not good, clipping, etc
 # todo mouse over crashes game - The get_cursor method is unavailable in SDL2
 # todo create a RAL (rendering abstraction layer) so i can switch from SDL to other
 # todo game idea: 9 types of planets, each with own props like toughness, speed, how they split, rotation
@@ -29,7 +27,6 @@ from utils import collides_with, print_pygame_info
 # todo state machine for GameState ?
 # todo https://realpython.com/pyinstaller-python/
 # todo check if ship not rotated to avoid a rotozoom call
-# todo https://realpython.com/python-logging-source-code/#what-does-getlogger-really-do
 # todo key to toggle fullscreen but pygame.display.toggle_fullscreen() is buggy
 # todo fix 3 nice playable balanced levels, settle tha, experiment on level4
 # todo load default assets once and then level assets per level change. for performance
@@ -136,7 +133,7 @@ class SpaceRocks:
                     self._world.set_current_level(2)
                     self._initialize_level()
                 if event.key == pygame.K_1:
-                    SoundLibrary.play("change_weapon")
+
                     self._level.spaceship.switch_weapon()
                 if event.key == pygame.K_RETURN:
                     if self._state == GameState.WON:

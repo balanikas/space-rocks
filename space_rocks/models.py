@@ -164,6 +164,7 @@ class Spaceship(GameObject):
             self._active_weapon = ActiveWeapon.SECONDARY
         else:
             self._active_weapon = ActiveWeapon.PRIMARY
+        SoundLibrary.play("change_weapon")
 
     def shoot(self):
         bullet = (

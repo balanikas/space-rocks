@@ -72,7 +72,7 @@ class Level:
             ship["maneuverability"],
             ship["acceleration"],
             ship["sound_hit"],
-            "spaceship",
+            ship["image"],
             ship["on_impact"],
             primary_weapon,
             secondary_weapon,
@@ -107,7 +107,7 @@ class Level:
                 Asteroid(props, position, self._asteroids.append, len(a["tiers"]))
             )
 
-        self._background: Background = Background("background")
+        self._background: Background = Background(data["background"], data["soundtrack"])
 
     @property
     def background(self) -> Background:

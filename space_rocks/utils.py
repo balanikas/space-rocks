@@ -28,7 +28,7 @@ def get_random_position(surface: Surface) -> Vector2:
 
 
 def get_random_velocity(min_speed: float, max_speed: float) -> Vector2:
-    speed = random.uniform(min_speed, max_speed)
+    speed = random.uniform(min_speed, max_speed) * random.uniform(0.5, 1.5)
     angle = random.randrange(0, 360)
     return Vector2(speed, 0).rotate(angle)
 
