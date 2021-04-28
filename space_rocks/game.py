@@ -2,7 +2,7 @@ import logging
 from typing import List, Optional
 
 import pygame
-from pygame import surface
+from pygame import surface, Vector2
 from pygame.locals import *
 
 import constants
@@ -10,11 +10,12 @@ from animation import init_animations, Animation
 from audio import SoundLibrary, init_sounds
 from debug import Debug
 from editing import LevelObserver
-from graphics import init_sprites
+from graphics import init_sprites, SpriteLibrary
 from hud import HUD
 from levels import World, Level
 from menu import Menu
 from models import GameState
+from effects import Sun, GradientEffect
 from ui import UI
 from utils import collides_with, print_pygame_info, sprite_collide, is_in_screen
 from window import window
@@ -45,7 +46,7 @@ class SpaceRocks:
         )  # file watcher that reloads a level on level change
         pygame.mixer.pre_init(44100, -16, 2, 4096)
         pygame.init()
-        pygame.display.set_caption("video game by Balanikas")
+        pygame.display.set_caption("experimental video game by balanikas@github")
         pygame.font.init()
 
         self._clock = pygame.time.Clock()
@@ -55,7 +56,7 @@ class SpaceRocks:
         self._hud = HUD()
 
         self._screen: surface.Surface = pygame.display.set_mode(
-            window.size, pygame.RESIZABLE, 16
+            window.size, pygame.RESIZABLE | pygame.SRCALPHA, 32
         )
 
         print_pygame_info()
@@ -82,7 +83,7 @@ class SpaceRocks:
         init_sprites(level_name)
         init_animations(level_name)
         self._level = self._world.start_level(level_id)
-        self._effects: List[Animation] = []
+        self._effects = []
         self._state = GameState.RUNNING
 
     def main_loop(self):
@@ -137,6 +138,15 @@ class SpaceRocks:
                     self._state = GameState.RUNNING
                     self._world.set_current_level(2)
                     self._initialize_level()
+                if event.key == pygame.K_0:
+                    for x in list(self._effects):
+                        if type(x) is Sun or type(x) is GradientEffect:
+                            self._effects.remove(x)
+
+                    self._effects.append(Sun(Vector2(300, 300)))
+                    self._effects.append(
+                        GradientEffect(self._level.ship.geometry.position)
+                    )
 
                 if event.key == pygame.K_1:
                     self._level.ship.switch_weapon()
@@ -233,7 +243,8 @@ class SpaceRocks:
         self._ui.draw(self._screen, self._state)
 
         pygame.display.flip()
-        self._clock.tick(constants.FRAME_RATE)
+        # self._clock.tick(constants.FRAME_RATE)
+        self._clock.tick_busy_loop(constants.FRAME_RATE)
 
     def _cleanup(self):
         for e in list(self._effects):

@@ -31,8 +31,14 @@ class HUD:
         self._weapon = UIComponent(Rect(window.width - 50, y, 200, h), self._green)
         self._level = UIComponent(Rect(window.center[0] - 50, y, 200, h), self._green)
 
-    def draw(self, screen: Surface, armor: float, damage: float, weapon: ActiveWeapon
-             , level_name: str):
+    def draw(
+        self,
+        screen: Surface,
+        armor: float,
+        damage: float,
+        weapon: ActiveWeapon,
+        level_name: str,
+    ):
         armor_color = self._red if armor < 10 else None
         self._armor.draw(screen, f"⛨{armor}", armor_color)
         self._damage.draw(screen, f"👊{damage}")

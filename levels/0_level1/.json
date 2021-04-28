@@ -7,7 +7,7 @@
         "acceleration" : 0.15,
         "on_impact" : "ring_blueish_flame",
         "damage" : 5,
-        "armor" : 2,
+        "armor" : 2000,
         "primary_weapon": {
             "damage": 1,
             "armor" : 0,
