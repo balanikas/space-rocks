@@ -1,7 +1,6 @@
 import io
 import logging
 import os
-import random
 from typing import Dict, Tuple, Any
 
 import pygame
@@ -10,6 +9,7 @@ from pygame.image import load
 from pygame.surface import Surface
 
 import constants
+from utils import get_random_choice
 
 logger = logging.getLogger(__name__)
 
@@ -56,10 +56,7 @@ class SpriteLibrary:
 
     @classmethod
     def load(cls, name: str, with_alpha: bool = True, resize: Tuple[int, int] = None):
-        name = name.lower()
-        name = random.choice(
-            [x.strip(" ") for x in name.split(",")]
-        )  # randomize what to load if many
+        name = get_random_choice(name)
 
         if name not in cls._bank:
             logger.warning(f"sprite {name} not found")

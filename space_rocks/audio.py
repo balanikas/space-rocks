@@ -1,9 +1,9 @@
 import logging
 import os
-import random
 from typing import Dict
 
 import constants
+from utils import get_random_choice
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +39,7 @@ class SoundLibrary:
 
     @classmethod
     def play(cls, name: str, repeat: bool = False):
-        name = name.lower()
-        name = random.choice(
-            [x.strip(" ") for x in name.split(",")]
-        )  # randomize what to play if many
+        name = get_random_choice(name)
         if name not in cls._bank:
             logger.warning(f"sound {name} not found")
             name = "not_found"

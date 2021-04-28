@@ -10,6 +10,7 @@ from pygame.math import Vector2
 from pygame.surface import Surface
 
 import constants
+from utils import get_random_choice
 
 logger = logging.getLogger(__name__)
 
@@ -116,10 +117,7 @@ class AnimationLibrary:
     def load(
         cls, name: str, position: Vector2, resize: Tuple[int, int] = None
     ) -> Animation:
-        name = name.lower()
-        name = random.choice(
-            [x.strip(" ") for x in name.split(",")]
-        )  # randomize what to load if many
+        name = get_random_choice(name)
 
         if name not in cls._bank:
             anim_data = AnimationData([], 1)

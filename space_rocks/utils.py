@@ -128,3 +128,10 @@ def bounce_other(obj: Geometry, other: Geometry) -> Geometry:
         vel.y = abs(vel.y) if other_y < obj.position.y else (abs(vel.y) * -1)
 
     return obj.update_vel(vel)
+
+
+def get_random_choice(text: str) -> str:
+    text = text.lower()
+    return random.choice(
+        [x.strip(" ") for x in text.split(",")]
+    )  # randomize what to play if many
