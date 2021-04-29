@@ -1,8 +1,8 @@
 import pygame
 from pygame import Vector2, Surface
 
-from graphics import SpriteLibrary
 from audio import SoundLibrary
+from graphics import SpriteLibrary
 from window import window
 
 

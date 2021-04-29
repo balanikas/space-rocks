@@ -30,13 +30,13 @@
         {
             "tiers": [
                 {
-                    "damage": 3,
-                    "armor" : 10,
+                    "damage": 1,
+                    "armor" : 1,
                     "max_velocity": 1,
                     "min_velocity": 2,
                     "max_rotation": 5,
                     "scale": 2,
-                    "children": 4,
+                    "children": 100,
                     "sound_destroy": "explosion_big",
                     "sound_hit": "absorb1,absorb2,absorb3,absorb4",
                     "sprite_name": "planet-10",
@@ -76,13 +76,13 @@
         {
             "tiers": [
                 {
-                    "damage": 3,
-                    "armor" : 10,
+                    "damage": 1,
+                    "armor" : 1,
                     "max_velocity": 1,
                     "min_velocity": 2,
                     "max_rotation": 5,
                     "scale": 2,
-                    "children": 3,
+                    "children": 100,
                     "sound_destroy": "explosion_big",
                     "sound_hit": "absorb1,absorb2,absorb3,absorb4",
                     "sprite_name": "planet-10",

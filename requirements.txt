@@ -14,3 +14,4 @@ flake8==3.9.0
 jsonschema
 Pillow==8.2.0
 watchdog==2.0.2
+psutil==5.8.0

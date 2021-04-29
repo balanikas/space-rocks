@@ -1,21 +1,22 @@
 import logging
-from typing import List, Optional
+from typing import Optional
 
 import pygame
 from pygame import surface, Vector2
 from pygame.locals import *
 
 import constants
-from animation import init_animations, Animation
+from animation import init_animations
 from audio import SoundLibrary, init_sounds
 from debug import Debug
+from decorators import timer
 from editing import LevelObserver
-from graphics import init_sprites, SpriteLibrary
+from effects import Sun, GradientEffect
+from graphics import init_sprites
 from hud import HUD
 from levels import World, Level
 from menu import Menu
 from models import GameState
-from effects import Sun, GradientEffect
 from ui import UI
 from utils import collides_with, print_pygame_info, sprite_collide, is_in_screen
 from window import window
@@ -107,6 +108,7 @@ class SpaceRocks:
             self._world.get_all_levels(),
         )
 
+    @timer
     def _handle_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -170,6 +172,7 @@ class SpaceRocks:
             if is_key_pressed[pygame.K_SPACE]:
                 self._level.ship.shoot()
 
+    @timer
     def _process_game_logic(self):
         for e in self._effects:
             e.move()
@@ -214,6 +217,7 @@ class SpaceRocks:
         if not self._level.asteroids and self._level.ship:
             self._state = GameState.WON
 
+    @timer
     def _draw(self):
         self._level.background.draw(self._screen, self._level.ship.geometry.position)
 
