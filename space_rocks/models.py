@@ -64,7 +64,7 @@ class Bullet(GameObject):  # rename class to weapon
     def __init__(self, props: BulletProperties, position: Vector2, velocity: Vector2):
         super().__init__(
             position,
-            SpriteLibrary.load(props.image, resize=get_resize_factor(0.03)),
+            SpriteLibrary.load(props.image, resize=get_resize_factor(0.05)),
             velocity,
         )
         self._p = props

@@ -5,6 +5,7 @@
         {"image": "ring_blueish_flame", "rows": 5, "columns": 8, "speed": 1},
         {"image": "flat_effect_fire", "rows": 5, "columns": 6, "speed": 1},
         {"image": "explosion8", "rows": 7, "columns": 7, "speed": 1},
-        {"image": "explosion20", "rows": 3, "columns": 5, "speed": 1}
+        {"image": "explosion20", "rows": 3, "columns": 5, "speed": 1},
+        {"image": "animation1", "rows": 4, "columns": 4, "speed": 1}
     ]
 }
