@@ -27,16 +27,15 @@ from window import window
 # todo embed QT in the game window or vice versa, so game can be paused, .json file edited and restart game
 # todo state machine for GameState ?
 # todo https://realpython.com/pyinstaller-python/
-# todo check if ship not rotated to avoid a rotozoom call
+# todo check if player not rotated to avoid a rotozoom call
 # todo key to toggle fullscreen but pygame.display.toggle_fullscreen() is buggy
 # todo fix 3 nice playable balanced levels, settle tha, experiment on level4
 # todo load default assets once and then level assets per level change. for performance
 # todo asserts
-# todo rename asteroids to enemy or other generic and space.. to other
 # todo resizable window as constant flag
 
 
-class SpaceRocks:
+class Game:
     def set_level(self, level):
         self._world.set_current_level(level)
 
@@ -102,8 +101,8 @@ class SpaceRocks:
     def _resize(self):
         window.resize()
         self._level.background.resize()
-        self._level.ship.resize()
-        for a in self._level.asteroids:
+        self._level.player.resize()
+        for a in self._level.enemies:
             a.resize()
         self._menu = Menu(
             self.set_level,
@@ -150,11 +149,11 @@ class SpaceRocks:
 
                     self._effects.append(Sun(Vector2(300, 300)))
                     self._effects.append(
-                        GradientEffect(self._level.ship.geometry.position)
+                        GradientEffect(self._level.player.geometry.position)
                     )
 
                 if event.key == pygame.K_1:
-                    self._level.ship.switch_weapon()
+                    self._level.player.switch_weapon()
                 if event.key == pygame.K_RETURN:
                     if self._state == GameState.WON:
                         self._world.advance_level()
@@ -165,15 +164,15 @@ class SpaceRocks:
 
         is_key_pressed = pygame.key.get_pressed()
 
-        if self._state is GameState.RUNNING and self._level.ship:
+        if self._state is GameState.RUNNING and self._level.player:
             if is_key_pressed[pygame.K_RIGHT] or is_key_pressed[pygame.K_d]:
-                self._level.ship.rotate(clockwise=True)
+                self._level.player.rotate(clockwise=True)
             elif is_key_pressed[pygame.K_LEFT] or is_key_pressed[pygame.K_a]:
-                self._level.ship.rotate(clockwise=False)
+                self._level.player.rotate(clockwise=False)
             if is_key_pressed[pygame.K_UP] or is_key_pressed[pygame.K_w]:
-                self._level.ship.accelerate()
+                self._level.player.accelerate()
             if is_key_pressed[pygame.K_SPACE]:
-                self._level.ship.shoot()
+                self._level.player.shoot()
 
     @timer
     def _process_game_logic(self):
@@ -183,29 +182,29 @@ class SpaceRocks:
         for game_object in self._level.game_objects:
             game_object.move(self._screen)
 
-        ship = self._level.ship
-        if ship and not ship.dead:
-            for a in list(self._level.asteroids):
-                if collides_with(ship.geometry, a.geometry):
-                    if sprite_collide(ship, a):
-                        ship_geo = ship.geometry
-                        ship_anim = ship.hit(a.geometry, a.damage)
-                        if ship_anim:
-                            self._effects.append(ship_anim)
+        player = self._level.player
+        if player and not player.dead:
+            for a in list(self._level.enemies):
+                if collides_with(player.geometry, a.geometry):
+                    if sprite_collide(player, a):
+                        player_geo = player.geometry
+                        player_anim = player.hit(a.geometry, a.damage)
+                        if player_anim:
+                            self._effects.append(player_anim)
                             self._state = GameState.LOST
-                        a_anim = a.hit(ship_geo, ship.damage)
+                        a_anim = a.hit(player_geo, player.damage)
                         if a_anim:
                             self._effects.append(a_anim)
-                            self._level.remove_asteroid(a)
+                            self._level.remove_enemy(a)
                         break
 
         for b in list(self._level.bullets):
-            for a in list(self._level.asteroids):
+            for a in list(self._level.enemies):
                 if collides_with(a.geometry, b.geometry):
                     a_anim = a.hit(b.geometry, b.damage)
                     if a_anim:
                         self._effects.append(a_anim)
-                        self._level.remove_asteroid(a)
+                        self._level.remove_enemy(a)
                     self._level.remove_bullet(b)
                     break
 
@@ -213,12 +212,12 @@ class SpaceRocks:
             if not is_in_screen(self._screen, b.geometry):
                 self._level.remove_bullet(b)
 
-        if not self._level.asteroids and self._level.ship:
+        if not self._level.enemies and self._level.player:
             self._state = GameState.WON
 
     @timer
     def _draw(self):
-        self._level.background.draw(self._screen, self._level.ship.geometry.position)
+        self._level.background.draw(self._screen, self._level.player.geometry.position)
 
         for o in self._level.game_objects:
             o.draw(self._screen)
@@ -229,17 +228,17 @@ class SpaceRocks:
         # self._debug.draw_visual(self._screen, self._level.game_objects)
         self._debug.draw_text(
             self._screen,
-            self._level.ship.geometry.position,
-            self._level.ship.geometry.velocity,
-            self._level.ship.direction,
+            self._level.player.geometry.position,
+            self._level.player.geometry.velocity,
+            self._level.player.direction,
         )
 
         _, level_name = self._world.get_current_level()
         self._hud.draw(
             self._screen,
-            self._level.ship.armor,
-            self._level.ship.damage,
-            self._level.ship.active_weapon,
+            self._level.player.armor,
+            self._level.player.damage,
+            self._level.player.active_weapon,
             level_name,
         )
 

@@ -19,7 +19,7 @@ class ActiveWeapon(Enum):
     SECONDARY = 2
 
 
-class ShipProperties(NamedTuple):
+class PlayerProperties(NamedTuple):
     damage: float
     armor: float
     maneuverability: float
@@ -37,12 +37,12 @@ class ShipProperties(NamedTuple):
         assert self.acceleration > 0
 
 
-class Ship(GameObject):
+class Player(GameObject):
     UP = Vector2(0, -1)
 
     def __init__(
         self,
-        properties: ShipProperties,
+        properties: PlayerProperties,
         position: Vector2,
         create_bullet_callback: Callable[[Any], None],
     ):

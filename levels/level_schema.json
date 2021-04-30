@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "ship": {
+    "player": {
       "type": "object",
       "properties": {
         "maneuverability": {
@@ -17,7 +17,7 @@
         "acceleration"
       ]
     },
-    "asteroids": {
+    "enemies": {
       "type": "array",
       "items": {
         "type": "object",
@@ -68,7 +68,7 @@
     }
   },
   "required": [
-    "ship",
-    "asteroids"
+    "player",
+    "enemies"
   ]
 }

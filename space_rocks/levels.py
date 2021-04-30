@@ -10,14 +10,14 @@ from pygame.surface import Surface
 import constants
 from background import Background
 from models import (
-    Asteroid,
+    Enemy,
     Bullet,
-    AsteroidProperties,
+    EnemyProperties,
     GameObject,
     BulletProperties,
 )
-from player import ShipProperties, Ship
-from utils import get_safe_asteroid_distance
+from player import PlayerProperties, Player
+from utils import get_safe_enemy_distance
 from window import window
 
 logger = logging.getLogger(__name__)
@@ -47,8 +47,8 @@ class Level:
     def __init__(self, screen: Surface, json_path: str):
         self._bullets: List[Bullet] = []
         data = self._load_level(json_path)
-        ship = data["ship"]
-        prim = ship["primary_weapon"]
+        player = data["player"]
+        prim = player["primary_weapon"]
         primary_weapon = BulletProperties(
             prim["damage"],
             prim["speed"],
@@ -58,7 +58,7 @@ class Level:
         )
         primary_weapon.validate()
 
-        sec = ship["secondary_weapon"]
+        sec = player["secondary_weapon"]
         secondary_weapon = BulletProperties(
             sec["damage"],
             sec["speed"],
@@ -68,28 +68,28 @@ class Level:
         )
         secondary_weapon.validate()
 
-        ship_props = ShipProperties(
-            ship["damage"],
-            ship["armor"],
-            ship["maneuverability"],
-            ship["acceleration"],
-            ship["sound_hit"],
-            ship["image"],
-            ship["on_impact"],
+        player_props = PlayerProperties(
+            player["damage"],
+            player["armor"],
+            player["maneuverability"],
+            player["acceleration"],
+            player["sound_hit"],
+            player["image"],
+            player["on_impact"],
             primary_weapon,
             secondary_weapon,
         )
 
-        ship_props.validate()
+        player_props.validate()
 
-        self._ship = Ship(ship_props, window.center, self._bullets.append)
-        self._asteroids: List[Asteroid] = []
+        self._player = Player(player_props, window.center, self._bullets.append)
+        self._enemies: List[Enemy] = []
 
-        for a in data["asteroids"]:
-            ship_props = {}
+        for a in data["enemies"]:
+            player_props = {}
             c = len(a["tiers"])
             for t in a["tiers"]:
-                p = AsteroidProperties(
+                p = EnemyProperties(
                     t["damage"],
                     t["armor"],
                     t["max_velocity"],
@@ -103,13 +103,13 @@ class Level:
                     t["on_impact"],
                 )
                 p.validate()
-                ship_props[c] = p
+                player_props[c] = p
                 c = c - 1
 
-            position = get_safe_asteroid_distance(screen, self.ship.geometry.position)
+            position = get_safe_enemy_distance(screen, self.player.geometry.position)
 
-            self._asteroids.append(
-                Asteroid(ship_props, position, self._asteroids.append, len(a["tiers"]))
+            self._enemies.append(
+                Enemy(player_props, position, self._enemies.append, len(a["tiers"]))
             )
 
         self._background: Background = Background(
@@ -125,28 +125,28 @@ class Level:
         return self._bullets
 
     @property
-    def ship(self) -> Ship:
-        return self._ship
+    def player(self) -> Player:
+        return self._player
 
     @property
-    def asteroids(self) -> Sequence[Asteroid]:
-        return self._asteroids
+    def enemies(self) -> Sequence[Enemy]:
+        return self._enemies
 
     @property
     def game_objects(self) -> Sequence[GameObject]:
-        game_objects = [*self._asteroids, *self._bullets]
-        if self._ship:
-            game_objects.append(self._ship)
+        game_objects = [*self._enemies, *self._bullets]
+        if self._player:
+            game_objects.append(self._player)
         return game_objects
 
-    def remove_ship(self):
-        self._ship = None
+    def remove_player(self):
+        self._player = None
 
     def remove_bullet(self, bullet: Bullet):
         self._bullets.remove(bullet)
 
-    def remove_asteroid(self, a: Asteroid):
-        self._asteroids.remove(a)
+    def remove_enemy(self, a: Enemy):
+        self._enemies.remove(a)
 
 
 class World:

@@ -91,7 +91,7 @@ class Bullet(GameObject):  # rename class to weapon
         self.reposition()
 
 
-class AsteroidProperties(NamedTuple):
+class EnemyProperties(NamedTuple):
     damage: float
     armor: float
     max_velocity: float
@@ -112,16 +112,16 @@ class AsteroidProperties(NamedTuple):
         assert self.scale > 0
 
 
-class Asteroid(GameObject):
+class Enemy(GameObject):
     def __init__(
         self,
-        properties: Dict[int, AsteroidProperties],
+        properties: Dict[int, EnemyProperties],
         position: Vector2,
-        create_asteroid_callback: Callable[[Any], None],
+        create_enemy_callback: Callable[[Any], None],
         tier: int,
     ):
         self._properties = properties
-        self._create_asteroid_callback = create_asteroid_callback
+        self._create_enemy_callback = create_enemy_callback
         self._tier: int = tier
         self._angle = 0
         self._p = self._properties[self._tier]
@@ -167,13 +167,13 @@ class Asteroid(GameObject):
         SoundLibrary.play(self._p.sound_destroy)
         if self._tier > 1:
             for _ in range(self._p.children):
-                asteroid = Asteroid(
+                enemy = Enemy(
                     self._properties,
                     self.geometry.position,
-                    self._create_asteroid_callback,
+                    self._create_enemy_callback,
                     self._tier - 1,
                 )
-                self._create_asteroid_callback(asteroid)
+                self._create_enemy_callback(enemy)
 
     def hit(self, other: Geometry, damage: float) -> Optional[Animation]:
         self._armor -= damage

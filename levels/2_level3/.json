@@ -1,7 +1,7 @@
 {
     "background" : "background",
     "soundtrack" : "background",
-    "ship": {
+    "player": {
         "image" : "player",
         "maneuverability": 7,
         "acceleration" : 0.25,
@@ -26,7 +26,7 @@
         },
         "sound_hit": "hum1"
     },
-    "asteroids": [
+    "enemies": [
         {
             "tiers": [
                 {

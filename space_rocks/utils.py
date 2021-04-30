@@ -48,11 +48,11 @@ def sprite_collide(a: Sprite, b: Sprite):
     )
 
 
-def get_safe_asteroid_distance(screen, ship_position: Vector2) -> Vector2:
-    min_asteroid_distance = 250
+def get_safe_enemy_distance(screen, player_position: Vector2) -> Vector2:
+    min_enemy_distance = 250
     while True:
         position = get_random_position(screen)
-        if position.distance_to(ship_position) > min_asteroid_distance:
+        if position.distance_to(player_position) > min_enemy_distance:
             break
     return position
 
