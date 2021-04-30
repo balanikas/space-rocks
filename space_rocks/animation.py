@@ -87,7 +87,7 @@ class AnimationLibrary:
             img.set_colorkey(orig_ckey)
             return images
 
-        def load_from(path: str):
+        def _load_from(path: str):
 
             if not os.path.isfile(os.path.join(path, ".json")):
                 return
@@ -107,10 +107,10 @@ class AnimationLibrary:
                 cls._bank[img_name] = AnimationData(frames, d["speed"])
 
         # load default assets
-        load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/anim/")
+        _load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/anim/")
 
         # load default assets
-        load_from(constants.ANIM_ASSETS_ROOT)
+        _load_from(constants.ANIM_ASSETS_ROOT)
 
     @classmethod
     def load(

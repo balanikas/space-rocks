@@ -4,22 +4,21 @@ from typing import Dict
 
 import constants
 from utils import get_random_choice
+from pygame.mixer import Sound
 
 logger = logging.getLogger(__name__)
 
 
 class SoundLibrary:
-    from pygame.mixer import Sound
 
     _bank: Dict[str, Sound] = {}
 
     @classmethod
     def __init__(cls, level_name: str) -> None:
-        from pygame.mixer import Sound
 
         cls._bank = {}
 
-        def load_from(path: str):
+        def _load_from(path: str):
             for root, _, files in os.walk(path):
                 for f in files:
                     f = f.lower()
@@ -32,10 +31,10 @@ class SoundLibrary:
                         cls._bank[key.split(".")[0]] = s
 
         # load level assets
-        load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/sounds/")
+        _load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/sounds/")
 
         # load default assets
-        load_from(constants.SOUND_ASSETS_ROOT)
+        _load_from(constants.SOUND_ASSETS_ROOT)
 
     @classmethod
     def play(cls, name: str, repeat: bool = False):

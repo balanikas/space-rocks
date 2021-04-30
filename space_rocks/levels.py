@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from typing import List, Sequence, Tuple
+from typing import List, Sequence, Tuple, Callable, Dict
 
 import jsonschema
 from jsonschema import validate
@@ -56,6 +56,7 @@ class Level:
             prim["reload"],
             prim["image"],
         )
+        primary_weapon.validate()
 
         sec = ship["secondary_weapon"]
         secondary_weapon = BulletProperties(
@@ -65,8 +66,9 @@ class Level:
             sec["reload"],
             sec["image"],
         )
+        secondary_weapon.validate()
 
-        props = ShipProperties(
+        ship_props = ShipProperties(
             ship["damage"],
             ship["armor"],
             ship["maneuverability"],
@@ -78,14 +80,16 @@ class Level:
             secondary_weapon,
         )
 
-        self._ship = Ship(props, window.center, self._bullets.append)
+        ship_props.validate()
+
+        self._ship = Ship(ship_props, window.center, self._bullets.append)
         self._asteroids: List[Asteroid] = []
 
         for a in data["asteroids"]:
-            props = {}
+            ship_props = {}
             c = len(a["tiers"])
             for t in a["tiers"]:
-                props[c] = AsteroidProperties(
+                p = AsteroidProperties(
                     t["damage"],
                     t["armor"],
                     t["max_velocity"],
@@ -98,12 +102,14 @@ class Level:
                     t["sprite_name"],
                     t["on_impact"],
                 )
+                p.validate()
+                ship_props[c] = p
                 c = c - 1
 
             position = get_safe_asteroid_distance(screen, self.ship.geometry.position)
 
             self._asteroids.append(
-                Asteroid(props, position, self._asteroids.append, len(a["tiers"]))
+                Asteroid(ship_props, position, self._asteroids.append, len(a["tiers"]))
             )
 
         self._background: Background = Background(
@@ -119,7 +125,7 @@ class Level:
         return self._bullets
 
     @property
-    def ship(self):
+    def ship(self) -> Ship:
         return self._ship
 
     @property
@@ -144,19 +150,19 @@ class Level:
 
 
 class World:
-    def load_level(self, screen: Surface, directory: str):
+    def _load_level(self, screen: Surface, directory: str) -> Callable:
         return lambda: Level(
             screen, os.path.join(constants.LEVELS_ROOT, directory, ".json")
         )
 
     def __init__(self, screen: Surface):
-        self._levels = {}
+        self._levels: Dict[int, Tuple[str, Callable]] = {}
         for d in os.listdir(constants.LEVELS_ROOT):
             if not d.startswith(".") and os.path.isdir(
                 os.path.join(constants.LEVELS_ROOT, d)
             ):
                 (k, v) = d.split("_")
-                self._levels[int(k)] = (d, self.load_level(screen, d))
+                self._levels[int(k)] = (d, self._load_level(screen, d))
 
         self._current_level_id = -1
 
@@ -187,6 +193,12 @@ class World:
             self._current_level_id = 0
         else:
             self._current_level_id += 1
+
+    def set_previous_level(self):
+        if self._current_level_id > 0:
+            self._current_level_id -= 1
+        else:
+            self._current_level_id = len(self._levels) - 1
 
     def get_all_levels(self) -> List[Tuple[str, int]]:
         levels = []

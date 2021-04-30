@@ -30,6 +30,12 @@ class ShipProperties(NamedTuple):
     primary_weapon: BulletProperties
     secondary_weapon: BulletProperties
 
+    def validate(self):
+        assert self.damage > 0
+        assert self.armor > 0
+        assert self.maneuverability > 0
+        assert self.acceleration > 0
+
 
 class Ship(GameObject):
     UP = Vector2(0, -1)
@@ -93,7 +99,7 @@ class Ship(GameObject):
         angle = self._direction.angle_to(self.UP)
         rotated_surface = rotozoom(self.image, angle, 1)
         rotated_surface_size = Vector2(rotated_surface.get_size())
-        blit_position: Vector2 = self.geometry.position - rotated_surface_size * 0.5
+        blit_position = self.geometry.position - rotated_surface_size * 0.5
         surface.blit(rotated_surface, blit_position)
 
     def accelerate(self):
@@ -138,3 +144,7 @@ class Ship(GameObject):
             return AnimationLibrary.load(
                 self._p.on_impact, self.geometry.position, resize=(200, 200)
             )
+
+    @property
+    def active_weapon(self) -> ActiveWeapon:
+        return self._active_weapon

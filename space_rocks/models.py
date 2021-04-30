@@ -12,7 +12,6 @@ from audio import SoundLibrary
 from geometry import Geometry
 from graphics import SpriteLibrary
 from utils import (
-    wrap_position,
     get_random_velocity,
     get_random_rotation,
     get_resize_factor,
@@ -37,12 +36,11 @@ class GameObject(pygame.sprite.Sprite):
         self.geometry: Geometry = Geometry(position, image.get_width() / 2, velocity)
         self.rect: pygame.rect.Rect = self.image.get_rect(center=position)
 
-    def draw(self, surface: Surface):
-        blit_position = self.geometry.position - Vector2(self.geometry.radius)
-        surface.blit(self.image, blit_position)
-
     def move(self, surface: Surface):
-        self.geometry = wrap_position(surface, self.geometry)
+        pass
+
+    def draw(self, surface: Surface):
+        pass
 
     def reposition(self):
         new_pos = Vector2(
@@ -58,6 +56,11 @@ class BulletProperties(NamedTuple):
     sound: str
     reload: int
     image: str
+
+    def validate(self):
+        assert self.damage > 0
+        assert self.speed > 0
+        assert self.reload > 0
 
 
 class Bullet(GameObject):  # rename class to weapon
@@ -79,6 +82,10 @@ class Bullet(GameObject):  # rename class to weapon
             self.geometry.position + self.geometry.velocity
         )
 
+    def draw(self, surface: Surface):
+        blit_position = self.geometry.position - Vector2(self.geometry.radius)
+        surface.blit(self.image, blit_position)
+
     def resize(self):
         self.image = SpriteLibrary.load(self._p.image, resize=get_resize_factor(0.03))
         self.reposition()
@@ -97,6 +104,13 @@ class AsteroidProperties(NamedTuple):
     sprite_name: str
     on_impact: str
 
+    def validate(self):
+        assert self.damage > 0
+        assert self.armor > 0
+        assert self.max_velocity >= 0
+        assert self.min_velocity >= 0
+        assert self.scale > 0
+
 
 class Asteroid(GameObject):
     def __init__(
@@ -112,7 +126,6 @@ class Asteroid(GameObject):
         self._angle = 0
         self._p = self._properties[self._tier]
         self._scale = self._p.scale
-
         self._armor = self._p.armor
         self._rotation = get_random_rotation(0, self._p.max_rotation)
         image = rotozoom(
@@ -176,9 +189,9 @@ class Asteroid(GameObject):
             )
 
     @property
-    def damage(self):
+    def damage(self) -> float:
         return self._p.damage
 
     @property
-    def armor(self):
+    def armor(self) -> float:
         return self._armor

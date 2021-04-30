@@ -10,17 +10,12 @@ class GradientEffect:
     def __init__(self, focus_point: Vector2):
         self._focus_point = focus_point
 
-    def _gradientRect(self, surface, left_colour, right_colour, target_rect):
+    def _gradient_rect(self, surface, left_colour, right_colour, target_rect):
         """ Draw a horizontal-gradient filled rectangle covering <target_rect> """
         colour_rect = pygame.Surface((2, 2), pygame.SRCALPHA)  # tiny! 2x2 bitmap
         pygame.draw.line(colour_rect, left_colour, (0, 0), (0, 1))  # left colour line
         pygame.draw.line(colour_rect, right_colour, (1, 0), (1, 1))  # right colour line
-        # pygame.draw.line(
-        #     colour_rect, left_colour, (1, 1), (0, 1)
-        # )  # right colour line
-        # pygame.draw.line(
-        #     colour_rect, right_colour, (0, 1), (0, 0)
-        # )  # right colour line
+
         colour_rect = pygame.transform.smoothscale(
             colour_rect, (target_rect.width, target_rect.height)
         )  # stretch!
@@ -34,14 +29,14 @@ class GradientEffect:
         return False
 
     def draw(self, surface: Surface):
-        self._gradientRect(
+        self._gradient_rect(
             surface,
             (0, 0, 200, 100),
             (0, 0, 200, 0),
             pygame.Rect(0, 0, self._focus_point.x, window.height),
         )
 
-        self._gradientRect(
+        self._gradient_rect(
             surface,
             (200, 0, 0, 0),
             (200, 0, 0, 100),
@@ -85,8 +80,10 @@ class Sun:
         w, h = (int(window.width * self._scale), int(window.height * self._scale))
         light = SpriteLibrary.load("blue_gradient")
         light = pygame.transform.scale(light, (w, h))
-        filter = pygame.surface.Surface((window.width, window.height), pygame.SRCALPHA)
+        filter_surface = pygame.surface.Surface(
+            (window.width, window.height), pygame.SRCALPHA
+        )
 
-        filter.fill(pygame.Color(0, 0, 0, self._darkness))
-        filter.blit(light, (self._pos.x - (w / 2), self._pos.y - (h / 2)))
-        surface.blit(filter, (0, 0))
+        filter_surface.fill(pygame.Color(0, 0, 0, self._darkness))
+        filter_surface.blit(light, (self._pos.x - (w / 2), self._pos.y - (h / 2)))
+        surface.blit(filter_surface, (0, 0))

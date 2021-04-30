@@ -31,6 +31,9 @@ from window import window
 # todo key to toggle fullscreen but pygame.display.toggle_fullscreen() is buggy
 # todo fix 3 nice playable balanced levels, settle tha, experiment on level4
 # todo load default assets once and then level assets per level change. for performance
+# todo asserts
+# todo rename asteroids to enemy or other generic and space.. to other
+# todo resizable window as constant flag
 
 
 class SpaceRocks:
@@ -55,10 +58,10 @@ class SpaceRocks:
         self._debug = Debug(self._clock)
         self._ui = UI()
         self._hud = HUD()
-
-        self._screen: surface.Surface = pygame.display.set_mode(
-            window.size, pygame.RESIZABLE | pygame.SRCALPHA, 32
-        )
+        flags = pygame.SRCALPHA
+        if constants.RESIZABLE_WINDOW:
+            flags = flags | pygame.RESIZABLE
+        self._screen: surface.Surface = pygame.display.set_mode(window.size, flags, 32)
 
         print_pygame_info()
 
@@ -128,18 +131,18 @@ class SpaceRocks:
                     self._debug.enabled = not self._debug.enabled
                 if event.key == pygame.K_z:
                     self._state = GameState.WON
-                if event.key == pygame.K_5:
-                    self._state = GameState.RUNNING
-                    self._world.set_current_level(0)
-                    self._initialize_level()
-                if event.key == pygame.K_6:
-                    self._state = GameState.RUNNING
-                    self._world.set_current_level(1)
-                    self._initialize_level()
                 if event.key == pygame.K_7:
                     self._state = GameState.RUNNING
-                    self._world.set_current_level(2)
+                    self._world.set_previous_level()
                     self._initialize_level()
+                if event.key == pygame.K_8:
+                    self._state = GameState.RUNNING
+                    self._initialize_level()
+                if event.key == pygame.K_9:
+                    self._state = GameState.RUNNING
+                    self._world.advance_level()
+                    self._initialize_level()
+
                 if event.key == pygame.K_0:
                     for x in list(self._effects):
                         if type(x) is Sun or type(x) is GradientEffect:
@@ -182,9 +185,7 @@ class SpaceRocks:
 
         ship = self._level.ship
         if ship and not ship.dead:
-
             for a in list(self._level.asteroids):
-
                 if collides_with(ship.geometry, a.geometry):
                     if sprite_collide(ship, a):
                         ship_geo = ship.geometry
@@ -192,12 +193,10 @@ class SpaceRocks:
                         if ship_anim:
                             self._effects.append(ship_anim)
                             self._state = GameState.LOST
-
                         a_anim = a.hit(ship_geo, ship.damage)
                         if a_anim:
                             self._effects.append(a_anim)
                             self._level.remove_asteroid(a)
-
                         break
 
         for b in list(self._level.bullets):
@@ -240,14 +239,13 @@ class SpaceRocks:
             self._screen,
             self._level.ship.armor,
             self._level.ship.damage,
-            self._level.ship._active_weapon,
+            self._level.ship.active_weapon,
             level_name,
         )
 
         self._ui.draw(self._screen, self._state)
 
         pygame.display.flip()
-        # self._clock.tick(constants.FRAME_RATE)
         self._clock.tick_busy_loop(constants.FRAME_RATE)
 
     def _cleanup(self):

@@ -29,7 +29,9 @@ class Debug:
             surface.blit(text_surface, (0, y))
             y += 25
 
-    def draw_text(self, surface: Surface, pos: Vector2, vel: Vector2, dir: Vector2):
+    def draw_text(
+        self, surface: Surface, position: Vector2, velocity: Vector2, direction: Vector2
+    ):
         if not self.enabled:
             return
 
@@ -38,10 +40,11 @@ class Debug:
             f"{round(self._clock.get_fps(), 0)} fps | "
             f"win:{window.size} | "
             f"display: {(pygame.display.Info().current_w, pygame.display.Info().current_h)} | "
-            f"x:{round(pos.x, 1)} y:{round(pos.y, 1)} | "
-            f"vel: {vel} | "
-            f"dir: {dir} | "
+            f"x:{round(position.x, 1)} y:{round(position.y, 1)} | "
+            f"vel: {velocity} | "
+            f"dir: {direction} | "
         )
+
         lines.append("-" * 10)
         for k, v in func_timings.items():
             lines.append(f"{k}:{v:.2f} ms")
@@ -51,7 +54,7 @@ class Debug:
         lines.append(f"{mem_mb} Mb")
 
         cpu = round(self._process.cpu_percent())
-        lines.append(f"{cpu} % cpu")
+        lines.append(f"{cpu} % CPU")
 
         self._draw_lines(surface, lines)
 

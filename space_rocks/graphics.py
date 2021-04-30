@@ -24,19 +24,19 @@ class SpriteLibrary:
         img: Image = Image.new("RGBA", (200, 200))
 
         d = ImageDraw.Draw(img)
-        font = ImageFont.truetype("../assets/font.ttf", 20)
+        font = ImageFont.truetype("../assets/OpenSansEmoji.ttf", 20)
         d.text((0, 100), text, fill=(255, 0, 255), font=font)
         s = io.BytesIO()
         img.save(s, "png")
-        bytes = img.tobytes()
+        img_bytes = img.tobytes()
 
-        return pygame.image.fromstring(bytes, img.size, img.mode)
+        return pygame.image.fromstring(img_bytes, img.size, img.mode)
 
     @classmethod
     def __init__(cls, level_name: str) -> None:
         cls._bank = {}
 
-        def load_from(path: str):
+        def _load_from(path: str):
             for root, _, files in os.walk(path):
                 for f in files:
                     f = f.lower()
@@ -49,13 +49,15 @@ class SpriteLibrary:
                         cls._bank[key.split(".")[0]] = g
 
         # load default assets
-        load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/sprites/")
+        _load_from(f"{constants.LEVELS_ROOT}{level_name.lower()}/sprites/")
 
         # load default assets
-        load_from(constants.GFX_ASSETS_ROOT)
+        _load_from(constants.GFX_ASSETS_ROOT)
 
     @classmethod
-    def load(cls, name: str, with_alpha: bool = True, resize: Tuple[int, int] = None):
+    def load(
+        cls, name: str, with_alpha: bool = True, resize: Tuple[int, int] = None
+    ) -> Surface:
         name = get_random_choice(name)
 
         if name not in cls._bank:

@@ -11,16 +11,6 @@ from geometry import Geometry
 from window import window
 
 
-def wrap_position(surface: Surface, geometry: Geometry) -> Geometry:
-    position = Vector2(geometry.position + geometry.velocity)
-    w, h = surface.get_size()
-    if position.x % (w + 100) < position.x:
-        position.x = -100
-    if position.y % (h + 100) < position.y:
-        position.y = -100
-    return geometry.update_vel(position)
-
-
 def get_random_position(surface: Surface) -> Vector2:
     return Vector2(
         random.randrange(50, surface.get_width() - 50),
@@ -29,6 +19,7 @@ def get_random_position(surface: Surface) -> Vector2:
 
 
 def get_random_velocity(min_speed: float, max_speed: float) -> Vector2:
+
     speed = random.uniform(min_speed, max_speed) * random.uniform(0.5, 1.5)
     angle = random.randrange(0, 360)
     return Vector2(speed, 0).rotate(angle)
@@ -45,7 +36,7 @@ def collides_with(obj: Geometry, other_obj: Geometry) -> bool:
 
 
 def is_in_screen(screen: Surface, geometry: Geometry):
-    return screen.get_rect().collidepoint(geometry.position)
+    return screen.get_rect().collidepoint(geometry.position.x, geometry.position.y)
 
 
 def sprite_collide(a: Sprite, b: Sprite):
@@ -82,6 +73,7 @@ def print_pygame_info():
 
 
 def get_resize_factor(factor: float) -> Tuple[int, int]:
+    assert factor > 0
     max_ratio = max(window.size)
     return math.floor(max_ratio * factor), math.floor(max_ratio * factor)
 
@@ -114,18 +106,17 @@ def bounce_edge(
 
 
 def bounce_other(obj: Geometry, other: Geometry) -> Geometry:
-    other_x, other_y = other.position
     vel = Vector2(obj.velocity)
 
-    if other_x > 0:
-        vel.x = (abs(vel.x) * -1) if other_x > obj.position.x else abs(vel.x)
-    else:
-        vel.x = abs(vel.x) if other_x < obj.position.x else (abs(vel.x) * -1)
+    def update_velocity(vel: float, pos: float, other_pos: float):
+        vel = abs(vel)
+        if other_pos > 0:
+            return vel * -1 if other_pos > pos else vel
+        else:
+            return vel if other_pos < pos else vel * -1
 
-    if other_y > 0:
-        vel.y = (abs(vel.y) * -1) if other_y > obj.position.y else abs(vel.y)
-    else:
-        vel.y = abs(vel.y) if other_y < obj.position.y else (abs(vel.y) * -1)
+    vel.x = update_velocity(vel.x, other.position.x, obj.position.x)
+    vel.y = update_velocity(vel.y, other.position.y, obj.position.y)
 
     return obj.update_vel(vel)
 

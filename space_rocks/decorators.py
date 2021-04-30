@@ -3,8 +3,6 @@ import time
 
 
 def slow_down(_func=None, *, rate=1):
-    """Sleep given amount of seconds before calling the function"""
-
     def decorator_slow_down(func):
         @functools.wraps(func)
         def wrapper_slow_down(*args, **kwargs):
@@ -26,23 +24,20 @@ func_timings = {}
 
 
 def register(func):
-    if not func.__name__ in func_timings:
+    if func.__name__ not in func_timings:
         func_timings[func.__name__] = 0
     return func
 
 
 def timer(func):
-    """Print the runtime of the decorated function"""
-
     register(func)
 
     @functools.wraps(func)
     def wrapper_timer(*args, **kwargs):
-        start_time = time.perf_counter()  # 1
+        start_time = time.perf_counter()
         value = func(*args, **kwargs)
-        end_time = time.perf_counter()  # 2
-        run_time = end_time - start_time  # 3
-        # print(f"Finished {func.__name__!r} in {run_time*1000:.4f} ms")
+        end_time = time.perf_counter()
+        run_time = end_time - start_time
         func_timings[func.__name__] = (
             func_timings[func.__name__] + run_time * 1000
         ) / 2
