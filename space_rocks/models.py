@@ -122,7 +122,7 @@ class Enemy(GameObject):
     ):
         self._properties = properties
         self._create_enemy_callback = create_enemy_callback
-        self._tier: int = tier
+        self._tier = tier
         self._angle = 0
         self._p = self._properties[self._tier]
         self._scale = self._p.scale
