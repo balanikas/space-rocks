@@ -5,6 +5,7 @@ from typing import List, Sequence, Tuple, Callable, Dict
 
 import jsonschema
 from jsonschema import validate
+from pygame import Vector2
 from pygame.surface import Surface
 
 import constants
@@ -82,7 +83,9 @@ class Level:
 
         player_props.validate()
 
-        self._player = Player(player_props, window.center, self._bullets.append)
+        self._player = Player(
+            player_props, Vector2(window.center), self._bullets.append
+        )
         self._enemies: List[Enemy] = []
 
         for a in data["enemies"]:

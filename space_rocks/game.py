@@ -6,7 +6,7 @@ from pygame import surface, Vector2
 from pygame.locals import *
 
 import constants
-from animation import init_animations
+from animation import init_animations, AnimationLibrary
 from audio import SoundLibrary, init_sounds
 from debug import Debug
 from decorators import timer
@@ -33,6 +33,19 @@ from window import window
 # todo load default assets once and then level assets per level change. for performance
 # todo asserts
 # todo resizable window as constant flag
+# todo detect monitors update rate Hz and set framerate dynamically to that. make sure game objects speed is correct
+# todo autogenerate armor slowly
+# todo show armor as bar
+# todo less explosive sounds
+# todo bounce related to sizes, small size bounce more
+# todo better wallpaper
+# todo better soundtrack
+# todo more anims, and comment on why they suck on vsync
+# todo black hole randomly appears
+# todo electcity anim on player!
+# todo refactor libs to non classes
+
+#
 
 
 class Game:
@@ -47,20 +60,30 @@ class Game:
         LevelObserver(
             self._initialize_level
         )  # file watcher that reloads a level on level change
-        pygame.mixer.pre_init(44100, -16, 2, 4096)
+
+        # very small buffer but sound lag still exists(est 0.2 - 0.4 secs).
+        # Tried many hthings, perhaps just a pygame limitation
+        pygame.mixer.pre_init(44100, -16, 2, 128)
         pygame.init()
         pygame.display.set_caption("experimental video game by balanikas@github")
         pygame.font.init()
 
         self._clock = pygame.time.Clock()
         self._state = GameState.NOT_RUNNING
+
+        # having SCALED as flags enables vsync but fucks up most animations.
+        flags = pygame.SCALED | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF
+        self._screen: surface.Surface = pygame.display.set_mode(
+            (pygame.display.Info().current_w, pygame.display.Info().current_h),
+            flags,
+            32,
+            vsync=1,
+        )
+        window.resize()
+
         self._debug = Debug(self._clock)
         self._ui = UI()
         self._hud = HUD()
-        flags = pygame.SRCALPHA
-        if constants.RESIZABLE_WINDOW:
-            flags = flags | pygame.RESIZABLE
-        self._screen: surface.Surface = pygame.display.set_mode(window.size, flags, 32)
 
         print_pygame_info()
 
@@ -71,7 +94,7 @@ class Game:
             self.start_the_game,
             self._world.get_all_levels(),
         )
-        # self._menu.menu.mainloop(self._screen)
+        self._menu.menu.mainloop(self._screen)
 
         self.set_level(0)
         self.start_the_game()
@@ -97,6 +120,7 @@ class Game:
             self._process_game_logic()
             self._draw()
             self._cleanup()
+            self._clock.tick_busy_loop(constants.FRAME_RATE)
 
     def _resize(self):
         window.resize()
@@ -116,7 +140,8 @@ class Game:
             if event.type == pygame.QUIT:
                 quit()
             elif event.type == VIDEORESIZE:
-                self._resize()
+                pass
+                # self._resize()
             elif event.type == VIDEOEXPOSE:  # handles window minimising/maximising
                 pass
 
@@ -141,6 +166,22 @@ class Game:
                     self._state = GameState.RUNNING
                     self._world.advance_level()
                     self._initialize_level()
+
+                if event.key == pygame.K_5:
+                    self._effects = []
+                    x = 0
+                    y = 250
+                    c = 0
+                    for k, _ in AnimationLibrary._bank.items():
+                        x += 250
+                        c += 1
+                        if c > 8:
+                            y += 250
+                            c = 0
+                            x = 0
+                        self._effects.append(
+                            AnimationLibrary.load(k, Vector2(x, y), resize=(200, 200))
+                        )
 
                 if event.key == pygame.K_0:
                     for x in list(self._effects):
@@ -245,7 +286,6 @@ class Game:
         self._ui.draw(self._screen, self._state)
 
         pygame.display.flip()
-        self._clock.tick_busy_loop(constants.FRAME_RATE)
 
     def _cleanup(self):
         for e in list(self._effects):

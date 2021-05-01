@@ -115,8 +115,8 @@ def bounce_other(obj: Geometry, other: Geometry) -> Geometry:
         else:
             return vel if other_pos < pos else vel * -1
 
-    vel.x = update_velocity(vel.x, other.position.x, obj.position.x)
-    vel.y = update_velocity(vel.y, other.position.y, obj.position.y)
+    vel.x = update_velocity(vel.x, obj.position.x, other.position.x)
+    vel.y = update_velocity(vel.y, obj.position.y, other.position.y)
 
     return obj.update_vel(vel)
 

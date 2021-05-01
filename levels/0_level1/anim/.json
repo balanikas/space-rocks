@@ -1,10 +1,8 @@
 {
     "animations": [
-        {"image": "explosion2", "rows": 1, "columns": 16, "speed": 1},
-        {"image": "shockwave_blueish_flame", "rows": 5, "columns": 4, "speed": 1},
-        {"image": "ring_blueish_flame", "rows": 5, "columns": 8, "speed": 1},
-        {"image": "flat_effect_fire", "rows": 5, "columns": 6, "speed": 1},
-        {"image": "explosion8", "rows": 7, "columns": 7, "speed": 1},
-        {"image": "explosion20", "rows": 3, "columns": 5, "speed": 1}
+        {"image": "explosion2", "rows": 1, "columns": 16, "speed": 1.2},
+
+        {"image": "explosion8", "rows": 7, "columns": 7, "speed": 1.2}
+
     ]
 }
