@@ -1,14 +1,14 @@
 from pygame import Vector2, Surface
 
 import audio as sounds
-from graphics import SpriteLibrary
+import graphics as gfx
 from utils import get_resize_factor
 from window import window
 
 
 class Background:
     def _initialize(self):
-        self._image = SpriteLibrary.load(
+        self._image = gfx.get(
             self._image_name, False, resize=get_resize_factor(1.2)
         )
 

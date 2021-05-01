@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 _bank: Dict[str, Sound] = {}
 
 
-def _load(level_name):
+def _init(level_name):
     def _load_from(path: str):
         for root, _, files in os.walk(path):
             for f in files:
@@ -57,11 +57,11 @@ def stop_all():
         v.stop()
 
 
-def log_state():
+def _log_state():
     logger.info(f"{len(_bank)} sounds loaded")
     logger.info(_bank.keys())
 
 
-def init_sounds(level_name: str):
-    _load(level_name)
-    log_state()
+def init(level_name: str):
+    _init(level_name)
+    _log_state()

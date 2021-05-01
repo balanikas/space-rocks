@@ -2,9 +2,8 @@ import pygame
 from pygame import Vector2, Surface
 
 import audio as sounds
-from graphics import SpriteLibrary
 from window import window
-
+import graphics as gfx
 
 class GradientEffect:
     def __init__(self, focus_point: Vector2):
@@ -78,7 +77,7 @@ class Sun:
 
     def draw(self, surface: Surface):
         w, h = (int(window.width * self._scale), int(window.height * self._scale))
-        light = SpriteLibrary.load("blue_gradient")
+        light = gfx.get("blue_gradient")
         light = pygame.transform.scale(light, (w, h))
         filter_surface = pygame.surface.Surface(
             (window.width, window.height), pygame.SRCALPHA

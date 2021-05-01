@@ -10,7 +10,7 @@ from pygame.transform import rotozoom
 import audio as sounds
 from animation import AnimationLibrary, Animation
 from geometry import Geometry
-from graphics import SpriteLibrary
+import graphics as gfx
 from utils import (
     get_random_velocity,
     get_random_rotation,
@@ -67,7 +67,7 @@ class Bullet(GameObject):  # rename class to weapon
     def __init__(self, props: BulletProperties, position: Vector2, velocity: Vector2):
         super().__init__(
             position,
-            SpriteLibrary.load(props.image, resize=get_resize_factor(0.05)),
+            gfx.get(props.image, resize=get_resize_factor(0.05)),
             velocity,
         )
         self._p = props
@@ -87,7 +87,7 @@ class Bullet(GameObject):  # rename class to weapon
         surface.blit(self.image, blit_position)
 
     def resize(self):
-        self.image = SpriteLibrary.load(self._p.image, resize=get_resize_factor(0.03))
+        self.image = gfx.get(self._p.image, resize=get_resize_factor(0.03))
         self.reposition()
 
 
@@ -129,7 +129,7 @@ class Enemy(GameObject):
         self._armor = self._p.armor
         self._rotation = get_random_rotation(0, self._p.max_rotation)
         image = rotozoom(
-            SpriteLibrary.load(self._p.sprite_name, resize=get_resize_factor(0.1)),
+            gfx.get(self._p.sprite_name, resize=get_resize_factor(0.1)),
             0,
             self._scale,
         )
@@ -141,7 +141,7 @@ class Enemy(GameObject):
         )
 
     def resize(self):
-        self.image = SpriteLibrary.load(
+        self.image = gfx.get(
             self._p.sprite_name, resize=get_resize_factor(0.1)
         )
         self._scale *= max(window.factor)

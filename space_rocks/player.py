@@ -8,7 +8,7 @@ from pygame.transform import rotozoom
 import audio as sounds
 from animation import Animation, AnimationLibrary
 from geometry import Geometry
-from graphics import SpriteLibrary
+import graphics as gfx
 from models import GameObject, BulletProperties, Bullet
 from utils import get_resize_factor, bounce_edge, bounce_other
 from window import window
@@ -57,7 +57,7 @@ class Player(GameObject):
 
         super().__init__(
             position,
-            SpriteLibrary.load(self._p.image_name, resize=get_resize_factor(0.1)),
+            gfx.get(self._p.image_name, resize=get_resize_factor(0.1)),
             Vector2(0),
         )
 
@@ -78,7 +78,7 @@ class Player(GameObject):
         return self._dead
 
     def resize(self):
-        self.image = SpriteLibrary.load(
+        self.image = gfx.get(
             self._p.image_name, resize=get_resize_factor(0.1)
         )
         self.reposition()

@@ -12,7 +12,7 @@ from debug import Debug
 from decorators import timer
 from editing import LevelObserver
 from effects import Sun, GradientEffect
-from graphics import init_sprites
+import graphics as gfx
 from hud import HUD
 from levels import World, Level
 from menu import Menu
@@ -96,17 +96,17 @@ class Game:
         )
         self._menu.menu.mainloop(self._screen)
 
-        self.set_level(0)
-        self.start_the_game()
+        # self.set_level(0)
+        # self.start_the_game()
 
     def _initialize_level(self):
         self._state = GameState.LOADING_LEVEL
         sounds.stop_all()
         level_id, level_name = self._world.get_current_level()
-        sounds.init_sounds(level_name)
+        sounds.init(level_name)
         sounds.play("change_level")
 
-        init_sprites(level_name)
+        gfx.init(level_name)
         init_animations(level_name)
         self._level = self._world.start_level(level_id)
         self._effects = []
