@@ -2,9 +2,9 @@ import pygame.freetype
 from pygame import Surface, Rect, Color
 from pygame.font import Font
 
+from decorators import timer
 from player import ActiveWeapon
 from window import window
-from decorators import timer
 
 
 class UIText:
@@ -46,9 +46,7 @@ class HUD:
         self._armor = UIText(Rect(20, y + 10, 150, h), self._white, self._font)
         self._damage = UIText(Rect(170, y + 10, 150, h), self._white, self._font)
         self._weapon = UIText(Rect(320, y + 10, 150, h), self._white, self._font)
-        self._level = UIText(
-            Rect(w - 300, y + 10, 300, h), self._white, self._font
-        )
+        self._level = UIText(Rect(w - 300, y + 10, 300, h), self._white, self._font)
 
     @timer
     def draw(

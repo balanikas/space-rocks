@@ -1,6 +1,6 @@
 from pygame import Vector2, Surface
 
-from audio import SoundLibrary
+import audio as sounds
 from graphics import SpriteLibrary
 from utils import get_resize_factor
 from window import window
@@ -20,7 +20,7 @@ class Background:
     def __init__(self, image_name: str, soundtrack: str):
         self._image_name = image_name
         self._initialize()
-        SoundLibrary.play(soundtrack, True)
+        sounds.play(soundtrack, True)
 
     def draw(self, surface: Surface, pos: Vector2):
         position = (

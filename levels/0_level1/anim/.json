@@ -2,7 +2,8 @@
     "animations": [
         {"image": "explosion2", "rows": 1, "columns": 16, "speed": 1.2},
 
-        {"image": "explosion8", "rows": 7, "columns": 7, "speed": 1.2}
+        {"image": "explosion8", "rows": 7, "columns": 7, "speed": 1.2},
+        {"image": "electric1", "rows": 1, "columns": 7, "speed": 0.5}
 
     ]
 }

@@ -7,7 +7,7 @@
         "acceleration" : 0.15,
         "on_impact" : "explosion8",
         "damage" : 5,
-        "armor" : 100,
+        "armor" : 1,
         "primary_weapon": {
             "damage": 1,
             "armor" : 0,

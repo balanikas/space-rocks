@@ -4,7 +4,7 @@ from pygame.font import Font
 from pygame.math import Vector2
 from pygame.surface import Surface
 
-from audio import SoundLibrary
+import audio as sounds
 from models import GameState
 
 
@@ -27,12 +27,12 @@ class UI:
         if state == GameState.WON:
             self._message = "You won! Press RETURN to continue"
             if not self._sound_played:
-                SoundLibrary.play("win_level")
+                sounds.play("win_level")
                 self._sound_played = not self._sound_played
         elif state == GameState.LOST:
             self._message = "You lost! Press RETURN to restart"
             if not self._sound_played:
-                SoundLibrary.play("game_over")
+                sounds.play("game_over")
                 self._sound_played = not self._sound_played
         elif state == GameState.RUNNING:
             self._sound_played = False

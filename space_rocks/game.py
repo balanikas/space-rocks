@@ -5,9 +5,9 @@ import pygame
 from pygame import surface, Vector2
 from pygame.locals import *
 
+import audio as sounds
 import constants
 from animation import init_animations, AnimationLibrary
-from audio import SoundLibrary, init_sounds
 from debug import Debug
 from decorators import timer
 from editing import LevelObserver
@@ -101,10 +101,10 @@ class Game:
 
     def _initialize_level(self):
         self._state = GameState.LOADING_LEVEL
-        SoundLibrary.stop_all()
+        sounds.stop_all()
         level_id, level_name = self._world.get_current_level()
-        init_sounds(level_name)
-        SoundLibrary.play("change_level")
+        sounds.init_sounds(level_name)
+        sounds.play("change_level")
 
         init_sprites(level_name)
         init_animations(level_name)

@@ -5,8 +5,8 @@ import pygame
 from pygame import Vector2, Surface
 from pygame.transform import rotozoom
 
+import audio as sounds
 from animation import Animation, AnimationLibrary
-from audio import SoundLibrary
 from geometry import Geometry
 from graphics import SpriteLibrary
 from models import GameObject, BulletProperties, Bullet
@@ -112,7 +112,7 @@ class Player(GameObject):
             self._active_weapon = ActiveWeapon.SECONDARY
         else:
             self._active_weapon = ActiveWeapon.PRIMARY
-        SoundLibrary.play("change_weapon")
+        sounds.play("change_weapon")
 
     def shoot(self):
         bullet = (
@@ -135,12 +135,12 @@ class Player(GameObject):
     def hit(self, other: Geometry, damage: float) -> Optional[Animation]:
         self._armor -= damage
         if self._armor > 0:
-            SoundLibrary.play(self._p.sound_hit)
+            sounds.play(self._p.sound_hit)
             self.geometry = bounce_other(self.geometry, other)
             return None
         else:
             self._dead = True
-            SoundLibrary.play(self._p.sound_hit)
+            sounds.play(self._p.sound_hit)
             return AnimationLibrary.load(
                 self._p.on_impact, self.geometry.position, resize=(200, 200)
             )

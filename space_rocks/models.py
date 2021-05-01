@@ -7,8 +7,8 @@ from pygame.math import Vector2
 from pygame.surface import Surface
 from pygame.transform import rotozoom
 
+import audio as sounds
 from animation import AnimationLibrary, Animation
-from audio import SoundLibrary
 from geometry import Geometry
 from graphics import SpriteLibrary
 from utils import (
@@ -71,7 +71,7 @@ class Bullet(GameObject):  # rename class to weapon
             velocity,
         )
         self._p = props
-        SoundLibrary.play(self._p.sound)
+        sounds.play(self._p.sound)
 
     @property
     def damage(self):
@@ -164,7 +164,7 @@ class Enemy(GameObject):
         self.rect.center = self.geometry.position
 
     def split(self):
-        SoundLibrary.play(self._p.sound_destroy)
+        sounds.play(self._p.sound_destroy)
         if self._tier > 1:
             for _ in range(self._p.children):
                 enemy = Enemy(
@@ -178,11 +178,11 @@ class Enemy(GameObject):
     def hit(self, other: Geometry, damage: float) -> Optional[Animation]:
         self._armor -= damage
         if self._armor > 0:
-            SoundLibrary.play(self._p.sound_hit)
+            sounds.play(self._p.sound_hit)
             self.geometry = bounce_other(self.geometry, other)
             return None
         else:
-            SoundLibrary.play(self._p.sound_destroy)
+            sounds.play(self._p.sound_destroy)
             self.split()
             return AnimationLibrary.load(
                 self._p.on_impact, self.geometry.position, resize=(200, 200)

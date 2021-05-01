@@ -1,7 +1,7 @@
 import pygame
 from pygame import Vector2, Surface
 
-from audio import SoundLibrary
+import audio as sounds
 from graphics import SpriteLibrary
 from window import window
 
@@ -52,12 +52,12 @@ class Sun:
         self._scale = 0.1
         self._growth = True
         self._pos = pos
-        SoundLibrary.play("gradient_start")
+        sounds.play("gradient_start")
 
     def move(self):
         if pygame.time.get_ticks() - self._start_ticks > self._flip_time_ms:
             self._growth = not self._growth
-            SoundLibrary.play("gradient_stop")
+            sounds.play("gradient_stop")
             self._start_ticks = pygame.time.get_ticks()
 
         if self._growth:
