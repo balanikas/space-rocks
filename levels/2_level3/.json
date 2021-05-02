@@ -3,91 +3,71 @@
     "soundtrack" : "background",
     "player": {
         "image" : "player",
-        "maneuverability": 7,
+        "maneuverability": 8,
         "acceleration" : 0.25,
-        "on_impact" : "animation1",
+        "on_impact" : "explosion8",
         "damage" : 5,
-        "armor" : 20,
+        "armor" : 1000,
         "primary_weapon": {
             "damage": 1,
             "armor" : 0,
             "speed": 8,
             "sound": "shoot1",
-            "reload": 200,
-            "image" : "bullet1"
+            "reload": 100,
+            "image" : "weapon1"
         },
         "secondary_weapon": {
-            "damage": 4,
+            "damage": 8,
             "armor" : 0,
-            "speed": 5,
+            "speed": 4,
             "sound": "shoot2",
-            "reload": 1000,
-            "image" : "bullet2"
+            "reload": 800,
+            "image" : "weapon2"
         },
-        "sound_hit": "hum1"
+        "sound_hit": "hurt"
     },
     "enemies": [
-        {
+         {
             "tiers": [
                 {
-                    "damage": 3,
+                    "damage": 10,
                     "armor" : 10,
-                    "max_velocity": 5,
-                    "min_velocity": 2,
-                    "max_rotation": 20,
-                    "scale": 3,
-                    "children": 50,
-                    "sound_destroy": "explosion1",
+                    "max_velocity": 7,
+                    "min_velocity": 3,
+                    "max_rotation": 3,
+                    "scale": 2,
+                    "children": 3,
+                    "sound_destroy": "explosion1,explosion2,explosion3",
                     "sound_hit": "impact1,impact2,impact3,impact4",
                     "sprite_name": "enemy1",
-                    "on_impact" : "animation1"
+                    "on_impact" : "explosion8"
+                },
+                {
+                    "damage": 2,
+                    "armor" : 4,
+                    "max_velocity": 5,
+                    "min_velocity": 2,
+                    "max_rotation": 10,
+                    "scale": 1.3,
+                    "children": 30,
+                    "sound_destroy": "explosion1,explosion2,explosion3",
+                    "sound_hit": "impact1,impact2,impact3,impact4",
+                    "sprite_name": "enemy1",
+                    "on_impact" : "explosion8"
+
                 },
                 {
                     "damage": 1,
                     "armor" : 1,
-                    "max_velocity": 2,
-                    "min_velocity": 1,
-                    "max_rotation": 3,
-                    "scale": 0.4,
-                    "children": 4,
-                    "sound_destroy": "explosion1",
-                    "sound_hit": "impact1,impact2,impact3,impact4",
+                    "max_velocity": 10,
+                    "min_velocity": 5,
+                    "max_rotation": 0,
+                    "scale": 0.3,
+                    "children": 0,
+                    "sound_destroy": "explosion1,explosion2,explosion3",
+                    "sound_hit": "impactMetal_000,impactMetal_001,impactMetal_002,impactMetal_003,impactMetal_00004",
                     "sprite_name": "enemy1",
-                    "on_impact" : "animation1"
-
-                }
-            ]
-        },
-
-
-        {
-            "tiers": [
-                {
-                    "damage": 3,
-                    "armor" : 10,
-                    "max_velocity": 5,
-                    "min_velocity": 2,
-                    "max_rotation": 20,
-                    "scale": 3,
-                    "children": 50,
-                    "sound_destroy": "explosion3",
-                    "sound_hit": "impact1,impact2,impact3,impact4",
-                    "sprite_name": "enemy2",
-                    "on_impact" : "animation1"
-                },
-                {
-                    "damage": 1,
-                    "armor" : 1,
-                    "max_velocity": 2,
-                    "min_velocity": 1,
-                    "max_rotation": 3,
-                    "scale": 0.4,
-                    "children": 4,
-                    "sound_destroy": "explosion3",
-                    "sound_hit": "impact1,impact2,impact3,impact4",
-                    "sprite_name": "enemy1",
-                    "on_impact" : "animation1"
-
+                    "on_impact" : "explosion2"
                 }
             ]
         },
@@ -95,31 +75,89 @@
          {
             "tiers": [
                 {
-                    "damage": 3,
+                    "damage": 10,
                     "armor" : 10,
                     "max_velocity": 5,
-                    "min_velocity": 2,
-                    "max_rotation": 20,
-                    "scale": 3,
-                    "children": 50,
-                    "sound_destroy": "explosion5",
+                    "min_velocity": 1,
+                    "max_rotation": 3,
+                    "scale": 2,
+                    "children": 3,
+                    "sound_destroy": "explosion1,explosion2,explosion3",
                     "sound_hit": "impact1,impact2,impact3,impact4",
-                    "sprite_name": "enemy3",
-                    "on_impact" : "animation1"
+                    "sprite_name": "enemy2",
+                    "on_impact" : "explosion8"
+                },
+                {
+                    "damage": 2,
+                    "armor" : 4,
+                    "max_velocity": 6,
+                    "min_velocity": 3,
+                    "max_rotation": 10,
+                    "scale": 1.4,
+                    "children": 40,
+                    "sound_destroy": "explosion1,explosion2,explosion3",
+                    "sound_hit": "impact1,impact2,impact3,impact4",
+                    "sprite_name": "enemy2",
+                    "on_impact" : "explosion8"
+
                 },
                 {
                     "damage": 1,
                     "armor" : 1,
-                    "max_velocity": 2,
-                    "min_velocity": 1,
+                    "max_velocity": 10,
+                    "min_velocity": 5,
+                    "max_rotation": 0,
+                    "scale": 0.3,
+                    "children": 0,
+                    "sound_destroy": "lowFrequency_explosion_000",
+                    "sound_hit": "impactMetal_000,impactMetal_001,impactMetal_002,impactMetal_003,impactMetal_00004",
+                    "sprite_name": "enemy2",
+                    "on_impact" : "explosion2"
+                }
+            ]
+        },
+
+         {
+            "tiers": [
+                {
+                    "damage": 10,
+                    "armor" : 10,
+                    "max_velocity": 8,
+                    "min_velocity": 5,
                     "max_rotation": 3,
-                    "scale": 0.4,
-                    "children": 4,
-                    "sound_destroy": "explosion5",
+                    "scale": 2.5,
+                    "children": 10,
+                    "sound_destroy": "explosion1,explosion2,explosion3",
                     "sound_hit": "impact1,impact2,impact3,impact4",
                     "sprite_name": "enemy3",
-                    "on_impact" : "animation1"
+                    "on_impact" : "explosion8"
+                },
+                {
+                    "damage": 2,
+                    "armor" : 4,
+                    "max_velocity": 5,
+                    "min_velocity": 2,
+                    "max_rotation": 10,
+                    "scale": 1.4,
+                    "children": 50,
+                    "sound_destroy": "explosion1,explosion2,explosion3",
+                    "sound_hit": "impact1,impact2,impact3,impact4",
+                    "sprite_name": "enemy3",
+                    "on_impact" : "explosion8"
 
+                },
+                {
+                    "damage": 1,
+                    "armor" : 1,
+                    "max_velocity": 10,
+                    "min_velocity": 5,
+                    "max_rotation": 0,
+                    "scale": 0.2,
+                    "children": 0,
+                    "sound_destroy": "lowFrequency_explosion_000",
+                    "sound_hit": "impactMetal_000,impactMetal_001,impactMetal_002,impactMetal_003,impactMetal_00004",
+                    "sprite_name": "enemy3",
+                    "on_impact" : "explosion2"
                 }
             ]
         }

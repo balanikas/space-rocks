@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict
 from typing import NamedTuple
 
 import pygame
@@ -8,9 +8,9 @@ from pygame.surface import Surface
 from pygame.transform import rotozoom
 
 import audio as sounds
-from animation import AnimationLibrary, Animation
-from geometry import Geometry
 import graphics as gfx
+import animation as anim
+from geometry import Geometry
 from utils import (
     get_random_velocity,
     get_random_rotation,
@@ -100,10 +100,10 @@ class EnemyProperties(NamedTuple):
     max_rotation: float
     scale: float
     children: int
-    sound_destroy: str
-    sound_hit: str
-    sprite_name: str
-    on_impact: str
+    sound_on_destroy: str
+    sound_on_impact: str
+    image: str
+    anim_on_destroy: str
 
     def validate(self):
         assert self.damage > 0
@@ -130,7 +130,7 @@ class Enemy(GameObject):
         self._armor = self._p.armor
         self._rotation = get_random_rotation(0, self._p.max_rotation)
         image = rotozoom(
-            gfx.get(self._p.sprite_name, resize=get_resize_factor(0.1)),
+            gfx.get(self._p.image, resize=get_resize_factor(0.1)),
             0,
             self._scale,
         )
@@ -142,7 +142,7 @@ class Enemy(GameObject):
         )
 
     def resize(self):
-        self.image = gfx.get(self._p.sprite_name, resize=get_resize_factor(0.1))
+        self.image = gfx.get(self._p.image, resize=get_resize_factor(0.1))
         self._scale *= max(window.factor)
         self.reposition()
 
@@ -161,7 +161,7 @@ class Enemy(GameObject):
         self.rect.center = self.geometry.position
 
     def split(self):
-        sounds.play(self._p.sound_destroy)
+        sounds.play(self._p.sound_on_destroy)
         if self._tier > 1:
             for _ in range(self._p.children):
                 enemy = Enemy(
@@ -175,15 +175,15 @@ class Enemy(GameObject):
     def hit(self, other: Geometry, damage: float):
         self._armor -= damage
         if self._armor > 0:
-            sounds.play(self._p.sound_hit)
+            sounds.play(self._p.sound_on_impact)
             self.geometry = bounce_other(self.geometry, other)
         else:
-            sounds.play(self._p.sound_destroy)
+            sounds.play(self._p.sound_on_destroy)
             self.split()
 
     def get_impact_animation(self):
-        return AnimationLibrary.load(
-            self._p.on_impact, self.geometry.position, resize=(200, 200)
+        return anim.get(
+            self._p.anim_on_destroy, self.geometry.position, resize=(200, 200)
         )
 
     @property

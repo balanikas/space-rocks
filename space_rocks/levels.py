@@ -74,9 +74,9 @@ class Level:
             player["armor"],
             player["maneuverability"],
             player["acceleration"],
-            player["sound_hit"],
+            player["sound_on_impact"],
             player["image"],
-            player["on_impact"],
+            player["anim_on_destroy"],
             primary_weapon,
             secondary_weapon,
         )
@@ -100,10 +100,10 @@ class Level:
                     t["max_rotation"],
                     t["scale"],
                     t["children"],
-                    t["sound_destroy"],
-                    t["sound_hit"],
-                    t["sprite_name"],
-                    t["on_impact"],
+                    t["sound_on_destroy"],
+                    t["sound_on_impact"],
+                    t["image"],
+                    t["anim_on_destroy"],
                 )
                 p.validate()
                 player_props[c] = p

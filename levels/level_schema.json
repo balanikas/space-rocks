@@ -2,19 +2,109 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
+    "background": {
+      "type": "string"
+    },
+    "soundtrack": {
+      "type": "string"
+    },
     "player": {
       "type": "object",
       "properties": {
+        "image": {
+          "type": "string"
+        },
         "maneuverability": {
           "type": "integer"
         },
         "acceleration": {
           "type": "number"
+        },
+        "anim_on_destroy": {
+          "type": "string"
+        },
+        "sound_on_impact": {
+          "type": "string"
+        },
+        "damage": {
+          "type": "integer"
+        },
+        "armor": {
+          "type": "integer"
+        },
+        "primary_weapon": {
+          "type": "object",
+          "properties": {
+            "damage": {
+              "type": "integer"
+            },
+            "armor": {
+              "type": "integer"
+            },
+            "speed": {
+              "type": "integer"
+            },
+            "sound": {
+              "type": "string"
+            },
+            "reload": {
+              "type": "integer"
+            },
+            "image": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "damage",
+            "armor",
+            "speed",
+            "sound",
+            "reload",
+            "image"
+          ]
+        },
+        "secondary_weapon": {
+          "type": "object",
+          "properties": {
+            "damage": {
+              "type": "integer"
+            },
+            "armor": {
+              "type": "integer"
+            },
+            "speed": {
+              "type": "integer"
+            },
+            "sound": {
+              "type": "string"
+            },
+            "reload": {
+              "type": "integer"
+            },
+            "image": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "damage",
+            "armor",
+            "speed",
+            "sound",
+            "reload",
+            "image"
+          ]
         }
       },
       "required": [
+        "image",
         "maneuverability",
-        "acceleration"
+        "acceleration",
+        "anim_on_destroy",
+        "sound_on_impact",
+        "damage",
+        "armor",
+        "primary_weapon",
+        "secondary_weapon"
       ]
     },
     "enemies": {
@@ -27,6 +117,12 @@
             "items": {
               "type": "object",
               "properties": {
+                "damage": {
+                  "type": "integer"
+                },
+                "armor": {
+                  "type": "integer"
+                },
                 "max_velocity": {
                   "type": "integer"
                 },
@@ -37,26 +133,39 @@
                   "type": "integer"
                 },
                 "scale": {
-                  "type": "number"
+                  "type": [
+                    "integer",
+                    "number"
+                  ]
                 },
                 "children": {
                   "type": "integer"
                 },
-                "sound_hit": {
+                "sound_on_destroy": {
                   "type": "string"
                 },
-                "sprite_name": {
+                "sound_on_impact": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "string"
+                },
+                "anim_on_destroy": {
                   "type": "string"
                 }
               },
               "required": [
+                "damage",
+                "armor",
                 "max_velocity",
                 "min_velocity",
                 "max_rotation",
                 "scale",
                 "children",
-                "sound_hit",
-                "sprite_name"
+                "sound_on_destroy",
+                "sound_on_impact",
+                "image",
+                "anim_on_destroy"
               ]
             }
           }
@@ -68,6 +177,8 @@
     }
   },
   "required": [
+    "background",
+    "soundtrack",
     "player",
     "enemies"
   ]

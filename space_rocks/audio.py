@@ -57,6 +57,10 @@ def stop_all():
         v.stop()
 
 
+def count():
+    return len(_bank)
+
+
 def _log_state():
     logger.info(f"{len(_bank)} sounds loaded")
     logger.info(_bank.keys())

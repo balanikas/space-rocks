@@ -1,24 +1,6 @@
 import functools
 import time
-
-
-def slow_down(_func=None, *, rate=1):
-    def decorator_slow_down(func):
-        @functools.wraps(func)
-        def wrapper_slow_down(*args, **kwargs):
-            wrapper_slow_down.num_calls += 1
-            if wrapper_slow_down.num_calls == rate:
-                wrapper_slow_down.num_calls = 0
-                return func(*args, **kwargs)
-
-        wrapper_slow_down.num_calls = 0
-        return wrapper_slow_down
-
-    if _func is None:
-        return decorator_slow_down
-    else:
-        return decorator_slow_down(_func)
-
+from typing import Callable
 
 func_timings = {}
 

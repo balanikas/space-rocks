@@ -65,6 +65,10 @@ def get(name: str, with_alpha: bool = True, resize: Tuple[int, int] = None) -> S
     return loaded_sprite.convert_alpha() if with_alpha else loaded_sprite.convert()
 
 
+def count():
+    return len(_bank)
+
+
 def _log_state():
     logger.info(f"{len(_bank)} images loaded")
     logger.info(_bank.keys())

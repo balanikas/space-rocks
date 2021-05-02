@@ -1,14 +1,14 @@
 from enum import Enum
-from typing import NamedTuple, Callable, Any, Optional
+from typing import NamedTuple, Callable, Any
 
 import pygame
 from pygame import Vector2, Surface
 from pygame.transform import rotozoom
 
 import audio as sounds
-from animation import Animation, AnimationLibrary
-from geometry import Geometry
 import graphics as gfx
+import animation as anim
+from geometry import Geometry
 from models import GameObject, BulletProperties, Bullet
 from utils import get_resize_factor, bounce_edge, bounce_other, get_blit_position
 from window import window
@@ -24,9 +24,9 @@ class PlayerProperties(NamedTuple):
     armor: float
     maneuverability: float
     acceleration: float
-    sound_hit: str
+    sound_on_impact: str
     image_name: str
-    on_impact: str
+    anim_on_destroy: str
     primary_weapon: BulletProperties
     secondary_weapon: BulletProperties
 
@@ -135,14 +135,14 @@ class Player(GameObject):
     def hit(self, other: Geometry, damage: float):
         self._armor -= damage
         if self._armor > 0:
-            sounds.play(self._p.sound_hit)
+            sounds.play(self._p.sound_on_impact)
             self.geometry = bounce_other(self.geometry, other)
         else:
-            sounds.play(self._p.sound_hit)
+            sounds.play(self._p.sound_on_impact)
 
     def get_impact_animation(self):
-        return AnimationLibrary.load(
-            self._p.on_impact, self.geometry.position, resize=(200, 200)
+        return anim.get(
+            self._p.anim_on_destroy, self.geometry.position, resize=(200, 200)
         )
 
     @property

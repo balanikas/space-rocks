@@ -34,7 +34,7 @@ class HUD:
         self._white = Color(255, 255, 255, 255)
         self._background_color = Color(0, 0, 0, 180)
         self._red = Color(255, 0, 0, 255)
-        self._font = pygame.freetype.Font(f"../assets/OpenSansEmoji.ttf", 40)
+        self._font = pygame.freetype.Font("../assets/OpenSansEmoji.ttf", 40)
 
         x = 0
         y = window.height * 0.95
@@ -60,10 +60,9 @@ class HUD:
         self._background.draw(screen)
 
         armor_color = self._red if armor < 10 else None
-
         self._armor.draw(screen, f"⛨{armor}", armor_color)
         self._damage.draw(screen, f"👊{damage}")
-        self._weapon.draw(screen, f"🔫" if weapon == ActiveWeapon.PRIMARY else f"🚀")
+        self._weapon.draw(screen, "🔫" if weapon == ActiveWeapon.PRIMARY else "🚀")
         self._level.draw(screen, f"{level_name}")
 
     def resize(self):

@@ -7,12 +7,11 @@ from pygame.locals import *
 
 import audio as sounds
 import constants
-from animation import init_animations, AnimationLibrary
+import graphics as gfx
+import animation as anim
 from debug import Debug
 from decorators import timer
 from editing import LevelObserver
-from effects import Sun, GradientEffect
-import graphics as gfx
 from hud import HUD
 from levels import World, Level
 from menu import Menu
@@ -31,9 +30,7 @@ class Game:
 
     def __init__(self):
         logging.basicConfig(level=logging.INFO)
-        LevelObserver(
-            self._initialize_level
-        )  # file watcher that reloads a level on level change
+        LevelObserver(self._initialize_level)
 
         # very small buffer but sound lag still exists(est 0.2 - 0.4 secs).
         # Tried many hthings, perhaps just a pygame limitation
@@ -41,9 +38,6 @@ class Game:
         pygame.init()
         pygame.display.set_caption("experimental video game by balanikas@github")
         pygame.font.init()
-
-        self._clock = pygame.time.Clock()
-        self._state = GameState.NOT_RUNNING
 
         # having SCALED as flags enables vsync but fucks up most animations.
         flags = pygame.SCALED | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF
@@ -54,13 +48,13 @@ class Game:
             vsync=1,
         )
         window.resize()
+        print_pygame_info()
 
+        self._state = GameState.NOT_RUNNING
+        self._clock = pygame.time.Clock()
         self._debug = Debug(self._clock)
         self._ui = UI()
         self._hud = HUD()
-
-        print_pygame_info()
-
         self._world = World(self._screen)
         self._level: Optional[Level]
         self._menu = Menu(
@@ -70,18 +64,14 @@ class Game:
         )
         self._menu.menu.mainloop(self._screen)
 
-        # self.set_level(0)
-        # self.start_the_game()
-
     def _initialize_level(self):
         self._state = GameState.LOADING_LEVEL
         sounds.stop_all()
         level_id, level_name = self._world.get_current_level()
         sounds.init(level_name)
         sounds.play("change_level")
-
         gfx.init(level_name)
-        init_animations(level_name)
+        anim.init(level_name)
         self._level = self._world.start_level(level_id)
         self._effects = []
         self._state = GameState.RUNNING
@@ -115,8 +105,7 @@ class Game:
                 quit()
             elif event.type == VIDEORESIZE:
                 pass
-                # self._resize()
-            elif event.type == VIDEOEXPOSE:  # handles window minimising/maximising
+            elif event.type == VIDEOEXPOSE:
                 pass
 
             if event.type == pygame.KEYDOWN:
@@ -141,32 +130,6 @@ class Game:
                     self._world.advance_level()
                     self._initialize_level()
 
-                if event.key == pygame.K_5:
-                    self._effects = []
-                    x = 0
-                    y = 250
-                    c = 0
-                    for k, _ in AnimationLibrary._bank.items():
-                        x += 250
-                        c += 1
-                        if c > 8:
-                            y += 250
-                            c = 0
-                            x = 0
-                        self._effects.append(
-                            AnimationLibrary.load(k, Vector2(x, y), resize=(200, 200))
-                        )
-
-                if event.key == pygame.K_0:
-                    for x in list(self._effects):
-                        if type(x) is Sun or type(x) is GradientEffect:
-                            self._effects.remove(x)
-
-                    self._effects.append(Sun(Vector2(300, 300)))
-                    self._effects.append(
-                        GradientEffect(self._level.player.geometry.position)
-                    )
-
                 if event.key == pygame.K_1:
                     self._level.player.switch_weapon()
                 if event.key == pygame.K_RETURN:
@@ -178,7 +141,6 @@ class Game:
                         self._initialize_level()
 
         is_key_pressed = pygame.key.get_pressed()
-
         if self._state is GameState.RUNNING and self._level.player:
             if is_key_pressed[pygame.K_RIGHT] or is_key_pressed[pygame.K_d]:
                 self._level.player.rotate(clockwise=True)
@@ -236,7 +198,6 @@ class Game:
         for e in self._effects:
             e.draw(self._screen)
 
-        # self._debug.draw_visual(self._screen, self._level.game_objects)
         self._debug.draw_text(
             self._screen,
             self._level.player.geometry.position,

@@ -3,7 +3,6 @@ from pygame import Vector2, Surface
 
 import audio as sounds
 import graphics as gfx
-from utils import get_resize_factor
 from window import window
 
 

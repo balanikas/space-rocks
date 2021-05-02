@@ -14,7 +14,14 @@ small-to-midsized. Thanks to the python community, and the gamedev community for
 
 
 ## Demo
-add youtube link
+
+![](docs/demo.mov)
+![](docs/menu.png)
+![](docs/gameplay1.png)
+![](docs/gameplay2.png)
+![](docs/debug.png)
+
+
 
 ## Controls
 
@@ -47,7 +54,10 @@ If a level asset is not found in the level specific folder, a default dummy asse
 Any file change in a level folder will reload the current level. 
 This is done to make the game testing loop faster.
 
-### useful debugging tools
+### other
+* useful debugging tools
+* vsync where available
+
 
 ## Future improvements:
 * GUI for level editor

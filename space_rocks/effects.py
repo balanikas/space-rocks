@@ -2,8 +2,8 @@ import pygame
 from pygame import Vector2, Surface
 
 import audio as sounds
-from window import window
 import graphics as gfx
+from window import window
 
 
 class GradientEffect:

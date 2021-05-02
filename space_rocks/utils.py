@@ -108,12 +108,12 @@ def bounce_edge(
 def bounce_other(obj: Geometry, other: Geometry) -> Geometry:
     vel = Vector2(obj.velocity)
 
-    def update_velocity(vel: float, pos: float, other_pos: float):
-        vel = abs(vel)
+    def update_velocity(velocity: float, pos: float, other_pos: float):
+        velocity = abs(velocity)
         if other_pos > 0:
-            return vel * -1 if other_pos > pos else vel
+            return velocity * -1 if other_pos > pos else velocity
         else:
-            return vel if other_pos < pos else vel * -1
+            return velocity if other_pos < pos else velocity * -1
 
     vel.x = update_velocity(vel.x, obj.position.x, other.position.x)
     vel.y = update_velocity(vel.y, obj.position.y, other.position.y)
