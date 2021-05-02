@@ -60,6 +60,8 @@ class Player(GameObject):
             Vector2(0),
         )
 
+        self._rotated_image = self.image
+
     @property
     def damage(self):
         return self._p.damage
@@ -79,7 +81,7 @@ class Player(GameObject):
     def rotate(self, clockwise: bool = True):
         sign = 1 if clockwise else -1
         angle = self._p.maneuverability * sign
-        self._direction.rotate_ip(angle)
+        self._direction = self._direction.rotate(angle)
 
     def move(self, surface: Surface):
         self.geometry = bounce_edge(surface, 50, 0.6, self.geometry)
@@ -90,7 +92,13 @@ class Player(GameObject):
             return
 
         angle = self._direction.angle_to(self.UP)
-        rotated_surface = rotozoom(self.image, angle, 1)
+        if angle != self._angle:
+            rotated_surface = rotozoom(self.image, angle, 1)
+            self._rotated_image = rotated_surface
+            self._angle = angle
+        else:
+            rotated_surface = self._rotated_image
+
         blit_position = get_blit_position(rotated_surface, self.geometry)
         surface.blit(rotated_surface, blit_position)
 

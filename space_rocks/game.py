@@ -22,29 +22,6 @@ from utils import collides_with, print_pygame_info, sprite_collide, is_in_screen
 from window import window
 
 
-# todo mouse over crashes game - The get_cursor method is unavailable in SDL2
-# todo have a "record" option and record all game input and then replay it
-# todo embed QT in the game window or vice versa, so game can be paused, .json file edited and restart game
-# todo state machine for GameState ?
-# todo https://realpython.com/pyinstaller-python/
-# todo check if player not rotated to avoid a rotozoom call
-# todo key to toggle fullscreen but pygame.display.toggle_fullscreen() is buggy
-# todo fix 3 nice playable balanced levels, settle tha, experiment on level4
-# todo load default assets once and then level assets per level change. for performance
-# todo asserts
-# todo resizable window as constant flag
-# todo detect monitors update rate Hz and set framerate dynamically to that. make sure game objects speed is correct
-# todo autogenerate armor slowly
-# todo show armor as bar
-# todo less explosive sounds
-# todo bounce related to sizes, small size bounce more
-# todo better soundtrack
-# todo black hole randomly appears
-# todo electcity anim on player!
-# todo bouncing not accurate, shooting from behind has no impact
-#
-
-
 class Game:
     def set_level(self, level):
         self._world.set_current_level(level)
