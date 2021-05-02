@@ -38,12 +38,9 @@ from window import window
 # todo show armor as bar
 # todo less explosive sounds
 # todo bounce related to sizes, small size bounce more
-# todo better wallpaper
 # todo better soundtrack
-# todo more anims, and comment on why they suck on vsync
 # todo black hole randomly appears
 # todo electcity anim on player!
-# todo refactor libs to non classes
 # todo bouncing not accurate, shooting from behind has no impact
 #
 

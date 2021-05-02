@@ -1,3 +1,4 @@
+import pygame
 from pygame import Vector2, Surface
 
 import audio as sounds
@@ -8,7 +9,13 @@ from window import window
 
 class Background:
     def _initialize(self):
-        self._image = gfx.get(self._image_name, False, resize=get_resize_factor(1.2))
+
+        self._image = gfx.get(self._image_name, False)
+        target_size = Vector2(window.width * 1.2, window.height * 1.2)
+        source_size = Vector2(self._image.get_size())
+        delta_x, delta_y = source_size - target_size
+        if delta_x < 0 or delta_y < 0:
+            self._image = pygame.transform.scale(self._image, target_size)
 
         (s_x, s_y) = self._image.get_size()
         x = ((s_x - window.width) / 2) * -1
