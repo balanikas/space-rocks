@@ -7,7 +7,7 @@
         "acceleration" : 0.15,
         "on_impact" : "explosion8",
         "damage" : 5,
-        "armor" : 1,
+        "armor" : 1000,
         "primary_weapon": {
             "damage": 1,
             "armor" : 0,
@@ -31,7 +31,7 @@
             "tiers": [
                 {
                     "damage": 10,
-                    "armor" : 20,
+                    "armor" : 200,
                     "max_velocity": 4,
                     "min_velocity": 1,
                     "max_rotation": 3,
@@ -70,141 +70,8 @@
                     "on_impact" : "explosion2"
                 }
             ]
-        },
-
-         {
-            "tiers": [
-                {
-                    "damage": 10,
-                    "armor" : 10,
-                    "max_velocity": 4,
-                    "min_velocity": 1,
-                    "max_rotation": 3,
-                    "scale": 2,
-                    "children": 3,
-                    "sound_destroy": "explosion_big",
-                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
-                    "sprite_name": "planet-3",
-                    "on_impact" : "explosion8"
-                },
-                {
-                    "damage": 2,
-                    "armor" : 4,
-                    "max_velocity": 5,
-                    "min_velocity": 2,
-                    "max_rotation": 10,
-                    "scale": 0.7,
-                    "children": 3,
-                    "sound_destroy": "explosion_medium",
-                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
-                    "sprite_name": "planet-3",
-                    "on_impact" : "explosion8"
-
-                },
-                {
-                    "damage": 1,
-                    "armor" : 2,
-                    "max_velocity": 10,
-                    "min_velocity": 5,
-                    "max_rotation": 0,
-                    "scale": 0.3,
-                    "children": 0,
-                    "sound_destroy": "explosion_small",
-                    "sound_hit": "absorb1_small,absorb2_small",
-                    "sprite_name": "planet-3",
-                    "on_impact" : "explosion2"
-                }
-            ]
-        },
-
-         {
-            "tiers": [
-                {
-                    "damage": 10,
-                    "armor" : 10,
-                    "max_velocity": 3,
-                    "min_velocity": 1,
-                    "max_rotation": 3,
-                    "scale": 2,
-                    "children": 3,
-                    "sound_destroy": "explosion_big",
-                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
-                    "sprite_name": "planet-4",
-                    "on_impact" : "explosion8"
-                },
-                {
-                    "damage": 2,
-                    "armor" : 4,
-                    "max_velocity": 6,
-                    "min_velocity": 3,
-                    "max_rotation": 10,
-                    "scale": 0.7,
-                    "children": 3,
-                    "sound_destroy": "explosion_medium",
-                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
-                    "sprite_name": "planet-4",
-                    "on_impact" : "explosion8"
-
-                },
-                {
-                    "damage": 1,
-                    "armor" : 2,
-                    "max_velocity": 10,
-                    "min_velocity": 5,
-                    "max_rotation": 0,
-                    "scale": 0.3,
-                    "children": 0,
-                    "sound_destroy": "explosion_small",
-                    "sound_hit": "absorb1_small,absorb2_small",
-                    "sprite_name": "planet-4",
-                    "on_impact" : "explosion2"
-                }
-            ]
-        },
-
-         {
-            "tiers": [
-                {
-                    "damage": 10,
-                    "armor" : 10,
-                    "max_velocity": 3,
-                    "min_velocity": 1,
-                    "max_rotation": 3,
-                    "scale": 2.5,
-                    "children": 2,
-                    "sound_destroy": "explosion_big",
-                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
-                    "sprite_name": "planet-5",
-                    "on_impact" : "explosion8"
-                },
-                {
-                    "damage": 2,
-                    "armor" : 4,
-                    "max_velocity": 5,
-                    "min_velocity": 2,
-                    "max_rotation": 10,
-                    "scale": 1,
-                    "children": 12,
-                    "sound_destroy": "explosion_medium",
-                    "sound_hit": "absorb1,absorb2,absorb3,absorb4",
-                    "sprite_name": "planet-5",
-                    "on_impact" : "explosion8"
-
-                },
-                {
-                    "damage": 1,
-                    "armor" : 2,
-                    "max_velocity": 10,
-                    "min_velocity": 5,
-                    "max_rotation": 0,
-                    "scale": 0.2,
-                    "children": 0,
-                    "sound_destroy": "explosion_small",
-                    "sound_hit": "absorb1_small,absorb2_small",
-                    "sprite_name": "planet-5",
-                    "on_impact" : "explosion2"
-                }
-            ]
         }
+
+
     ]
 }

@@ -17,6 +17,7 @@ from utils import (
     get_resize_factor,
     bounce_edge,
     bounce_other,
+    get_blit_position,
 )
 from window import window
 
@@ -83,7 +84,7 @@ class Bullet(GameObject):  # rename class to weapon
         )
 
     def draw(self, surface: Surface):
-        blit_position = self.geometry.position - Vector2(self.geometry.radius)
+        blit_position = get_blit_position(self.image, self.geometry)
         surface.blit(self.image, blit_position)
 
     def resize(self):
@@ -141,22 +142,18 @@ class Enemy(GameObject):
         )
 
     def resize(self):
-        self.image = gfx.get(
-            self._p.sprite_name, resize=get_resize_factor(0.1)
-        )
+        self.image = gfx.get(self._p.sprite_name, resize=get_resize_factor(0.1))
         self._scale *= max(window.factor)
         self.reposition()
 
     def draw(self, surface: Surface):
-
         if self._rotation > 0:
             self._angle += self._rotation
             rotated_surface = rotozoom(self.image, self._angle, 1)
         else:
             rotated_surface = self.image
 
-        rotated_surface_size = Vector2(rotated_surface.get_size())
-        blit_position: Vector2 = self.geometry.position - rotated_surface_size * 0.5
+        blit_position = get_blit_position(rotated_surface, self.geometry)
         surface.blit(rotated_surface, blit_position)
 
     def move(self, surface: Surface):
@@ -175,18 +172,19 @@ class Enemy(GameObject):
                 )
                 self._create_enemy_callback(enemy)
 
-    def hit(self, other: Geometry, damage: float) -> Optional[Animation]:
+    def hit(self, other: Geometry, damage: float):
         self._armor -= damage
         if self._armor > 0:
             sounds.play(self._p.sound_hit)
             self.geometry = bounce_other(self.geometry, other)
-            return None
         else:
             sounds.play(self._p.sound_destroy)
             self.split()
-            return AnimationLibrary.load(
-                self._p.on_impact, self.geometry.position, resize=(200, 200)
-            )
+
+    def get_impact_animation(self):
+        return AnimationLibrary.load(
+            self._p.on_impact, self.geometry.position, resize=(200, 200)
+        )
 
     @property
     def damage(self) -> float:

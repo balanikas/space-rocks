@@ -44,7 +44,7 @@ from window import window
 # todo black hole randomly appears
 # todo electcity anim on player!
 # todo refactor libs to non classes
-
+# todo bouncing not accurate, shooting from behind has no impact
 #
 
 
@@ -224,34 +224,30 @@ class Game:
             game_object.move(self._screen)
 
         player = self._level.player
-        if player and not player.dead:
+        if player and not player.armor <= 0:
             for a in list(self._level.enemies):
                 if collides_with(player.geometry, a.geometry):
                     if sprite_collide(player, a):
                         player_geo = player.geometry
-                        player_anim = player.hit(a.geometry, a.damage)
-                        if player_anim:
-                            self._effects.append(player_anim)
+                        player.hit(a.geometry, a.damage)
+                        if player.armor <= 0:
+                            self._effects.append(player.get_impact_animation())
                             self._state = GameState.LOST
-                        a_anim = a.hit(player_geo, player.damage)
-                        if a_anim:
-                            self._effects.append(a_anim)
+                        a.hit(player_geo, player.damage)
+                        if a.armor <= 0:
+                            self._effects.append(a.get_impact_animation())
                             self._level.remove_enemy(a)
                         break
 
         for b in list(self._level.bullets):
             for a in list(self._level.enemies):
                 if collides_with(a.geometry, b.geometry):
-                    a_anim = a.hit(b.geometry, b.damage)
-                    if a_anim:
-                        self._effects.append(a_anim)
+                    a.hit(b.geometry, b.damage)
+                    if a.armor <= 0:
+                        self._effects.append(a.get_impact_animation())
                         self._level.remove_enemy(a)
                     self._level.remove_bullet(b)
                     break
-
-        for b in list(self._level.bullets):
-            if not is_in_screen(self._screen, b.geometry):
-                self._level.remove_bullet(b)
 
         if not self._level.enemies and self._level.player:
             self._state = GameState.WON
@@ -288,6 +284,10 @@ class Game:
         pygame.display.flip()
 
     def _cleanup(self):
+        for b in list(self._level.bullets):
+            if not is_in_screen(self._screen, b.geometry):
+                self._level.remove_bullet(b)
+
         for e in list(self._effects):
             if e.complete:
                 self._effects.remove(e)

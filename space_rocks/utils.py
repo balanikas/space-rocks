@@ -126,3 +126,8 @@ def get_random_choice(text: str) -> str:
     return random.choice(
         [x.strip(" ") for x in text.split(",")]
     )  # randomize what to play if many
+
+
+def get_blit_position(surface: Surface, geometry: Geometry):
+    surface_size = Vector2(surface.get_size())
+    return geometry.position - surface_size * 0.5

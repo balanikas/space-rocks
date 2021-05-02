@@ -8,9 +8,7 @@ from window import window
 
 class Background:
     def _initialize(self):
-        self._image = gfx.get(
-            self._image_name, False, resize=get_resize_factor(1.2)
-        )
+        self._image = gfx.get(self._image_name, False, resize=get_resize_factor(1.2))
 
         (s_x, s_y) = self._image.get_size()
         x = ((s_x - window.width) / 2) * -1

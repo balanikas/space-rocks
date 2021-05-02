@@ -5,6 +5,7 @@ import audio as sounds
 from window import window
 import graphics as gfx
 
+
 class GradientEffect:
     def __init__(self, focus_point: Vector2):
         self._focus_point = focus_point

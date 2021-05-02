@@ -10,7 +10,7 @@ from animation import Animation, AnimationLibrary
 from geometry import Geometry
 import graphics as gfx
 from models import GameObject, BulletProperties, Bullet
-from utils import get_resize_factor, bounce_edge, bounce_other
+from utils import get_resize_factor, bounce_edge, bounce_other, get_blit_position
 from window import window
 
 
@@ -51,7 +51,6 @@ class Player(GameObject):
         self._direction = Vector2(self.UP)
         self._active_weapon = ActiveWeapon.PRIMARY
         self._last_shot = 0
-        self._dead = False
         self._armor = self._p.armor
         self._angle = 0
 
@@ -73,14 +72,8 @@ class Player(GameObject):
     def direction(self):
         return self._direction
 
-    @property
-    def dead(self):
-        return self._dead
-
     def resize(self):
-        self.image = gfx.get(
-            self._p.image_name, resize=get_resize_factor(0.1)
-        )
+        self.image = gfx.get(self._p.image_name, resize=get_resize_factor(0.1))
         self.reposition()
 
     def rotate(self, clockwise: bool = True):
@@ -93,13 +86,12 @@ class Player(GameObject):
         self.rect.center = self.geometry.position
 
     def draw(self, surface: Surface):
-        if self._dead:
+        if self.armor <= 0:
             return
 
         angle = self._direction.angle_to(self.UP)
         rotated_surface = rotozoom(self.image, angle, 1)
-        rotated_surface_size = Vector2(rotated_surface.get_size())
-        blit_position = self.geometry.position - rotated_surface_size * 0.5
+        blit_position = get_blit_position(rotated_surface, self.geometry)
         surface.blit(rotated_surface, blit_position)
 
     def accelerate(self):
@@ -115,35 +107,35 @@ class Player(GameObject):
         sounds.play("change_weapon")
 
     def shoot(self):
-        bullet = (
+        w = (
             self._p.primary_weapon
             if self._active_weapon == ActiveWeapon.PRIMARY
             else self._p.secondary_weapon
         )
 
-        if pygame.time.get_ticks() - self._last_shot < bullet.reload:
+        if pygame.time.get_ticks() - self._last_shot < w.reload:
             return
 
         self._last_shot = pygame.time.get_ticks()
-        bullet_velocity = self._direction * bullet.speed
-        bullet_velocity = Vector2(
-            bullet_velocity.x * window.factor.x, bullet_velocity.y * window.factor.y
+        weapon_velocity = self._direction * w.speed
+        weapon_velocity = Vector2(
+            weapon_velocity.x * window.factor.x, weapon_velocity.y * window.factor.y
         )
-        bullet = Bullet(bullet, self.geometry.position, bullet_velocity)
-        self._create_bullet_callback(bullet)
+        w = Bullet(w, self.geometry.position, weapon_velocity)
+        self._create_bullet_callback(w)
 
-    def hit(self, other: Geometry, damage: float) -> Optional[Animation]:
+    def hit(self, other: Geometry, damage: float):
         self._armor -= damage
         if self._armor > 0:
             sounds.play(self._p.sound_hit)
             self.geometry = bounce_other(self.geometry, other)
-            return None
         else:
-            self._dead = True
             sounds.play(self._p.sound_hit)
-            return AnimationLibrary.load(
-                self._p.on_impact, self.geometry.position, resize=(200, 200)
-            )
+
+    def get_impact_animation(self):
+        return AnimationLibrary.load(
+            self._p.on_impact, self.geometry.position, resize=(200, 200)
+        )
 
     @property
     def active_weapon(self) -> ActiveWeapon:
