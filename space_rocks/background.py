@@ -14,7 +14,7 @@ class Background:
         source_size = Vector2(self._image.get_size())
         delta_x, delta_y = source_size - target_size
         if delta_x < 0 or delta_y < 0:
-            self._image = pygame.transform.scale(self._image, target_size)
+            self._image = pygame.transform.scale(self._image, [int(target_size.x), int(target_size.y)])
 
         (s_x, s_y) = self._image.get_size()
         x = ((s_x - window.width) / 2) * -1
