@@ -3,6 +3,7 @@ from pygame import Vector2, Surface
 
 import audio as sounds
 import graphics as gfx
+from utils import scale_surface, create_surface_alpha
 from window import window
 
 
@@ -12,7 +13,7 @@ class GradientEffect:
 
     def _gradient_rect(self, surface, left_colour, right_colour, target_rect):
         """ Draw a horizontal-gradient filled rectangle covering <target_rect> """
-        colour_rect = pygame.Surface((2, 2), pygame.SRCALPHA)  # tiny! 2x2 bitmap
+        colour_rect = create_surface_alpha((2, 2))
         pygame.draw.line(colour_rect, left_colour, (0, 0), (0, 1))  # left colour line
         pygame.draw.line(colour_rect, right_colour, (1, 0), (1, 1))  # right colour line
 
@@ -79,7 +80,7 @@ class Sun:
     def draw(self, surface: Surface):
         w, h = (int(window.width * self._scale), int(window.height * self._scale))
         light = gfx.get("blue_gradient")
-        light = pygame.transform.scale(light, (w, h))
+        light = scale_surface(light, (w, h))
         filter_surface = pygame.surface.Surface(
             (window.width, window.height), pygame.SRCALPHA
         )

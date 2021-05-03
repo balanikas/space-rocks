@@ -2,6 +2,7 @@ import logging
 import os
 from typing import Dict
 
+import pygame
 from pygame.mixer import Sound
 
 import constants
@@ -69,3 +70,17 @@ def _log_state():
 def init(level_name: str):
     _init(level_name)
     _log_state()
+
+
+def init_audio():
+    # very small buffer but sound lag still exists(est 0.2 - 0.4 secs).
+    # Tried many hthings, perhaps just a pygame limitation
+    pygame.mixer.pre_init(44100, -16, 2, 128)
+    pygame.init()
+
+    lines = []
+    info = pygame.mixer.get_init()
+    logger.info(f"Sound Frequency: {info[0]:d}")
+    logger.info(f"Sound Quality: {abs(info[1]):d} bits")
+    logger.info(f"Sound Channels: {('Mono', 'Stereo')[info[2] - 1]}")
+    print(lines)

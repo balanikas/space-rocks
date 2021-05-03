@@ -1,6 +1,5 @@
 import functools
 import time
-from typing import Callable
 
 func_timings = {}
 

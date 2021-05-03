@@ -5,11 +5,10 @@ from typing import NamedTuple
 import pygame
 from pygame.math import Vector2
 from pygame.surface import Surface
-from pygame.transform import rotozoom
 
+import animation as anim
 import audio as sounds
 import graphics as gfx
-import animation as anim
 from geometry import Geometry
 from utils import (
     get_random_velocity,
@@ -18,6 +17,7 @@ from utils import (
     bounce_edge,
     bounce_other,
     get_blit_position,
+    scale_and_rotate,
 )
 from window import window
 
@@ -33,14 +33,17 @@ class GameState(Enum):
 class GameObject(pygame.sprite.Sprite):
     def __init__(self, position: Vector2, image: Surface, velocity: Vector2):
         super(GameObject, self).__init__()
-        self.image: Surface = image
-        self.geometry: Geometry = Geometry(position, image.get_width() / 2, velocity)
-        self.rect: pygame.rect.Rect = self.image.get_rect(center=position)
+        self.image = image
+        self.geometry = Geometry(position, image.get_width() / 2, velocity)
+        self.rect = self.image.get_rect(center=position)
 
     def move(self, surface: Surface):
         pass
 
     def draw(self, surface: Surface):
+        pass
+
+    def resize(self):
         pass
 
     def reposition(self):
@@ -129,7 +132,7 @@ class Enemy(GameObject):
         self._scale = self._p.scale
         self._armor = self._p.armor
         self._rotation = get_random_rotation(0, self._p.max_rotation)
-        image = rotozoom(
+        image = scale_and_rotate(
             gfx.get(self._p.image, resize=get_resize_factor(0.1)),
             0,
             self._scale,
@@ -149,7 +152,7 @@ class Enemy(GameObject):
     def draw(self, surface: Surface):
         if self._rotation > 0:
             self._angle += self._rotation
-            rotated_surface = rotozoom(self.image, self._angle, 1)
+            rotated_surface = scale_and_rotate(self.image, self._angle, 1)
         else:
             rotated_surface = self.image
 

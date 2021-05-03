@@ -5,11 +5,10 @@ from typing import Dict, Tuple, Any
 
 import pygame
 from PIL import Image, ImageDraw, ImageFont
-from pygame.image import load
 from pygame.surface import Surface
 
 import constants
-from utils import get_random_choice
+from utils import get_random_choice, scale_surface, create_surface_from_image
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +36,11 @@ def _init(level_name: str) -> None:
                 f = f.lower()
                 if f.endswith(".png") or f.endswith(".jpg") or f.endswith(".jpeg"):
                     try:
-                        g = load(f"{os.path.join(root, f)}")
+                        g = create_surface_from_image(f"{os.path.join(root, f)}")
                     except:
-                        g = load(f"{constants.GFX_ASSETS_ROOT}not_found.png")
+                        g = create_surface_from_image(
+                            f"{constants.GFX_ASSETS_ROOT}not_found.png"
+                        )
                     key = os.path.join(root.replace(path, ""), f)
                     _bank[key.split(".")[0]] = g
 
@@ -61,7 +62,7 @@ def get(name: str, with_alpha: bool = True, resize: Tuple[int, int] = None) -> S
             name = "not_found"
     loaded_sprite = _bank[name]
     if resize:
-        loaded_sprite = pygame.transform.scale(loaded_sprite, resize)
+        loaded_sprite = scale_surface(loaded_sprite, resize)
     return loaded_sprite.convert_alpha() if with_alpha else loaded_sprite.convert()
 
 

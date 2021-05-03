@@ -3,13 +3,11 @@ import logging
 import os
 from typing import Dict, Tuple, NamedTuple
 
-import pygame
-from pygame.image import load
 from pygame.math import Vector2
 from pygame.surface import Surface
 
 import constants
-from utils import get_random_choice
+from utils import get_random_choice, scale_surface, create_surface_from_image
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +71,7 @@ def _init(level_name: str) -> None:
 
         for y in range(0, img.get_height(), h):
             for x in range(0, img.get_width(), w):
-                i = pygame.Surface(size)
+                i = Surface(size)
                 i.blit(img, (0, 0), ((x, y), size))
                 if orig_alpha:
                     i.set_colorkey((0, 0, 0))
@@ -100,7 +98,7 @@ def _init(level_name: str) -> None:
             img_name = d["image"].lower()
             img_path = f"{os.path.join(path, img_name + '.png')}"
 
-            img = load(img_path)
+            img = create_surface_from_image(img_path)
             frames = create_frames(img, d["rows"], d["columns"])
 
             _bank[img_name] = AnimationData(frames, d["speed"])
@@ -121,7 +119,7 @@ def get(name: str, position: Vector2, resize: Tuple[int, int] = None) -> Animati
         anim_data = _bank[name]
         if resize:
             anim_data = AnimationData(
-                [pygame.transform.scale(img, resize) for img in anim_data.frames],
+                [scale_surface(img, resize) for img in anim_data.frames],
                 anim_data.speed,
             )
 

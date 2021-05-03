@@ -4,6 +4,7 @@ from pygame.font import Font
 
 from decorators import timer
 from player import ActiveWeapon
+from space_rocks.utils import create_surface_alpha
 from window import window
 
 
@@ -21,7 +22,7 @@ class UIText:
 
 class UIRect:
     def __init__(self, rect: Rect, color: Color):
-        self._surface = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+        self._surface = create_surface_alpha((rect.width, rect.height))
         self._surface.fill(color)
         self._rect = rect
 

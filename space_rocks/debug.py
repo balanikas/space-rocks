@@ -7,21 +7,22 @@ from pygame import Surface
 from pygame.color import Color
 from pygame.math import Vector2
 
+import animation as anim
+import audio as sounds
+import graphics as gfx
 from decorators import func_timings
 from models import GameObject
+from utils import create_surface_alpha, create_default_font
 from window import window
-import graphics as gfx
-import audio as sounds
-import animation as anim
 
 
 class Debug:
     def __init__(self, clock: pygame.time.Clock):
         self._clock = clock
-        self._font = pygame.font.Font(None, 24)
+        self._font = create_default_font(24)
         self.enabled = False
         self._process = psutil.Process(os.getpid())
-        self._surface = pygame.Surface((window.width, window.height), pygame.SRCALPHA)
+        self._surface = create_surface_alpha((window.width, window.height))
         self._surface.fill(Color(0, 0, 0, 128))
 
     def _draw_lines(self, surface: Surface, lines: []):

@@ -1,4 +1,3 @@
-import pygame
 from pygame.color import Color
 from pygame.font import Font
 from pygame.math import Vector2
@@ -6,11 +5,12 @@ from pygame.surface import Surface
 
 import audio as sounds
 from models import GameState
+from space_rocks.utils import create_default_font
 
 
 class UI:
     def __init__(self):
-        self._font = pygame.font.Font(None, 64)
+        self._font = create_default_font(64)
         self._message = ""
         self._sound_played = False
 

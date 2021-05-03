@@ -3,14 +3,19 @@ from typing import NamedTuple, Callable, Any
 
 import pygame
 from pygame import Vector2, Surface
-from pygame.transform import rotozoom
 
+import animation as anim
 import audio as sounds
 import graphics as gfx
-import animation as anim
 from geometry import Geometry
 from models import GameObject, BulletProperties, Bullet
-from utils import get_resize_factor, bounce_edge, bounce_other, get_blit_position
+from utils import (
+    get_resize_factor,
+    bounce_edge,
+    bounce_other,
+    get_blit_position,
+    scale_and_rotate,
+)
 from window import window
 
 
@@ -93,7 +98,7 @@ class Player(GameObject):
 
         angle = self._direction.angle_to(self.UP)
         if angle != self._angle:
-            rotated_surface = rotozoom(self.image, angle, 1)
+            rotated_surface = scale_and_rotate(self.image, angle, 1)
             self._rotated_image = rotated_surface
             self._angle = angle
         else:

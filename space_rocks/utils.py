@@ -6,6 +6,7 @@ import pygame
 from pygame.math import Vector2
 from pygame.sprite import Sprite
 from pygame.surface import Surface
+from pygame.transform import rotozoom
 
 from geometry import Geometry
 from window import window
@@ -55,21 +56,6 @@ def get_safe_enemy_distance(screen, player_position: Vector2) -> Vector2:
         if position.distance_to(player_position) > min_enemy_distance:
             break
     return position
-
-
-def print_pygame_info():
-    lines = []
-    info = pygame.display.Info()
-    lines.append(f"Current Video Driver: {pygame.display.get_driver()}")
-    lines.append(f"Video Mode is Accelerated: {('No', 'Yes')[info.hw]}")
-    lines.append(f"Display Depth (Bits Per Pixel): {info.bitsize:d}")
-
-    info = pygame.mixer.get_init()
-    lines.append(f"Sound Frequency: {info[0]:d}")
-    lines.append(f"Sound Quality: {abs(info[1]):d} bits")
-    lines.append(f"Sound Channels: {('Mono', 'Stereo')[info[2] - 1]}")
-
-    print(lines)
 
 
 def get_resize_factor(factor: float) -> Tuple[int, int]:
@@ -131,3 +117,48 @@ def get_random_choice(text: str) -> str:
 def get_blit_position(surface: Surface, geometry: Geometry):
     surface_size = Vector2(surface.get_size())
     return geometry.position - surface_size * 0.5
+
+
+def scale_surface(surface: Surface, size: Tuple[int, int]) -> Surface:
+    return pygame.transform.scale(surface, size)
+
+
+def create_surface_alpha(size: Tuple[int, int]) -> Surface:
+    return pygame.Surface(size, pygame.SRCALPHA)
+
+
+def create_surface_from_image(image_file_path: str):
+    return pygame.image.load(image_file_path)
+
+
+def create_default_font(size: int) -> pygame.font.Font:
+    return pygame.font.Font(None, size)
+
+
+def scale_and_rotate(surface: Surface, angle: float, scale: float) -> Surface:
+    return rotozoom(surface, angle, scale)
+
+
+def init_display() -> Surface:
+    pygame.display.set_caption("experimental video game by balanikas@github")
+    # having SCALED as flags enables vsync but fucks up most animations.
+    flags = pygame.SCALED | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF
+    screen = pygame.display.set_mode(
+        (pygame.display.Info().current_w, pygame.display.Info().current_h),
+        flags,
+        32,
+        vsync=1,
+    )
+
+    lines = []
+    info = pygame.display.Info()
+    lines.append(f"Current Video Driver: {pygame.display.get_driver()}")
+    lines.append(f"Video Mode is Accelerated: {('No', 'Yes')[info.hw]}")
+    lines.append(f"Display Depth (Bits Per Pixel): {info.bitsize:d}")
+    print(lines)
+
+    return screen
+
+
+def init_fonts():
+    pygame.font.init()

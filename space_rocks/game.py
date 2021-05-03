@@ -2,13 +2,12 @@ import logging
 from typing import Optional
 
 import pygame
-from pygame import surface, Vector2
 from pygame.locals import *
 
+import animation as anim
 import audio as sounds
 import constants
 import graphics as gfx
-import animation as anim
 from debug import Debug
 from decorators import timer
 from editing import LevelObserver
@@ -17,7 +16,7 @@ from levels import World, Level
 from menu import Menu
 from models import GameState
 from ui import UI
-from utils import collides_with, print_pygame_info, sprite_collide, is_in_screen
+from utils import collides_with, sprite_collide, is_in_screen, init_display, init_fonts
 from window import window
 
 
@@ -31,24 +30,10 @@ class Game:
     def __init__(self):
         logging.basicConfig(level=logging.INFO)
         LevelObserver(self._initialize_level)
-
-        # very small buffer but sound lag still exists(est 0.2 - 0.4 secs).
-        # Tried many hthings, perhaps just a pygame limitation
-        pygame.mixer.pre_init(44100, -16, 2, 128)
-        pygame.init()
-        pygame.display.set_caption("experimental video game by balanikas@github")
-        pygame.font.init()
-
-        # having SCALED as flags enables vsync but fucks up most animations.
-        flags = pygame.SCALED | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF
-        self._screen: surface.Surface = pygame.display.set_mode(
-            (pygame.display.Info().current_w, pygame.display.Info().current_h),
-            flags,
-            32,
-            vsync=1,
-        )
+        sounds.init_audio()
+        init_fonts()
+        self._screen = init_display()
         window.resize()
-        print_pygame_info()
 
         self._state = GameState.NOT_RUNNING
         self._clock = pygame.time.Clock()
@@ -88,10 +73,9 @@ class Game:
 
     def _resize(self):
         window.resize()
-        self._level.background.resize()
-        self._level.player.resize()
-        for a in self._level.enemies:
-            a.resize()
+        for go in self._level.game_objects:
+            go.resize()
+
         self._menu = Menu(
             self.set_level,
             self.start_the_game,
