@@ -6,20 +6,13 @@ import pygame
 from pygame.math import Vector2
 from pygame.surface import Surface
 
-import animation as anim
-import audio as sounds
-import graphics as gfx
-from geometry import Geometry
-from utils import (
-    get_random_velocity,
-    get_random_rotation,
-    get_resize_factor,
-    bounce_edge,
-    bounce_other,
-    get_blit_position,
-    scale_and_rotate,
-)
-from window import window
+import space_rocks.animation as anim
+import space_rocks.audio as sounds
+import space_rocks.graphics as gfx
+from space_rocks.geometry import Geometry
+from space_rocks.utils import bounce_other, bounce_edge, get_blit_position, scale_and_rotate, get_resize_factor, \
+    get_random_velocity, get_random_rotation
+from space_rocks.window import window
 
 
 class GameState(Enum):
@@ -35,7 +28,7 @@ class GameObject(pygame.sprite.Sprite):
         super(GameObject, self).__init__()
         self.image = image
         self.geometry = Geometry(position, image.get_width() / 2, velocity)
-        self.rect = self.image.get_rect(center=position)
+        self.rect = image.get_rect(center=position)
 
     def move(self, surface: Surface):
         pass
@@ -87,7 +80,7 @@ class Bullet(GameObject):  # rename class to weapon
         )
 
     def draw(self, surface: Surface):
-        blit_position = get_blit_position(self.image, self.geometry)
+        blit_position = get_blit_position(self.image, self.geometry.position)
         surface.blit(self.image, blit_position)
 
     def resize(self):
@@ -118,11 +111,11 @@ class EnemyProperties(NamedTuple):
 
 class Enemy(GameObject):
     def __init__(
-        self,
-        properties: Dict[int, EnemyProperties],
-        position: Vector2,
-        create_enemy_callback: Callable[[Any], None],
-        tier: int,
+            self,
+            properties: Dict[int, EnemyProperties],
+            position: Vector2,
+            create_enemy_callback: Callable[[Any], None],
+            tier: int,
     ):
         self._properties = properties
         self._create_enemy_callback = create_enemy_callback
@@ -146,7 +139,8 @@ class Enemy(GameObject):
 
     def resize(self):
         self.image = gfx.get(self._p.image, resize=get_resize_factor(0.1))
-        self._scale *= max(window.factor)
+        self._scale *= max(window.factor.x, window.factor.y)
+
         self.reposition()
 
     def draw(self, surface: Surface):
@@ -156,12 +150,12 @@ class Enemy(GameObject):
         else:
             rotated_surface = self.image
 
-        blit_position = get_blit_position(rotated_surface, self.geometry)
+        blit_position = get_blit_position(rotated_surface, self.geometry.position)
         surface.blit(rotated_surface, blit_position)
 
     def move(self, surface: Surface):
         self.geometry = bounce_edge(surface, 20, 1, self.geometry)
-        self.rect.center = self.geometry.position
+        self.rect.center = (int(self.geometry.position.x), int(self.geometry.position.y))
 
     def split(self):
         sounds.play(self._p.sound_on_destroy)

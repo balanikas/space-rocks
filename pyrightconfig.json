@@ -1,0 +1,16 @@
+{
+  "typeCheckingMode": "strict",
+
+
+  "include": [
+    "/space_rocks"
+  ],
+
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+
+  "reportUnusedImport" : "warning",
+  "reportUnusedClass" : "warning",
+  "reportUnusedFunction": "warning",
+  "reportUnusedVariable": "warning"
+}

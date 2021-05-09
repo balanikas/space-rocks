@@ -1,10 +1,9 @@
 from pygame.color import Color
 from pygame.font import Font
-from pygame.math import Vector2
 from pygame.surface import Surface
 
-import audio as sounds
-from models import GameState
+import space_rocks.audio as sounds
+from space_rocks.models import GameState
 from space_rocks.utils import create_default_font
 
 
@@ -15,11 +14,13 @@ class UI:
         self._sound_played = False
 
     def _print_text(
-        self, surface: Surface, text: str, font: Font, color: Color = Color(0, 255, 0)
+            self, surface: Surface, text: str, font: Font, color: Color = Color(0, 255, 0)
     ):
-        text_surface: Surface = font.render(text, True, color)
+        text_surface = font.render(text, True, color)
+        if not text_surface:
+            raise SystemExit
         rect = text_surface.get_rect()
-        rect.center = Vector2(surface.get_size()) / 2
+        rect.center = int(surface.get_size()[0] / 2), int(surface.get_size()[1] / 2)
         surface.blit(text_surface, rect)
 
     def draw(self, surface: Surface, state: GameState):

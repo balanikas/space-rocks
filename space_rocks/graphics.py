@@ -7,26 +7,25 @@ import pygame
 from PIL import Image, ImageDraw, ImageFont
 from pygame.surface import Surface
 
-import constants
-from utils import get_random_choice, scale_surface, create_surface_from_image
+from space_rocks import constants
+from space_rocks.utils import scale_surface, get_random_choice, create_surface_from_image
 
 logger = logging.getLogger(__name__)
 
-
 _bank: Dict[str, Surface] = {}
 
-
-def load_from_text(text: str) -> Any:
-    text = text.strip("text:")
-    img: Image = Image.new("RGBA", (200, 200))
-    d = ImageDraw.Draw(img)
-    font = ImageFont.truetype("../assets/OpenSansEmoji.ttf", 20)
-    d.text((0, 100), text, fill=(255, 0, 255), font=font)
-    s = io.BytesIO()
-    img.save(s, "png")
-    img_bytes = img.tobytes()
-
-    return pygame.image.fromstring(img_bytes, img.size, img.mode)
+#
+# def load_from_text(text: str) -> Any:
+#     text = text.strip("text:")
+#     img: Image = Image.new("RGBA", (200, 200))
+#     d = ImageDraw.Draw(img)
+#     font = ImageFont.truetype("../assets/OpenSansEmoji.ttf", 20)
+#     d.text((0, 100), text, fill=(255, 0, 255), font=font)
+#     s = io.BytesIO()
+#     img.save(s, "png")
+#     img_bytes = img.tobytes()
+#
+#     return pygame.image.fromstring(img_bytes, img.size, img.mode)
 
 
 def _init(level_name: str) -> None:
@@ -56,10 +55,10 @@ def get(name: str, with_alpha: bool = True, resize: Tuple[int, int] = None) -> S
     name = get_random_choice(name)
     if name not in _bank:
         logger.warning(f"sprite {name} not found")
-        if name.startswith("text:"):
-            _bank[name] = load_from_text(name)
-        else:
-            name = "not_found"
+        # if name.startswith("text:"):
+        #     _bank[name] = load_from_text(name)
+        # else:
+        name = "not_found"
     loaded_sprite = _bank[name]
     if resize:
         loaded_sprite = scale_surface(loaded_sprite, resize)

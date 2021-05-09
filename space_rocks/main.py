@@ -1,4 +1,4 @@
-from game import Game
+from space_rocks.game import Game
 
 if __name__ == "__main__":
     game = Game()

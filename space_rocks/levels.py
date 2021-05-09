@@ -8,18 +8,12 @@ from jsonschema import validate
 from pygame import Vector2
 from pygame.surface import Surface
 
-import constants
-from background import Background
-from models import (
-    Enemy,
-    Bullet,
-    EnemyProperties,
-    GameObject,
-    BulletProperties,
-)
-from player import PlayerProperties, Player
-from utils import get_safe_enemy_distance
-from window import window
+from space_rocks import constants
+from space_rocks.background import Background
+from space_rocks.models import Enemy, Bullet, EnemyProperties, BulletProperties, GameObject
+from space_rocks.player import PlayerProperties, Player
+from space_rocks.utils import get_safe_enemy_distance
+from space_rocks.window import window
 
 logger = logging.getLogger(__name__)
 
@@ -142,9 +136,6 @@ class Level:
             game_objects.append(self._player)
         return game_objects
 
-    def remove_player(self):
-        self._player = None
-
     def remove_bullet(self, bullet: Bullet):
         self._bullets.remove(bullet)
 
@@ -153,18 +144,18 @@ class Level:
 
 
 class World:
-    def _load_level(self, screen: Surface, directory: str) -> Callable:
+    def _load_level(self, screen: Surface, directory: str) -> Callable[[], Level]:
         return lambda: Level(
             screen, os.path.join(constants.LEVELS_ROOT, directory, ".json")
         )
 
     def __init__(self, screen: Surface):
-        self._levels: Dict[int, Tuple[str, Callable]] = {}
+        self._levels: Dict[int, Tuple[str, Callable[[], Level]]] = {}
         for d in os.listdir(constants.LEVELS_ROOT):
             if not d.startswith(".") and os.path.isdir(
-                os.path.join(constants.LEVELS_ROOT, d)
+                    os.path.join(constants.LEVELS_ROOT, d)
             ):
-                (k, v) = d.split("_")
+                (k, _) = d.split("_")
                 self._levels[int(k)] = (d, self._load_level(screen, d))
 
         self._current_level_id = -1

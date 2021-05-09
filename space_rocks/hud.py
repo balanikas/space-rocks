@@ -1,20 +1,22 @@
-import pygame.freetype
-from pygame import Surface, Rect, Color
-from pygame.font import Font
+from typing import Optional
 
-from decorators import timer
-from player import ActiveWeapon
+import pygame.freetype
+from pygame import Rect, Color
+from pygame.surface import Surface
+
+from space_rocks.decorators import timer
+from space_rocks.player import ActiveWeapon
 from space_rocks.utils import create_surface_alpha
-from window import window
+from space_rocks.window import window
 
 
 class UIText:
-    def __init__(self, rect: Rect, color: Color, font: Font):
+    def __init__(self, rect: Rect, color: Color, font: pygame.freetype.Font):
         self._rect = rect
         self._color = color
         self._font = font
 
-    def draw(self, surface: Surface, text, color: Color = None):
+    def draw(self, surface: Surface, text:str, color: Optional[Color] = None):
         color = color if color else self._color
         text_surface, _ = self._font.render(text, color, None)
         surface.blit(text_surface, self._rect)
@@ -37,7 +39,6 @@ class HUD:
         self._red = Color(255, 0, 0, 255)
         self._font = pygame.freetype.Font("../assets/OpenSansEmoji.ttf", 40)
 
-        x = 0
         y = window.height * 0.95
         w = window.width
         h = window.height * 0.05
@@ -51,16 +52,16 @@ class HUD:
 
     @timer
     def draw(
-        self,
-        screen: Surface,
-        armor: float,
-        damage: float,
-        weapon: ActiveWeapon,
-        level_name: str,
+            self,
+            screen: Surface,
+            armor: float,
+            damage: float,
+            weapon: ActiveWeapon,
+            level_name: str,
     ):
         self._background.draw(screen)
 
-        armor_color = self._red if armor < 10 else None
+        armor_color = self._red if armor < 10 else self._white
         self._armor.draw(screen, f"⛨{armor}", armor_color)
         self._damage.draw(screen, f"👊{damage}")
         self._weapon.draw(screen, "🔫" if weapon == ActiveWeapon.PRIMARY else "🚀")

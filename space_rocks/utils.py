@@ -7,9 +7,10 @@ from pygame.math import Vector2
 from pygame.sprite import Sprite
 from pygame.surface import Surface
 from pygame.transform import rotozoom
+from pygame.rect import Rect
 
-from geometry import Geometry
-from window import window
+from space_rocks.geometry import Geometry
+from space_rocks.window import window
 
 
 def get_random_position(surface: Surface) -> Vector2:
@@ -20,7 +21,6 @@ def get_random_position(surface: Surface) -> Vector2:
 
 
 def get_random_velocity(min_speed: float, max_speed: float) -> Vector2:
-
     speed = random.uniform(min_speed, max_speed) * random.uniform(0.5, 1.5)
     angle = random.randrange(0, 360)
     return Vector2(speed, 0).rotate(angle)
@@ -49,7 +49,7 @@ def sprite_collide(a: Sprite, b: Sprite):
     )
 
 
-def get_safe_enemy_distance(screen, player_position: Vector2) -> Vector2:
+def get_safe_enemy_distance(screen: Surface, player_position: Vector2) -> Vector2:
     min_enemy_distance = 350
     while True:
         position = get_random_position(screen)
@@ -65,7 +65,7 @@ def get_resize_factor(factor: float) -> Tuple[int, int]:
 
 
 def bounce_edge(
-    surface: Surface, edge_offset: int, velocity_decrease: float, geometry: Geometry
+        surface: Surface, edge_offset: int, velocity_decrease: float, geometry: Geometry
 ) -> Geometry:
     assert edge_offset > 0
     assert 0 < velocity_decrease <= 1
@@ -114,9 +114,10 @@ def get_random_choice(text: str) -> str:
     )  # randomize what to play if many
 
 
-def get_blit_position(surface: Surface, geometry: Geometry):
+def get_blit_position(surface: Surface, position: Vector2):
     surface_size = Vector2(surface.get_size())
-    return geometry.position - surface_size * 0.5
+    blit_position = position - surface_size * 0.5
+    return (int(blit_position.x), int(blit_position.y))
 
 
 def scale_surface(surface: Surface, size: Tuple[int, int]) -> Surface:
@@ -124,7 +125,7 @@ def scale_surface(surface: Surface, size: Tuple[int, int]) -> Surface:
 
 
 def create_surface_alpha(size: Tuple[int, int]) -> Surface:
-    return pygame.Surface(size, pygame.SRCALPHA)
+    return Surface(size, pygame.SRCALPHA)
 
 
 def create_surface_from_image(image_file_path: str):

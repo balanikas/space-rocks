@@ -5,16 +5,15 @@ from typing import Dict
 import pygame
 from pygame.mixer import Sound
 
-import constants
-from utils import get_random_choice
+from space_rocks import constants
+from space_rocks.utils import get_random_choice
 
 logger = logging.getLogger(__name__)
-
 
 _bank: Dict[str, Sound] = {}
 
 
-def _init(level_name):
+def _init(level_name:str):
     def _load_from(path: str):
         for root, _, files in os.walk(path):
             for f in files:
@@ -54,7 +53,7 @@ def stop(name: str):
 
 
 def stop_all():
-    for k, v in _bank.items():
+    for _, v in _bank.items():
         v.stop()
 
 

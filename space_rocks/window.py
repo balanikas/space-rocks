@@ -3,7 +3,7 @@ from typing import Tuple
 import pygame
 from pygame import Vector2
 
-import constants
+from space_rocks import constants
 
 
 class Window:
@@ -29,7 +29,7 @@ class Window:
 
     @property
     def center(self) -> Tuple[int, int]:
-        return self._size[0] / 2, self._size[1] / 2
+        return int(self._size[0] / 2), int(self._size[1] / 2)
 
     def resize(self):
         info = pygame.display.Info()

@@ -1,19 +1,20 @@
-from pygame import Vector2, Surface
+from pygame.math import Vector2
+from pygame.surface import Surface
 
-import audio as sounds
-import graphics as gfx
+
+import space_rocks.audio as sounds
+import space_rocks.graphics as gfx
 from space_rocks.utils import scale_surface
-from window import window
+from space_rocks.window import window
 
 
 class Background:
     def _initialize(self):
-
         self._image = gfx.get(self._image_name, False)
         target_size = Vector2(window.width * 1.2, window.height * 1.2)
         source_size = Vector2(self._image.get_size())
-        delta_x, delta_y = source_size - target_size
-        if delta_x < 0 or delta_y < 0:
+        delta = source_size - target_size
+        if delta.x < 0 or delta.y < 0:
             self._image = scale_surface(
                 self._image, (int(target_size.x), int(target_size.y))
             )
@@ -30,10 +31,10 @@ class Background:
 
     def draw(self, surface: Surface, pos: Vector2):
         position = (
-            pos - Vector2(window.center)
-        ) * -0.2  # ensures background moves slower than player
-        position += self._offset
-        surface.blit(self._image, position)
+                           pos - Vector2(window.center)
+                   ) * -0.2  # ensures background moves slower than player
+        position += Vector2(self._offset)
+        surface.blit(self._image, (int(position.x), int(position.y)))
 
     def resize(self):
         self._initialize()

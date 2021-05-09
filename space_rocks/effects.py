@@ -1,17 +1,18 @@
 import pygame
-from pygame import Vector2, Surface
-
-import audio as sounds
-import graphics as gfx
-from utils import scale_surface, create_surface_alpha
-from window import window
+from pygame import Vector2
+from pygame.color import Color
+from pygame.surface import  Surface
+import space_rocks.audio as sounds
+import space_rocks.graphics as gfx
+from space_rocks.utils import scale_surface, create_surface_alpha
+from space_rocks.window import window
 
 
 class GradientEffect:
     def __init__(self, focus_point: Vector2):
         self._focus_point = focus_point
 
-    def _gradient_rect(self, surface, left_colour, right_colour, target_rect):
+    def _gradient_rect(self, surface: Surface, left_colour : Color, right_colour:Color, target_rect: pygame.Rect):
         """ Draw a horizontal-gradient filled rectangle covering <target_rect> """
         colour_rect = create_surface_alpha((2, 2))
         pygame.draw.line(colour_rect, left_colour, (0, 0), (0, 1))  # left colour line
@@ -32,15 +33,15 @@ class GradientEffect:
     def draw(self, surface: Surface):
         self._gradient_rect(
             surface,
-            (0, 0, 200, 100),
-            (0, 0, 200, 0),
+            Color(0, 0, 200, 100),
+            Color(0, 0, 200, 0),
             pygame.Rect(0, 0, self._focus_point.x, window.height),
         )
 
         self._gradient_rect(
             surface,
-            (200, 0, 0, 0),
-            (200, 0, 0, 100),
+            Color(200, 0, 0, 0),
+            Color(200, 0, 0, 100),
             pygame.Rect(self._focus_point.x, 0, window.width, window.height),
         )
 

@@ -1,24 +1,25 @@
 import json
 import logging
 import os
-from typing import Dict, Tuple, NamedTuple
+from typing import Dict, Tuple, NamedTuple, List, Optional
 
 from pygame.math import Vector2
+from pygame.rect import Rect
 from pygame.surface import Surface
 
-import constants
-from utils import get_random_choice, scale_surface, create_surface_from_image
+from space_rocks import constants
+from space_rocks.utils import get_random_choice, scale_surface, create_surface_from_image, get_blit_position
 
 logger = logging.getLogger(__name__)
 
 
 class Animation:
     def __init__(
-        self,
-        frames: list[Surface],
-        position: Vector2,
-        speed: float,
-        repeat: bool = False,
+            self,
+            frames: list[Surface],
+            position: Vector2,
+            speed: float,
+            repeat: bool = False,
     ):
         self._frames = frames
         self._time = 0.0
@@ -46,7 +47,7 @@ class Animation:
             self._frame_index = 0
 
         img = self._frames[self._frame_index]
-        blit_position = self._position - (Vector2(img.get_size()) * 0.5)
+        blit_position = get_blit_position(img, self._position)
         surface.blit(img, blit_position)
 
 
@@ -59,11 +60,11 @@ _bank: Dict[str, AnimationData] = {}
 
 
 def _init(level_name: str) -> None:
-    def create_frames(img: Surface, rows, columns) -> list[Surface]:
+    def create_frames(img: Surface, rows : int, columns: int) -> list[Surface]:
         h = int(img.get_height() / rows)
         w = int(img.get_width() / columns)
         size = w, h
-        images = []
+        images : List[Surface]= []
         orig_alpha = img.get_alpha()
         orig_ckey = img.get_colorkey()
         img.set_colorkey(None)
@@ -72,7 +73,7 @@ def _init(level_name: str) -> None:
         for y in range(0, img.get_height(), h):
             for x in range(0, img.get_width(), w):
                 i = Surface(size)
-                i.blit(img, (0, 0), ((x, y), size))
+                i.blit(img, (0, 0), Rect(x, y, w,h))
                 if orig_alpha:
                     i.set_colorkey((0, 0, 0))
                 elif orig_ckey:
@@ -110,7 +111,7 @@ def _init(level_name: str) -> None:
     _load_from(constants.ANIM_ASSETS_ROOT)
 
 
-def get(name: str, position: Vector2, resize: Tuple[int, int] = None) -> Animation:
+def get(name: str, position: Vector2, resize: Optional[Tuple[int, int]] = None) -> Animation:
     name = get_random_choice(name)
 
     if name not in _bank:

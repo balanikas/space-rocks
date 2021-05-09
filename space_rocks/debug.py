@@ -1,19 +1,19 @@
 import os
-from typing import Sequence
+from typing import Sequence, List
 
 import psutil
 import pygame
-from pygame import Surface
+from pygame.surface import Surface
 from pygame.color import Color
 from pygame.math import Vector2
 
-import animation as anim
-import audio as sounds
-import graphics as gfx
-from decorators import func_timings
-from models import GameObject
-from utils import create_surface_alpha, create_default_font
-from window import window
+import space_rocks.animation as anim
+import space_rocks.audio as sounds
+import space_rocks.graphics as gfx
+from space_rocks.decorators import func_timings
+from space_rocks.models import GameObject
+from space_rocks.utils import create_surface_alpha, create_default_font
+from space_rocks.window import window
 
 
 class Debug:
@@ -25,7 +25,7 @@ class Debug:
         self._surface = create_surface_alpha((window.width, window.height))
         self._surface.fill(Color(0, 0, 0, 128))
 
-    def _draw_lines(self, surface: Surface, lines: []):
+    def _draw_lines(self, surface: Surface, lines: List[str]):
         y = 0
         for l in lines:
             text_surface = self._font.render(
@@ -37,7 +37,7 @@ class Debug:
             y += 25
 
     def draw_text(
-        self, surface: Surface, position: Vector2, velocity: Vector2, direction: Vector2
+            self, surface: Surface, position: Vector2, velocity: Vector2, direction: Vector2
     ):
         if not self.enabled:
             return

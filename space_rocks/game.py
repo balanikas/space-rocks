@@ -2,26 +2,25 @@ import logging
 from typing import Optional
 
 import pygame
-from pygame.locals import *
 
-import animation as anim
-import audio as sounds
-import constants
-import graphics as gfx
-from debug import Debug
-from decorators import timer
-from editing import LevelObserver
-from hud import HUD
-from levels import World, Level
-from menu import Menu
-from models import GameState
-from ui import UI
-from utils import collides_with, sprite_collide, is_in_screen, init_display, init_fonts
-from window import window
+import space_rocks.animation as anim
+import space_rocks.audio as sounds
+import space_rocks.graphics as gfx
+from space_rocks import constants
+from space_rocks.debug import Debug
+from space_rocks.decorators import timer
+from space_rocks.editing import LevelObserver
+from space_rocks.hud import HUD
+from space_rocks.levels import Level, World
+from space_rocks.menu import Menu
+from space_rocks.models import GameState
+from space_rocks.ui import UI
+from space_rocks.utils import is_in_screen, collides_with, sprite_collide, init_display, init_fonts
+from space_rocks.window import window
 
 
 class Game:
-    def set_level(self, level):
+    def set_level(self, level:int):
         self._world.set_current_level(level)
 
     def start_the_game(self):
@@ -87,9 +86,9 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
-            elif event.type == VIDEORESIZE:
+            elif event.type == pygame.VIDEORESIZE:
                 pass
-            elif event.type == VIDEOEXPOSE:
+            elif event.type == pygame.VIDEOEXPOSE:
                 pass
 
             if event.type == pygame.KEYDOWN:

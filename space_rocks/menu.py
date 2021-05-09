@@ -4,16 +4,16 @@ import pygame_menu
 from pygame import Color
 from pygame_menu import sound
 
-import constants
-from window import window
+from space_rocks import constants
+from space_rocks.window import window
 
 
 class Menu:
     def __init__(
-        self,
-        on_change_level: Callable,
-        on_start_game: Callable,
-        all_levels: List[Tuple[str, int]],
+            self,
+            on_change_level: Callable,
+            on_start_game: Callable,
+            all_levels: List[Tuple[str, int]],
     ):
         engine = sound.Sound()
         engine.set_sound(
@@ -23,8 +23,7 @@ class Menu:
         theme = pygame_menu.themes.THEME_DARK.copy()
         theme.set_background_color_opacity(0.3)
         theme.title_bar_style = pygame_menu.widgets.MENUBAR_STYLE_NONE
-        theme.widget_font_size = int(50 * min(window.factor))
-        # theme.background_color =
+        theme.widget_font_size = int(50 * min(window.factor.x, window.factor.y))
         theme.selection_color = Color(0, 255, 0)
         self.menu = pygame_menu.Menu(
             "menu",
