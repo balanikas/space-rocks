@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 _bank: Dict[str, Sound] = {}
 
 
-def _init(level_name:str):
+def _init(level_name: str):
     def _load_from(path: str):
         for root, _, files in os.walk(path):
             for f in files:
@@ -77,9 +77,7 @@ def init_audio():
     pygame.mixer.pre_init(44100, -16, 2, 128)
     pygame.init()
 
-    lines = []
     info = pygame.mixer.get_init()
     logger.info(f"Sound Frequency: {info[0]:d}")
     logger.info(f"Sound Quality: {abs(info[1]):d} bits")
     logger.info(f"Sound Channels: {('Mono', 'Stereo')[info[2] - 1]}")
-    print(lines)

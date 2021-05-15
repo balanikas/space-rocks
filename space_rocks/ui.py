@@ -14,7 +14,7 @@ class UI:
         self._sound_played = False
 
     def _print_text(
-            self, surface: Surface, text: str, font: Font, color: Color = Color(0, 255, 0)
+        self, surface: Surface, text: str, font: Font, color: Color = Color(0, 255, 0)
     ):
         text_surface = font.render(text, True, color)
         if not text_surface:

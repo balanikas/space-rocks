@@ -6,11 +6,17 @@ from pygame import Vector2
 from pygame.surface import Surface
 
 import space_rocks.animation as anim
-import space_rocks.audio as  sounds
+import space_rocks.audio as sounds
 import space_rocks.graphics as gfx
 from space_rocks.geometry import Geometry
 from space_rocks.models import Bullet, BulletProperties, GameObject
-from space_rocks.utils import bounce_other, get_blit_position, scale_and_rotate, bounce_edge, get_resize_factor
+from space_rocks.utils import (
+    bounce_other,
+    get_blit_position,
+    scale_and_rotate,
+    bounce_edge,
+    get_resize_factor,
+)
 from space_rocks.window import window
 
 
@@ -41,18 +47,18 @@ class Player(GameObject):
     UP = Vector2(0, -1)
 
     def __init__(
-            self,
-            properties: PlayerProperties,
-            position: Vector2,
-            create_bullet_callback: Callable[[Any], None],
+        self,
+        properties: PlayerProperties,
+        position: Vector2,
+        create_bullet_callback: Callable[[Any], None],
     ):
         self._p = properties
         self._create_bullet_callback = create_bullet_callback
-        self._direction = Vector2(self.UP)
+        self._direction = self.UP
         self._active_weapon = ActiveWeapon.PRIMARY
         self._last_shot = 0
         self._armor = self._p.armor
-        self._angle = 0
+        self._angle = 0.0
 
         super().__init__(
             position,
@@ -85,7 +91,10 @@ class Player(GameObject):
 
     def move(self, surface: Surface):
         self.geometry = bounce_edge(surface, 50, 0.6, self.geometry)
-        self.rect.center = (int(self.geometry.position.x), int(self.geometry.position.y))
+        self.rect.center = (
+            int(self.geometry.position.x),
+            int(self.geometry.position.y),
+        )
 
     def draw(self, surface: Surface):
         if self.armor <= 0:
@@ -141,7 +150,7 @@ class Player(GameObject):
         else:
             sounds.play(self._p.sound_on_impact)
 
-    def get_impact_animation(self):
+    def get_impact_animation(self) -> anim.Animation:
         return anim.get(
             self._p.anim_on_destroy, self.geometry.position, resize=(200, 200)
         )

@@ -30,8 +30,8 @@ class Background:
 
     def draw(self, surface: Surface, pos: Vector2):
         position = (
-                           pos - Vector2(window.center)
-                   ) * -0.2  # ensures background moves slower than player
+            pos - Vector2(window.center)
+        ) * -0.2  # ensures background moves slower than player
         position += Vector2(self._offset)
         surface.blit(self._image, (int(position.x), int(position.y)))
 

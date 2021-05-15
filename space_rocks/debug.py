@@ -37,14 +37,14 @@ class Debug:
             y += 25
 
     def draw_text(
-            self, surface: Surface, position: Vector2, velocity: Vector2, direction: Vector2
+        self, surface: Surface, position: Vector2, velocity: Vector2, direction: Vector2
     ):
         if not self.enabled:
             return
 
         surface.blit(self._surface, (0, 0))
 
-        lines = []
+        lines: List[str] = []
         lines.append(
             f"fps: {round(self._clock.get_fps(), 0)} | "
             f"win:{window.size} | "
@@ -69,31 +69,3 @@ class Debug:
         lines.append(f"sounds: {sounds.count()}")
         lines.append(f"animations: {anim.count()}")
         self._draw_lines(surface, lines)
-
-    def draw_visual(self, screen: pygame.Surface, objs: Sequence[GameObject]):
-        if not self.enabled:
-            return
-
-        for o in objs:
-            points = pygame.mask.from_surface(o.image).outline()
-            if len(points) < 2:
-                continue
-
-            pygame.draw.polygon(
-                o.image,
-                (0, 255, 0),
-                points,
-                1,
-            )
-            rect = o.rect
-            pygame.draw.rect(
-                screen,
-                (0, 255, 0),
-                (
-                    o.geometry.position.x - (rect.width / 2),
-                    o.geometry.position.y - (rect.height / 2),
-                    rect.width,
-                    rect.height,
-                ),
-                1,
-            )

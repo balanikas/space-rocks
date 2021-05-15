@@ -16,7 +16,7 @@ class UIText:
         self._color = color
         self._font = font
 
-    def draw(self, surface: Surface, text:str, color: Optional[Color] = None):
+    def draw(self, surface: Surface, text: str, color: Optional[Color] = None):
         color = color if color else self._color
         text_surface, _ = self._font.render(text, color, None)
         surface.blit(text_surface, self._rect)
@@ -52,12 +52,12 @@ class HUD:
 
     @timer
     def draw(
-            self,
-            screen: Surface,
-            armor: float,
-            damage: float,
-            weapon: ActiveWeapon,
-            level_name: str,
+        self,
+        screen: Surface,
+        armor: float,
+        damage: float,
+        weapon: ActiveWeapon,
+        level_name: str,
     ):
         self._background.draw(screen)
 

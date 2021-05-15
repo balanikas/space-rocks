@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from typing import List, Sequence, Tuple, Callable, Dict
+from typing import Any, List, Sequence, Tuple, Callable, Dict
 
 import jsonschema
 from jsonschema import validate
@@ -10,7 +10,13 @@ from pygame.surface import Surface
 
 from space_rocks import constants
 from space_rocks.background import Background
-from space_rocks.models import Enemy, Bullet, EnemyProperties, BulletProperties, GameObject
+from space_rocks.models import (
+    Enemy,
+    Bullet,
+    EnemyProperties,
+    BulletProperties,
+    GameObject,
+)
 from space_rocks.player import PlayerProperties, Player
 from space_rocks.utils import get_safe_enemy_distance
 from space_rocks.window import window
@@ -83,7 +89,7 @@ class Level:
         self._enemies: List[Enemy] = []
 
         for a in data["enemies"]:
-            player_props = {}
+            enemy_props = {}
             c = len(a["tiers"])
             for t in a["tiers"]:
                 p = EnemyProperties(
@@ -100,13 +106,13 @@ class Level:
                     t["anim_on_destroy"],
                 )
                 p.validate()
-                player_props[c] = p
+                enemy_props[c] = p
                 c = c - 1
 
             position = get_safe_enemy_distance(screen, self.player.geometry.position)
 
             self._enemies.append(
-                Enemy(player_props, position, self._enemies.append, len(a["tiers"]))
+                Enemy(enemy_props, position, self._enemies.append, len(a["tiers"]))
             )
 
         self._background: Background = Background(
@@ -153,7 +159,7 @@ class World:
         self._levels: Dict[int, Tuple[str, Callable[[], Level]]] = {}
         for d in os.listdir(constants.LEVELS_ROOT):
             if not d.startswith(".") and os.path.isdir(
-                    os.path.join(constants.LEVELS_ROOT, d)
+                os.path.join(constants.LEVELS_ROOT, d)
             ):
                 (k, _) = d.split("_")
                 self._levels[int(k)] = (d, self._load_level(screen, d))
@@ -195,7 +201,7 @@ class World:
             self._current_level_id = len(self._levels) - 1
 
     def get_all_levels(self) -> List[Tuple[str, int]]:
-        levels = []
+        levels: List[Any] = []
         for k, v in self._levels.items():
             levels.append((v[0], k))
 

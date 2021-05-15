@@ -10,8 +10,15 @@ import space_rocks.animation as anim
 import space_rocks.audio as sounds
 import space_rocks.graphics as gfx
 from space_rocks.geometry import Geometry
-from space_rocks.utils import bounce_other, bounce_edge, get_blit_position, scale_and_rotate, get_resize_factor, \
-    get_random_velocity, get_random_rotation
+from space_rocks.utils import (
+    bounce_other,
+    bounce_edge,
+    get_blit_position,
+    scale_and_rotate,
+    get_resize_factor,
+    get_random_velocity,
+    get_random_rotation,
+)
 from space_rocks.window import window
 
 
@@ -26,9 +33,9 @@ class GameState(Enum):
 class GameObject(pygame.sprite.Sprite):
     def __init__(self, position: Vector2, image: Surface, velocity: Vector2):
         super(GameObject, self).__init__()
-        self.image = image
+        self.image :Surface= image
         self.geometry = Geometry(position, image.get_width() / 2, velocity)
-        self.rect = image.get_rect(center=position)
+        self.rect = self.image.get_rect(center=position)
 
     def move(self, surface: Surface):
         pass
@@ -111,16 +118,16 @@ class EnemyProperties(NamedTuple):
 
 class Enemy(GameObject):
     def __init__(
-            self,
-            properties: Dict[int, EnemyProperties],
-            position: Vector2,
-            create_enemy_callback: Callable[[Any], None],
-            tier: int,
+        self,
+        properties: Dict[int, EnemyProperties],
+        position: Vector2,
+        create_enemy_callback: Callable[[Any], None],
+        tier: int,
     ):
         self._properties = properties
         self._create_enemy_callback = create_enemy_callback
         self._tier = tier
-        self._angle = 0
+        self._angle = 0.0
         self._p = self._properties[self._tier]
         self._scale = self._p.scale
         self._armor = self._p.armor
@@ -155,7 +162,10 @@ class Enemy(GameObject):
 
     def move(self, surface: Surface):
         self.geometry = bounce_edge(surface, 20, 1, self.geometry)
-        self.rect.center = (int(self.geometry.position.x), int(self.geometry.position.y))
+        self.rect.center = (
+            int(self.geometry.position.x),
+            int(self.geometry.position.y),
+        )
 
     def split(self):
         sounds.play(self._p.sound_on_destroy)

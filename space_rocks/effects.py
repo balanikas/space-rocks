@@ -13,7 +13,13 @@ class GradientEffect:
     def __init__(self, focus_point: Vector2):
         self._focus_point = focus_point
 
-    def _gradient_rect(self, surface: Surface, left_colour : Color, right_colour:Color, target_rect: pygame.Rect):
+    def _gradient_rect(
+        self,
+        surface: Surface,
+        left_colour: Color,
+        right_colour: Color,
+        target_rect: pygame.Rect,
+    ):
         """ Draw a horizontal-gradient filled rectangle covering <target_rect> """
         colour_rect = create_surface_alpha((2, 2))
         pygame.draw.line(colour_rect, left_colour, (0, 0), (0, 1))  # left colour line

@@ -64,7 +64,7 @@ def get_resize_factor(factor: float) -> Tuple[int, int]:
 
 
 def bounce_edge(
-        surface: Surface, edge_offset: int, velocity_decrease: float, geometry: Geometry
+    surface: Surface, edge_offset: int, velocity_decrease: float, geometry: Geometry
 ) -> Geometry:
     assert edge_offset > 0
     assert 0 < velocity_decrease <= 1

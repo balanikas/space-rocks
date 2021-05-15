@@ -1,15 +1,20 @@
 import logging
 import os
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 from pygame.surface import Surface
 
 from space_rocks import constants
-from space_rocks.utils import scale_surface, get_random_choice, create_surface_from_image
+from space_rocks.utils import (
+    scale_surface,
+    get_random_choice,
+    create_surface_from_image,
+)
 
 logger = logging.getLogger(__name__)
 
 _bank: Dict[str, Surface] = {}
+
 
 #
 # def load_from_text(text: str) -> Any:
@@ -48,13 +53,12 @@ def _init(level_name: str) -> None:
     _load_from(constants.GFX_ASSETS_ROOT)
 
 
-def get(name: str, with_alpha: bool = True, resize: Tuple[int, int] = None) -> Surface:
+def get(
+    name: str, with_alpha: bool = True, resize: Optional[Tuple[int, int]] = None
+) -> Surface:
     name = get_random_choice(name)
     if name not in _bank:
         logger.warning(f"sprite {name} not found")
-        # if name.startswith("text:"):
-        #     _bank[name] = load_from_text(name)
-        # else:
         name = "not_found"
     loaded_sprite = _bank[name]
     if resize:

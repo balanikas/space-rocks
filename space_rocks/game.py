@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import List
 
 import pygame
 
@@ -15,12 +15,18 @@ from space_rocks.levels import Level, World
 from space_rocks.menu import Menu
 from space_rocks.models import GameState
 from space_rocks.ui import UI
-from space_rocks.utils import is_in_screen, collides_with, sprite_collide, init_display, init_fonts
+from space_rocks.utils import (
+    is_in_screen,
+    collides_with,
+    sprite_collide,
+    init_display,
+    init_fonts,
+)
 from space_rocks.window import window
 
 
 class Game:
-    def set_level(self, level:int):
+    def set_level(self, level: int):
         self._world.set_current_level(level)
 
     def start_the_game(self):
@@ -40,7 +46,8 @@ class Game:
         self._ui = UI()
         self._hud = HUD()
         self._world = World(self._screen)
-        self._level: Optional[Level]
+        self._level: Level
+        self._effects: List[anim.Animation]
         self._menu = Menu(
             self.set_level,
             self.start_the_game,

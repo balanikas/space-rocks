@@ -10,10 +10,10 @@ from space_rocks.window import window
 
 class Menu:
     def __init__(
-            self,
-            on_change_level: Callable,
-            on_start_game: Callable,
-            all_levels: List[Tuple[str, int]],
+        self,
+        on_change_level: Callable,
+        on_start_game: Callable,
+        all_levels: List[Tuple[str, int]],
     ):
         engine = sound.Sound()
         engine.set_sound(
