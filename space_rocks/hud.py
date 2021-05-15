@@ -37,7 +37,7 @@ class HUD:
         self._white = Color(255, 255, 255, 255)
         self._background_color = Color(0, 0, 0, 180)
         self._red = Color(255, 0, 0, 255)
-        self._font = pygame.freetype.Font("../assets/OpenSansEmoji.ttf", 40)
+        self._font = pygame.freetype.Font("assets/OpenSansEmoji.ttf", 40)
 
         y = window.height * 0.95
         w = window.width
