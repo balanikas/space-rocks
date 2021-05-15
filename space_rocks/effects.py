@@ -1,7 +1,8 @@
 import pygame
 from pygame import Vector2
 from pygame.color import Color
-from pygame.surface import  Surface
+from pygame.surface import Surface
+
 import space_rocks.audio as sounds
 import space_rocks.graphics as gfx
 from space_rocks.utils import scale_surface, create_surface_alpha

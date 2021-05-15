@@ -3,9 +3,9 @@ from typing import Sequence, List
 
 import psutil
 import pygame
-from pygame.surface import Surface
 from pygame.color import Color
 from pygame.math import Vector2
+from pygame.surface import Surface
 
 import space_rocks.animation as anim
 import space_rocks.audio as sounds

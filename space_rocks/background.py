@@ -1,7 +1,6 @@
 from pygame.math import Vector2
 from pygame.surface import Surface
 
-
 import space_rocks.audio as sounds
 import space_rocks.graphics as gfx
 from space_rocks.utils import scale_surface

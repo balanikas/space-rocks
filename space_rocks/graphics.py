@@ -1,10 +1,7 @@
-import io
 import logging
 import os
-from typing import Dict, Tuple, Any
+from typing import Dict, Tuple
 
-import pygame
-from PIL import Image, ImageDraw, ImageFont
 from pygame.surface import Surface
 
 from space_rocks import constants

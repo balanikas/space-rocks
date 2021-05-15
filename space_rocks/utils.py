@@ -7,7 +7,6 @@ from pygame.math import Vector2
 from pygame.sprite import Sprite
 from pygame.surface import Surface
 from pygame.transform import rotozoom
-from pygame.rect import Rect
 
 from space_rocks.geometry import Geometry
 from space_rocks.window import window
